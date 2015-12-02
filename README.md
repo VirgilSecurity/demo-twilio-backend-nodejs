@@ -1,6 +1,8 @@
 # Virgil IP Messaging
 
-## Instructions
+This is an instruction how to install and integrate Virgil Security to Twilio IP messaging API.
+
+## Publish
 
 Only two steps to publish Virgil History Service :)
 
