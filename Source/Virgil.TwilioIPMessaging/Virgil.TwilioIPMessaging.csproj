@@ -177,10 +177,7 @@
     <Content Include="js\FileSaver.js" />
     <Content Include="js\FileSaver.min.js" />
     <Content Include="js\knockoutjs.utils.js" />
-    <Content Include="js\twilio-sdk.js" />
-    <Content Include="js\viewModel.js" />
-    <Content Include="js\virgil-sdk-keys-public.dev.js" />
-    <Content Include="js\virgil-sdk-keys-public.min.js" />
+    <Content Include="js\app.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

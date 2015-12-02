@@ -13,8 +13,10 @@
         <div class="row" data-bind="visible: currentState() < 3">
             <div class="col-md-4 col-md-offset-4">
                 <div class="auth-form">
-                    <h3 class="text-center title"><b>Virgil</b> IP Messaging</h3>
-                    <div data-bind="visible: currentState() == 0" style="display:none">
+                    <h3 class="text-center title">
+                        <b>Virgil</b> IP Messaging
+                    </h3>
+                    <div data-bind="visible: currentState() == 0" style="display: none">
                         <div class="form-group">
                             <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
                             <p class="help-block">This e-mail address used to register your public key on our service.</p>
@@ -22,10 +24,10 @@
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input data-bind="checked: hasPrivateKey" type="checkbox">  Use enterprise Virgil private key sync or load keys manually.
+                                <input data-bind="checked: hasPrivateKey" type="checkbox"> Use enterprise Virgil private key sync or load keys manually.
                             </label>
                         </div>
-                        <div data-bind="visible: hasPrivateKey" style="display:none" class="form-group">
+                        <div data-bind="visible: hasPrivateKey" style="display: none" class="form-group">
                             <input type="file" id="privateKeyInputFile">
                         </div>
                         <div class="auth-form-footer">
@@ -33,7 +35,7 @@
                             <button type="submit" data-bind="click: register" class="btn btn-primary btn-block">Login</button>
                         </div>
                     </div>
-                    <div class="form-confirm" data-bind="visible: currentState() == 1" style="display:none">
+                    <div class="form-confirm" data-bind="visible: currentState() == 1" style="display: none">
                         <div class="form-group">
                             <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
                             <p class="help-block">Please check your e-mail box and use confirmation code to verify your account.</p>
@@ -55,10 +57,12 @@
                 </div>
             </div>
         </div>
-        <div data-bind="visible: currentState() == 3" style="display:none">
+        <div data-bind="visible: currentState() == 3" style="display: none">
             <div class="row">
                 <div class="col-md-12">
-                    <h3 class="text-center title"><b>Virgil</b> IP Messaging</h3>
+                    <h3 class="text-center title">
+                        <b>Virgil</b> IP Messaging
+                    </h3>
                 </div>
             </div>
             <div class="row">
@@ -74,7 +78,7 @@
                                         <li><a href="#" data-bind="text: friendlyName, click: $root.setChannel"></a></li>
                                     </ul>
                                 </div>
-                                <button type="button" data-bind="click: createChannel, enable: !isCurrentChannelLoading()" class="btn btn-default">Create</button>
+                                <button type="button" data-toggle="modal" data-target="#createChannelModal"  class="btn btn-default">Create</button>
                             </div>
                         </div>
                         <ul class="nav navbar-nav navbar-right">
@@ -105,16 +109,43 @@
             </div>
         </div>
     </div>
+    <div id="createChannelModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Create Channel</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="channelName">Channel Name</label>
+                            <input type="email" class="form-control" id="channelName" data-bind="value: newChannelName, valueUpdate: 'afterkeydown'" placeholder="Enter Name...">
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" data-bind="checked: isNewChannelHistory" > History
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: createChannel, enable: !isCurrentChannelLoading() && newChannelName().length > 0" >Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
-    <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.7.4.b1-5dfdaf9/twilio-ip-messaging.min.js"></script>
+    <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.8.1/twilio-ip-messaging.js"></script>
     <script src="https://cdn.virgilsecurity.com/data/js/virgil-sdk-keys-public/latest/virgil-sdk-keys-public.min.js"></script>
     <script src="/js/knockoutjs.utils.js"></script>
     <script src="/js/FileSaver.js"></script>
-    <script src="/js/viewModel.js?56F21D85-ADEF-4265-92CE-0921BAC6E415"></script>
+    <script src="/js/app.js"></script>
     <script type="text/javascript">
-		ko.applyBindings(new ViewModel());
+        ko.applyBindings(new App());
     </script>
 
 </body>
