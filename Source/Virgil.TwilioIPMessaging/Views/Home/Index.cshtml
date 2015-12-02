@@ -65,7 +65,7 @@
                     </h3>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" >
                 <div class="col-md-8 col-md-offset-2">
                     <nav class="navbar navbar-default chat-header">
                         <div class="navbar-form navbar-left" role="search">
@@ -78,7 +78,8 @@
                                         <li><a href="#" data-bind="text: friendlyName, click: $root.setChannel"></a></li>
                                     </ul>
                                 </div>
-                                <button type="button" data-toggle="modal" data-target="#createChannelModal"  class="btn btn-default">Create</button>
+                                <button type="button" data-toggle="modal" data-bind="enable: !isCurrentChannelLoading()" data-target="#createChannelModal"  class="btn btn-default">Create</button>
+                                <img style="width: 20px;" data-bind="visible: isCurrentChannelLoading" src="/img/loading.gif" />
                             </div>
                         </div>
                         <ul class="nav navbar-nav navbar-right">
@@ -99,9 +100,9 @@
                     </div>
                     <div class="chat-input-panel">
                         <div class="input-group">
-                            <input type="text" data-bind="enable: currentChannel, value: inputMessage, valueUpdate: 'afterkeydown', executeOnEnter: postMessage" class="form-control" placeholder="Type a message here">
+                            <input type="text" data-bind="enable: currentChannel && !isCurrentChannelLoading(), value: inputMessage, valueUpdate: 'afterkeydown', executeOnEnter: postMessage" class="form-control" placeholder="Type a message here">
                             <span class="input-group-btn">
-                                <button data-bind="click: postMessage, enable: inputMessage().length > 0 && currentChannel" class="btn btn-primary btn-chat" type="button">Send</button>
+                                <button data-bind="click: postMessage, enable: inputMessage().length > 0 && currentChannel && !isCurrentChannelLoading()" class="btn btn-primary btn-chat" type="button">Send</button>
                             </span>
                         </div>
                     </div>

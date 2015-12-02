@@ -195,14 +195,19 @@ var App = function () {
     var onChannelLoaded = function (channel) {
 
         if (!channel.attributes.virgil_public_key) {
+            self.isCurrentChannelLoading(false);
             return;
         }
+
+        self.isCurrentChannelLoading(true);
 
         var url = "/api/history?channelSid=" + channel.sid + "&memberName=" + account.user_data.value;
         $.getJSON(url, function (data) {
             for (var i = 0; i < data.length; i++) {
                 onMessageAdded(data[i]);
             }
+
+            self.isCurrentChannelLoading(false);
         });
     };
 
@@ -229,7 +234,7 @@ var App = function () {
             .then(function (members) {
                 members.forEach(onMemberJoined);
                 onChannelLoaded(channel);
-                self.isCurrentChannelLoading(false);
+                // self.isCurrentChannelLoading(false);
             });
     }
 
@@ -269,7 +274,7 @@ var App = function () {
     self.createChannel = function () {
 
         $('#createChannelModal').modal('hide');
-        self.isCurrentChannelLoading = ko.observable(true);
+        self.isCurrentChannelLoading(true);
 
         var channelName = self.newChannelName();
 
@@ -290,7 +295,8 @@ var App = function () {
 
                 return messagingClient.createChannel(options);
             })
-            .then(function(channel) {
+            .then(function (channel) {
+                self.channels.push(channel);
                 self.setChannel(channel);
             });
     };
