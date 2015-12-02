@@ -22,3 +22,5 @@ Set Twilio & Virgil authentication tokens in web.config
   </appSettings>
 ```
 
+## Quick start guide
+To review the Twilio quick start guide adjustments please visit [this document](./Quick%20start%20guide.md).
