@@ -79,7 +79,7 @@ myChannel.getMembers()
     })
     .then(function(recipients) {
         var msg = $('#chat-input').val();
-        var encryptedMsg = vsCrypto.encrypt(message, recipients);
+        var encryptedMsg = Virgil.Crypto.encrypt(message, recipients);
         myChannel.sendMessage(encryptedMsg);    
     });
 ```
@@ -95,7 +95,7 @@ You can also be notified of any new incoming messages with an event handler. Thi
 // Listen for new messages sent to a channel
 myChannel.on('messageAdded', function(message) {
     // Decrypt the message using global public key id and private key values.
-    var decryptedMessage = vsCrypto.decryptWithKey(
+    var decryptedMessage = Virgil.Crypto.decryptWithKey(
         message.body,
         currentUserPublicKeyId,
         currentUserPrivateKey
