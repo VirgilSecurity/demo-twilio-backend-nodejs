@@ -5,8 +5,8 @@ In a Twilio IP Messaging application, a Channel is where all the action happens.
 Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. Let's also apply end-to-end encryption using Virgil Security's security infrastructure.
 
 * [Virgil Security infrastructure changes](#user-content-virgil-security-infrastructure-changes)
-  * [Register a Virgil Security developer's account](#user-content-register-virgil-developers-account)
-  * [Generate a new key pair for end-to-end encryption](#user-content-generate-new-key-pair-for-end-to-end-encryption)
+  * [Register a Virgil Security developer's account](#user-content-register-virgil-security-developers-account)
+  * [Generate a new key pair for end-to-end encryption](#user-content-generate-a-new-key-pair-for-end-to-end-encryption)
   * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
 * [Create a Channel](#user-content-create-a-channel)
 * [Send encrypted Messages to a Channel](#user-content-send-encrypted-messages-to-a-channel)
