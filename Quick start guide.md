@@ -20,7 +20,10 @@ and will be used to instantiate Virgil SDK client in the code below.
 
 ### Generate new key pair for end-to-end encryption
 ```javascript
-var generateKeyPair = Virgil.Crypto.generateKeysAsync('', 'KEYS_PASSWORD_GOES_HERE');
+var keyPair = Virgil.Crypto.generateKeys('', 'KEYS_PASSWORD_GOES_HERE');
+
+// Instantiate Virgil Keys client with developer's access token
+var vsKeysService = new Virgil.PublicKeysService('45fd8a505f50243fa8400594ba0b2b29');
 ```
 
 ### Publish the public key to the Virgil Keys service
@@ -36,19 +39,14 @@ var userIdentity = [{
     'value': 'User nickname'
 }];
 
-generateKeyPair.then(function(keyPair) {
-    // Instantiate Virgil Keys client with developer's access token
-    var vsKeysService = new Virgil.PublicKeysService('45fd8a505f50243fa8400594ba0b2b29');
-    
-    // Publish the key to the Virgil Keys infrastructure to make available for other users
-    vsKeysService.publish(keyPair, userIdentity).then(
-        function(response) {
-            // Save public and private keys values to the global variables for further encryption / decryption
-            currentUserPublicKeyId = response.id.public_key_id;
-            currentUserPrivateKey = keyPair.privateKey;
-        })
-    )); 
-});
+// Publish the key to the Virgil Keys infrastructure to make available for other users
+vsKeysService.publish(keyPair, userIdentity).then(
+    function(response) {
+        // Save public and private keys values to the global variables for further encryption / decryption
+        currentUserPublicKeyId = response.id.public_key_id;
+        currentUserPrivateKey = keyPair.privateKey;
+    })
+)); 
 ```
 
 ## Create a channel
@@ -95,12 +93,7 @@ You can also be notified of any new incoming messages with an event handler. Thi
 // Listen for new messages sent to a channel
 myChannel.on('messageAdded', function(message) {
     // Decrypt the message using global public key id and private key values.
-    var decryptedMessage = Virgil.Crypto.decryptWithKey(
-        message.body,
-        currentUserPublicKeyId,
-        currentUserPrivateKey
-    );
-    
+    var decryptedMessage = Virgil.Crypto.decrypt(message.body, keyPair);
     console.log(message.author, decryptedMessage);
 });
 ```
