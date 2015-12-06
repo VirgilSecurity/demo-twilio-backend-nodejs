@@ -6,7 +6,7 @@ Let's dive into a few of the key techniques you'll need to employ while working 
 
 * [Virgil Security infrastructure changes](#user-content-virgil-security-infrastructure-changes)
   * [Register a Virgil developer's account](#user-content-register-virgil-developers-account)
-  * [Generate new key pair for end-to-end encryption](#user-content-generate-new-key-pair-for-end-to-end-encryption)
+  * [Generate a new key pair for end-to-end encryption](#user-content-generate-new-key-pair-for-end-to-end-encryption)
   * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
 * [Create a Channel](#user-content-create-a-channel)
 * [Send encrypted Messages to a Channel](#user-content-send-encrypted-messages-to-a-channel)
@@ -20,7 +20,7 @@ As a first step, you’ll need to create a development account on https://virgil
 an access token to perform calls to Virgil API services. The access token looks like `45fd8a505f50243fa8400594ba0b2b29` 
 and will be used to instantiate Virgil SDK client in the code below.
 
-### Generate new key pair for end-to-end encryption
+### Generate a new key pair for end-to-end encryption
 ```javascript
 var keyPair = Virgil.Crypto.generateKeys('', 'KEYS_PASSWORD_GOES_HERE');
 
