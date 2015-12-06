@@ -7,7 +7,7 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 
 ## Publish
 
-Only two steps to publish Virgil History Service :)
+There are only two steps required to publish Virgil History Service :)
 
 - Run **Virgil.TwilioService.sln** in Visual Studio Community 2015 (it is free)
 - Right click on **Virgil.TwilioIPMessaging** project > then **Publish** (with your Azure credentials)
