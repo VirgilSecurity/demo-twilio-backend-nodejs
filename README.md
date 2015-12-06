@@ -28,4 +28,4 @@ Set Twilio & Virgil authentication tokens in web.config
 ```
 
 ## Quick start guide
-To review the Twilio quick start guide adjustments please visit [this document](./Quick%20start%20guide.md).
+To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](./Quick%20start%20guide.md).
