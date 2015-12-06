@@ -9,6 +9,7 @@ In an IP Messaging application, a Channel is where all the action happens. Wheth
 * [Create a channel](#user-content-create-a-channel)
 * [Send encrypted messages to a channel](#user-content-send-encrypted-messages-to-a-channel)
 * [Receive encrypted messages on a channel and decrypt them](#user-content-receive-eencrypted-messages-on-a-channel-and-decrypt-them)
+
 Note: All of these samples assume you have created your authenticated IP Messaging client. Read more about Identity and Tokens.
 
 ## Virgil Security infrastructure adjustments
