@@ -53,7 +53,7 @@ vsKeysService.publish(keyPair, userIdentity).then(
 
 ## Create a Channel
 
-Before you can start sending messages, you first need a Channel to send them to. Here is how you create a Channel.
+Before you can start sending Messages, you first need a Channel to send them to. Here is how you create a Channel.
 
 ```javascript
 // Create a Channel
