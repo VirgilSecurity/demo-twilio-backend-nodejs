@@ -65,7 +65,7 @@ messagingClient.createChannel({
 });
 ```
 
-## Send messages to a channel
+## Send encrypted messages to a channel
 
 Once you're a member of a channel, you can send a message to it. A message is a bit of data that is sent first to the Twilio backend where it is stored for later access by members of the channel, and then pushed out in real time to all channel members that are currently online. Only users subscribed to your channel will receive your messages.
 
