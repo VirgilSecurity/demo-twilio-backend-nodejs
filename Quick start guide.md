@@ -1,14 +1,14 @@
 # Channels and Messages with Virgil Security changes
 
-In an IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where messages are sent, received, and archived for later viewing by offline clients. Let's dive into a few of the key techniques you'll need to employ while working with channels and messages in your application. We will also apply the end-to-end encryption using Virgil Security insfractructure.
+In an IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where messages are sent, received, and archived for later viewing by offline clients. Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. We will also apply the end-to-end encryption using Virgil Security insfractructure.
 
 * [Virgil Security infrastructure changes](#user-content-virgil-security-infrastructure-changes)
   * [Register Virgil developer's account](#user-content-register-virgil-developers-account)
   * [Generate new key pair for end-to-end encryption](#user-content-generate-new-key-pair-for-end-to-end-encryption)
   * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
-* [Create a channel](#user-content-create-a-channel)
-* [Send encrypted messages to a channel](#user-content-send-encrypted-messages-to-a-channel)
-* [Receive encrypted messages on a channel and decrypt them](#user-content-receive-encrypted-messages-on-a-channel-and-decrypt-them)
+* [Create a Channel](#user-content-create-a-channel)
+* [Send encrypted Messages to a Channel](#user-content-send-encrypted-messages-to-a-channel)
+* [Receive encrypted Messages on a Channel and decrypt them](#user-content-receive-encrypted-messages-on-a-channel-and-decrypt-them)
 
 Note: All of these samples assume you have created your authenticated IP Messaging client. Read more about Identity and Tokens.
 
@@ -49,9 +49,9 @@ vsKeysService.publish(keyPair, userIdentity).then(
 )); 
 ```
 
-## Create a channel
+## Create a Channel
 
-Before you can start sending messages, you first need a Channel to send them to. Here is how you create a channel.
+Before you can start sending messages, you first need a Channel to send them to. Here is how you create a Channel.
 
 ```javascript
 // Create a Channel
@@ -64,12 +64,12 @@ messagingClient.createChannel({
 });
 ```
 
-## Send encrypted messages to a channel
+## Send encrypted messages to a Channel
 
-Once you're a member of a channel, you can send a message to it. A message is a bit of data that is sent first to the Twilio backend where it is stored for later access by members of the channel, and then pushed out in real time to all channel members that are currently online. Only users subscribed to your channel will receive your messages.
+Once you're a member of a Channel, you can send a Message to it. A Message is a bit of data that is sent first to the Twilio backend where it is stored for later access by members of the Channel, and then pushed out in real time to all Channel members that are currently online. Only users subscribed to your Channel will receive your messages.
 
 ```javascript
-// Receive the list of channel's recipients
+// Receive the list of Channel's recipients
 myChannel.getMembers()
     .map(function(member) {
         // Search for the member’s key on Virgil Keys service
@@ -82,12 +82,12 @@ myChannel.getMembers()
     });
 ```
 
-Today, a message is just a string of text. In the future, this may expand to include other media types, like images and binary data. For now, in addition to text messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
+Today, a Message is just a string of text. In the future, this may expand to include other media types, like images and binary data. For now, in addition to text messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
 
 
-## Receive encrypted messages on a channel and decrypt them
+## Receive encrypted Messages on a channel and decrypt them
 
-You can also be notified of any new incoming messages with an event handler. This is likely where you would handle updating your user interface to display new messages.
+You can also be notified of any new incoming Messages with an event handler. This is likely where you would handle updating your user interface to display new Messages.
 
 ```javascript
 // Listen for new messages sent to a channel
