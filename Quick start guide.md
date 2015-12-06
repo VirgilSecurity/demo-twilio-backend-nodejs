@@ -8,9 +8,9 @@ Let's dive into a few of the key techniques you'll need to employ while working 
   * [Register a Virgil Security developer's account](#user-content-register-a-virgil-security-developers-account)
   * [Generate a new public / private key pair for end-to-end encryption](#user-content-generate-a-new-public-private-key-pair-for-end-to-end-encryption)
   * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
-* [Create a Channel](#user-content-create-a-channel)
-* [Send encrypted Messages to a Channel](#user-content-send-encrypted-messages-to-a-channel)
-* [Receive encrypted Messages on a Channel and decrypt them](#user-content-receive-encrypted-messages-on-a-channel-and-decrypt-them)
+  * [Create a Channel](#user-content-create-a-channel)
+  * [Send encrypted Messages to a Channel](#user-content-send-encrypted-messages-to-a-channel)
+  * [Receive encrypted Messages on a Channel and decrypt them](#user-content-receive-encrypted-messages-on-a-channel-and-decrypt-them)
 
 Note: All of these samples assume you have created your authenticated IP Messaging client. Read more about Identity and Tokens.
 
