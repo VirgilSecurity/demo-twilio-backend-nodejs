@@ -1,6 +1,8 @@
 # Channels and Messages with Virgil Security changes
 
-In a Twilio IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where Messages are sent, received, and archived for later viewing by offline clients. Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. We will also apply  end-to-end encryption using Virgil Security's infrasctructure.
+In a Twilio IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where Messages are sent, received, and archived for later viewing by offline clients.
+
+Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. We will also apply  end-to-end encryption using Virgil Security's infrasctructure.
 
 * [Virgil Security infrastructure changes](#user-content-virgil-security-infrastructure-changes)
   * [Register Virgil developer's account](#user-content-register-virgil-developers-account)
