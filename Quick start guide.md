@@ -85,12 +85,12 @@ myChannel.getMembers()
 Today, a Message is just a string of text. In the future, this may expand to include other media types, like images and binary data. For now, in addition to text messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
 
 
-## Receive encrypted Messages on a channel and decrypt them
+## Receive encrypted Messages on a Channel and decrypt them
 
 You can also be notified of any new incoming Messages with an event handler. This is likely where you would handle updating your user interface to display new Messages.
 
 ```javascript
-// Listen for new messages sent to a channel
+// Listen for new messages sent to a Channel
 myChannel.on('messageAdded', function(message) {
     // Decrypt the message using global public key id and private key values.
     var decryptedMessage = Virgil.Crypto.decrypt(message.body, keyPair);
