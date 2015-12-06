@@ -66,9 +66,9 @@ messagingClient.createChannel({
 });
 ```
 
-## Send encrypted messages to a Channel
+## Send encrypted Messages to a Channel
 
-Once you're a member of a Channel, you can send a Message to it. A Message is a bit of data that is sent first to the Twilio backend where it is stored for later access by members of the Channel, and then pushed out in real time to all Channel members that are currently online. Only users subscribed to your Channel will receive your messages.
+Once you're a member of a Channel, you can send a Message to it. A Message is a bit of data that is sent first to the Twilio backend where it is stored for later access by members of the Channel, and then pushed out in real time to all Channel members that are currently online. Only users subscribed to your Channel will receive your Messages.
 
 ```javascript
 // Receive the list of Channel's recipients
@@ -84,7 +84,7 @@ myChannel.getMembers()
     });
 ```
 
-Today, a Message is just a string of text. In the future, this may expand to include other media types, like images and binary data. For now, in addition to text messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
+Today, a Message is just a string of text. In the future, this may expand to include other media types, like images and binary data. For now, in addition to text Messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
 
 
 ## Receive encrypted Messages on a Channel and decrypt them
@@ -92,9 +92,9 @@ Today, a Message is just a string of text. In the future, this may expand to inc
 You can also be notified of any new incoming Messages with an event handler. This is likely where you would handle updating your user interface to display new Messages.
 
 ```javascript
-// Listen for new messages sent to a Channel
+// Listen for new Messages sent to a Channel
 myChannel.on('messageAdded', function(message) {
-    // Decrypt the message using global public key id and private key values.
+    // Decrypt the Message using global public key id and private key values.
     var decryptedMessage = Virgil.Crypto.decrypt(message.body, keyPair);
     console.log(message.author, decryptedMessage);
 });
