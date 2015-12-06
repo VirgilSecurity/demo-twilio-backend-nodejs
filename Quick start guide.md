@@ -1,8 +1,8 @@
-# Channels and Messages with Virgil Security adjustments
+# Channels and Messages with Virgil Security changes
 
 In an IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where messages are sent, received, and archived for later viewing by offline clients. Let's dive into a few of the key techniques you'll need to employ while working with channels and messages in your application. We will also apply the end-to-end encryption using Virgil Security insfractructure.
 
-* [Virgil Security infrastructure adjustments](#user-content-virgil-security-infrastructure-adjustments)
+* [Virgil Security infrastructure changes](#user-content-virgil-security-infrastructure-changes)
   * [Register Virgil developer's account](#user-content-register-virgil-developers-account)
   * [Generate new key pair for end-to-end encryption](#user-content-generate-new-key-pair-for-end-to-end-encryption)
   * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
@@ -12,7 +12,7 @@ In an IP Messaging application, a Channel is where all the action happens. Wheth
 
 Note: All of these samples assume you have created your authenticated IP Messaging client. Read more about Identity and Tokens.
 
-## Virgil Security infrastructure adjustments
+## Virgil Security infrastructure changes
 ### Register Virgil developer's account
 As a first step, you’ll need to create a development account on https://virgilsecurity.com/account/signin to receive 
 an access token to perform calls to Virgil API services. The access token looks like `45fd8a505f50243fa8400594ba0b2b29` 
