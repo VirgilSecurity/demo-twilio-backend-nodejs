@@ -1,20 +1,17 @@
-# Channels and Messages (with Virgil Security on board)
+# Channels and Messages with Virgil Security adjustments
 
 In an IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where messages are sent, received, and archived for later viewing by offline clients. Let's dive into a few of the key techniques you'll need to employ while working with channels and messages in your application. We will also apply the end-to-end encryption using Virgil Security insfractructure.
 
-Create Virgil Security key
-Create a channel
-Join a channel
-Send encrypted messages to a channel
-Receive encrypted messages on a channel and decrypt them
-Invite other users to a channel
-Accept an invitation to a channel
-Get a list of channels
-Subscribe for channel events
-Delete a channel
+* [Virgil Security infrastructure adjustments](#user-content-virgil-security-infrastructure-adjustments)
+  * [Register Virgil developer's account](#user-content-register-virgil-developers-account)
+  * [Generate new key pair for end-to-end encryption](#user-content-generate-new-key-pair-for-end-to-end-encryption)
+  * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
+* [Create a channel](#user-content-create-a-channel)
+* [Send encrypted messages to a channel](#user-content-send-encrypted-messages-to-a-channel)
+* [Receive encrypted messages on a channel and decrypt them](#user-content-receive-eencrypted-messages-on-a-channel-and-decrypt-them)
 Note: All of these samples assume you have created your authenticated IP Messaging client. Read more about Identity and Tokens.
 
-## Create Virgil Security key
+## Virgil Security infrastructure adjustments
 ### Register Virgil developer's account
 As a first step, you’ll need to create a development account on https://virgilsecurity.com/account/signin to receive 
 an access token to perform calls to Virgil API services. The access token looks like `45fd8a505f50243fa8400594ba0b2b29` 
@@ -25,9 +22,9 @@ and will be used to instantiate Virgil SDK client in the code below.
 var generateKeyPair = Virgil.Crypto.generateKeysAsync('', 'KEYS_PASSWORD_GOES_HERE');
 ```
 
-### Push the public key to the Virgil Keys service
+### Publish the public key to the Virgil Keys service
 ```javascript
-// Global variables to store public key id and private key valu
+// Global variables to store public key id and private key value
 var currentUserPublicKeyId;
 var currentUserPrivateKey;
 
@@ -39,11 +36,13 @@ var userIdentity = [{
 }];
 
 generateKeyPair.then(function(keyPair) {
+    // Instantiate Virgil Keys client with developer's access token
     var vsKeysService = new Virgil.PublicKeysService('45fd8a505f50243fa8400594ba0b2b29');
     
+    // Publish the key to the Virgil Keys infrastructure to make available for other users
     vsKeysService.publish(keyPair, userIdentity).then(
         function(response) {
-            // Save public and private keys values to the global variables
+            // Save public and private keys values to the global variables for further encryption / decryption
             currentUserPublicKeyId = response.id.public_key_id;
             currentUserPrivateKey = keyPair.privateKey;
         })
@@ -63,17 +62,6 @@ messagingClient.createChannel({
 }).then(function(channel) {
     console.log('Created general channel:');
     console.log(channel);
-});
-```
-
-## Join a channel
-
-Once you've created a channel, you must join it to begin receiving or sending messages on that channel.
-
-```javascript
-// Join a previously created channel
-myChannel.join().then(function(channel) {
-    console.log('Joined channel' + channel.friendlyName) 
 });
 ```
 
@@ -98,29 +86,14 @@ myChannel.getMembers()
 Today, a message is just a string of text. In the future, this may expand to include other media types, like images and binary data. For now, in addition to text messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
 
 
-## Receive messages on a channel
-
-With a channel object in hand, you can access a list of all previous messages that have been sent to the channel.
-
-```javascript
-// Get Messages for a previously created channel
-myChannel.getMessages().then(function(messages) {
-  var totalMessages = messages.length;
-  for (i=0; i<messages.length; i++) {
-    var message = messages[i];
-    console.log('Author:' + message.author);
-  }
-  console.log('Total Messages:' + totalMessages);
-});
-```
+## Receive encrypted messages on a channel and decrypt them
 
 You can also be notified of any new incoming messages with an event handler. This is likely where you would handle updating your user interface to display new messages.
 
 ```javascript
 // Listen for new messages sent to a channel
 myChannel.on('messageAdded', function(message) {
-    // Instantiate new Crypto object and decrypt the message using global
-    // public key id and private key values.
+    // Decrypt the message using global public key id and private key values.
     var decryptedMessage = vsCrypto.decryptWithKey(
         message.body,
         currentUserPublicKeyId,
@@ -130,97 +103,3 @@ myChannel.on('messageAdded', function(message) {
     console.log(message.author, decryptedMessage);
 });
 ```
-
-## Invite other users to a channel
-
-Sometimes you might feel lonely in a channel. Rather than sending messages to yourself, you could invite a friend to come and chat! It doesn't matter if the channel is public or private, you are always able to invite another user to any channel you own.
-
-```javascript
-// Invite another member to your channel
-myChannel.invite('elmo').then(function() {
-  console.log('Your friend has been invited!');
-});
-```
-Accept an invitation to a channel
-
-Social acceptance is a great feeling. Accepting an invite to a channel means you too can partake in glorious banter with other channel members.
-
-## Accepting an Invite
-```javascript
-// Listen for new invitations to your Client
-messagingClient.on('channelInvited', function(channel) {
-  console.log('Invited to channel ' + channel.friendlyName);
-  // Join the channel that you were invited to
-  channel.join();
-});
-```
-## Get a list of channels
-
-Retrieving channels lets you perform actions on them as a user (e.g join, display, etc.) You'll only be able to view public channels and any private channels your user can access.
-
-```javascript
-// Get Messages for a previously created channel
-messagingClient.getChannels().then(function(channels) {
-  for (i=0; i<channels.length; i++) {
-    var channel = channels[i];
-    console.log('Channel: ' + channel.friendlyName);
-  }
-});
-```
-## Subscribe for channel events
-
-Channels are a flurry of activity. Members join and leave, messages are sent and received, and channel states change. As a member of a channel, you'll want to know the status of the channel. You might want to receive a notification if the channel has been deleted or changed. Channel event listeners help you do just that.
-
-These event listeners will notify your app when a channel's state changes. Once it does, you can perform the necessary actions in your app to react to it.
-
-Handle Channel Events
-```javascript
-// A channel has become visible to the Client
-messagingClient.on('channelAdded', function(channel) {
-  console.log('Channel added: ' + channel.friendlyName);
-});
-// A channel is no longer visible to the Client
-messagingClient.on('channelRemoved', function(channel) {
-  console.log('Channel removed: ' + channel.friendlyName);
-});
-// A channel's attributes or metadata have changed.
-messagingClient.on('channelUpdated', function(channel) {
-  console.log('Channel updates: ' + channel.sid);
-});
-```
-These event listeners will notify your app when channel members perform some sort of action. Namely when they leave, join, change, or start/stop typing.
-
-Handle Member
-```javascript
-// Listen for members joining a channel
-myChannel.on('memberJoined', function(member) {
-  console.log(member.identity + 'has joined the channel.');
-});
-// Listen for members joining a channel
-myChannel.on('memberLeft', function(member) {
-  console.log(member.identity + 'has left the channel.');
-});
-// Listen for members typing
-myChannel.on('typingStarted', function(member) {
-  console.log(member.identity + 'is currently typing.');
-});
-// Listen for members typing
-myChannel.on('typingEnded', function(member) {
-  console.log(member.identity + 'has stopped typing.');
-});
-```
-
-## Delete a Channel
-
-Deleting a channel both deletes the message history and removes all members from it.
-
-Delete a Channel
-```javascript
-// Delete a previously created Channel
-myChannel.delete().then(function(channel) {
-  console.log("Deleted channel: " + channel.sid);
-})
-```javascript
-You can only delete channels that you have permissions to delete and deleting a channel means it cannot be retrieved at a later date for any reason. Do so carefully!
-
-Now that you know all there is to know about channels, might we suggest learning more about the REST API? With the REST API, you can execute many of these same actions from your server-side code as well.
