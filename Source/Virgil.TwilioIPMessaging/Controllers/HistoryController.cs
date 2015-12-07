@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
     using System.Threading.Tasks;
     using System.Web.Http;
@@ -20,7 +21,7 @@
             var messages = twilioService.GetChennelHistory(channelSid);
 
             var publicKey = await EnsurePublicKey(memberName);
-
+            
             using (var cipher = new VirgilCipher())
             {
                 cipher.AddKeyRecipient(publicKey.PublicKeyIdData, publicKey.PublicKeyData);
@@ -29,9 +30,17 @@
                 {
                     var encryptedBodyData = Convert.FromBase64String(message.body);
                     var recepientIdData = Encoding.UTF8.GetBytes(Constants.TwilioChannelAdminPublicKeyId);
-                    var decryptedBody = cipher.DecryptWithKey(encryptedBodyData, recepientIdData, Constants.TwilioChannelAdminPrivateKey);
 
-                    message.body = Convert.ToBase64String(cipher.Encrypt(decryptedBody, true));
+                    try
+                    {
+                        var decryptedBody = cipher.DecryptWithKey(encryptedBodyData, recepientIdData, Constants.TwilioChannelAdminPrivateKey);
+                        message.body = Convert.ToBase64String(cipher.Encrypt(decryptedBody, true));
+                    }
+                    catch (Exception)
+                    {
+                        var undecryptedBody = Encoding.UTF8.GetBytes("Problemo Problemo!");
+                        message.body = Convert.ToBase64String(cipher.Encrypt(undecryptedBody, true));
+                    }
                 }
             }
 

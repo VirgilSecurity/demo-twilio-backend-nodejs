@@ -8,6 +8,7 @@ var App = function () {
 
     var keysService = new VirgilSDK.PublicKeysService(APP_TOKEN);
     var messagingClient = null;
+    var accessManager = null;
 
     var appStates = { STARTUP: 0, CONFIRMATION: 1, LOADING: 2, CHAT: 3 };
 
@@ -73,9 +74,11 @@ var App = function () {
 
         self.loadingText("Initializing IP Messaging...");
 
-        $.getJSON("/api/token?identity=" + account.user_data.value, function (data) {
+        $.getJSON("/api/token?identity=" + account.user_data.value, function (token) {
 
-            messagingClient = new Twilio.IPMessaging.Client(data);
+            accessManager = new Twilio.AccessManager(token);
+            messagingClient = new Twilio.IPMessaging.Client(accessManager);
+
             //messagingClient.on('channelAdded', onChannelAdded);
 
             self.loadingText("Loading channels...");
