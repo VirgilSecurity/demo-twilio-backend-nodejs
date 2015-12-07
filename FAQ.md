@@ -6,6 +6,9 @@ with Virgil's end-to-end encryption and verification.
 ## Quick start guide
 To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](./Quick%20start%20guide.md).
 
+## What does Virgil provide to enable end-to-end encryption, authentication and verification of data?
+Virgil consists of an open-source encryption library which implements CMS and ECIES(including RSA schema), Key Management API and clodu Key management service (Virgil Keys). Virgil Keys Service consists of public key service and private keys escrow service. See Technical Specifications for the up-to-date programming languages and platforms supported by our library. Generally all modern platforms and programming languages are supported. 
+
 ## Who controls private keys?
 Developers have full control over how private keys are generated, stored and synced on end-client devices.
 Virgil provides Private Key Escrow Service which can help backup and sync private keys. 
@@ -18,22 +21,21 @@ private key bundle. This mode is least secure and requires end-users to trust Vi
 
 - Enterprise: In this mode developer runs their own instance of Private Key Escrow or end-users can manage their private keys manually. There is nothing stored by Virgil except the corresponding public key for each private key.
 
-##How many public/provate key pair can each user have?
+## How many public/provate key pair can each user have?
 At this time there is no limit. Depending on the application you can and sometimes should generate a new public/private key pair as often as "per session".
 
 ## Does Virgil use standard encryption?
 Yes. Additional details can be found in our technical specification.
 
-## Do I have to pick specific configuration? For example if I pick NSA Suite B compliance. Will this
-break compartibility with other users?
+## How can I add history my Twilio UP Messaging channel and maintain end-to-end encryption?
+Virgil provides sample application services for Twilio IP Messaging that, at developers discretion, can run history service for each channel where this behavior is appropriate. This service effectively re-encrypts history for any user who is authrorized to see this
+information.
+
+## Do I have to pick specific configuration? For example if I pick NSA Suite B compliance. Will this break compartibility with other users?
 No. Virgil uses Crypgraphic Agility which allows different users, platforms and even individuals files or chat sessions to have individually selected crypgraphic parameters. Our library automatically detects which parameters
 were used and uses appropriate settings to decrypt content. Developers have full control over this funtionality
 however we generally recommend sticking to defaults selected by Virgil as we continuously evaluate and update
 best practices. Current defaults can be found in our Technical Specifications.
-
-## How can I add history my Twilio UP Messaging channel and maintain end-to-end encryption?
-Virgil provides sample application services for Twilio IP Messaging that, at developers discretion, can run history service for each channel where this behavior is appropriate. This service effectively re-encrypts history for any user who is authrorized to see this
-information.
 
 
 
