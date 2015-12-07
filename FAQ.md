@@ -16,7 +16,7 @@ private key bundle. This mode is least secure and requires end-users to trust Vi
 
 - Normal: End users are given an option to store encrypted private key bundle for backup and device sync purposes. Virgil cannot reset this password and cannot recover the private key bundle should user forget the string used to encrypt the bundle.
 
--Enterprise: In this mode developer runs their own instance of Private Key Escrow or end-users can manage their private keys manually. There is nothing stored by Virgil except the corresponding public key for each private key.
+- Enterprise: In this mode developer runs their own instance of Private Key Escrow or end-users can manage their private keys manually. There is nothing stored by Virgil except the corresponding public key for each private key.
 
 ##How many public/provate key pair can each user have?
 At this time there is no limit. Depending on the application you can and sometimes should generate a new public/private key pair as often as "per session".
