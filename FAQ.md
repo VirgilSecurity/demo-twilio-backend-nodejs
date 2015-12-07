@@ -8,6 +8,9 @@ To review the changes required to use Virgil Security's security infrastructure 
 ## What does Virgil provide to enable end-to-end encryption, authentication, and verification of data?
 Virgil consists of an open-source encryption library which implements Cryptographic Message Syntax (CMS) and Elliptic Curve Integrated Encryption Scheme (ECIES) (including RSA schema), a Key Management API, and a cloud-based Key Management Service (Virgil Keys). The Virgil Keys Service consists of a public key service and a private key escrow service. See our Technical Specifications for the up-to-date list of programming languages and platforms supported by our library. Generally all modern platforms and programming languages are supported. 
 
+## If I send a mesage to a channel that contains many recipients does it mean that the message will be encrypted as many times as many recipients are in the channel?
+No. 
+
 ## Who controls private keys?
 Developers have full control over how private keys are generated, stored, and synced on end-client devices. Virgil provides Private Key Escrow Service which can help backup and sync private keys. 
 
