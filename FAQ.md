@@ -47,7 +47,7 @@ There are multiple methods to handle this issues available to the developer. Exa
 2. Developers can use a key of their own choosing and define it as "revocation" key. By signing any public record with this key developers can be certain that the key has been revoked.
 
 ## How are keys synced between multiple devices?
-Private keys can use Virgil Privaye Keys Service to securely sync their application keys across multiple user devices (it works similar to iCloud Keychain or similar services). This question is also addressed in more details as part of [this document](How is the user recovered after their private key is lost from a device?).
+Private keys can use Virgil Private Keys Service to securely sync their application keys across multiple user devices (it works similar to iCloud Keychain service).
 
 Public Keys and the associated signatures are always available using Virgil Public Keyy Service API.
  
