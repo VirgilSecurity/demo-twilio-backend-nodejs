@@ -44,8 +44,6 @@ There are multiple methods to handle these issues available to the developer. Th
 2. Use case: iOS or Android based mobile device. 
  - The Virgil Private Key API allows developers to easily implement private key synchronization across multiple devices and/or provide a simple recovery mechanism for keys. This service can be run "offline" or behind company firewall.
 
-This description assumes IP Messaging application. Recommended defaults for file synchronization applications would be different.
- 
 ## How are the user keys revoked?
 1. Developers can use the API method for key revocation provided by Virgil. This method signs the given public key with an application specific "revoked" key. Developers can validate revocation key signatures by signing them with their own key. Revocation requests must be signed by the developer or by the end user.
 2. Developers can use a key of their own choosing and define it as "revocation" key. By signing any public record with this key developers can be certain that the key has been revoked.
