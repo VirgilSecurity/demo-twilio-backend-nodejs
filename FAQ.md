@@ -49,7 +49,7 @@ There are multiple methods to handle this issues available to the developer. Exa
 ## How are keys synced between multiple devices?
 Private keys can use Virgil Private Keys Service to securely sync their application keys across multiple user devices (it works similar to iCloud Keychain service).
 
-Public Keys and the associated signatures are always available using Virgil Public Keyy Service API.
+Public Keys and the associated signatures are always available using Virgil Public Keys Service API.
  
 
 
