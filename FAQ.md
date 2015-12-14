@@ -36,12 +36,14 @@ No. Virgil uses Cryptographic Agility, which allows different users, platforms, 
 
 ## How is the user recovered after their private key is lost from a device?
 There are multiple methods to handle these issues available to the developer. The exact solution selected depends on the kind of data encrypted as well as any requirements for history. 
+
 1. Use case: Web browser with no ability to store private keys between sessions. 
   - The user would generate a new private key "per authenticated session" and re-register public key with Virgil Public Key Service. Old public and private keys would still be maintained using the Virgil Private Key storage API. This is the recommended, default behavior for the IP Messaging use case.
   - The user would retrieve the previously issued private key using the Virgil Private Key API. The key may be optionally encrypted using a passphrase or a passcode.  The passcode can be delivered using two-factor authentication or be a part of a multi-factor authentication process.
+
 2. Use case: iOS or Android based mobile device. 
  - The Virgil Private Key API allows developers to easily implement private key synchronization across multiple devices and/or provide a simple recovery mechanism for keys. This service can be run "offline" or behind company firewall.
- 
+
 This description assumes IP Messaging application. Recommended defaults for file synchronization applications would be different.
  
 ## How are the user keys revoked?
