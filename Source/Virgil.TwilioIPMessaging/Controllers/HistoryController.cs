@@ -2,14 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
+    using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using System.Web.Http;
 
     using Virgil.Crypto;
-    using Virgil.SDK.Keys;
-
+    using Virgil.SDK.Infrastructure;
     using Virgil.TwilioIPMessaging.Common;
     using Virgil.TwilioIPMessaging.Models;
 
@@ -49,14 +48,19 @@
 
         private static async Task<PublicKeyInfo> EnsurePublicKey(string memberName)
         {
-            var keysClient = new KeysClient(Constants.VirgilAppToken);
-            var publicKeyEntity = await keysClient.PublicKeys.Search(memberName);
+            var virgilHub = Bootsrapper.UseAccessToken(Constants.VirgilAppToken)
+                .WithCustomIdentityServiceUri(new Uri("https://identity-stg.virgilsecurity.com/v3/"))
+                .WithCustomPublicServiceUri(new Uri("https://keys-stg.virgilsecurity.com/v3/"))
+                .Build();
 
+            var cards = await virgilHub.Cards.Search(memberName);
+            var card = cards.Single();
+                        
             var publicKeyInfo = new PublicKeyInfo
             {
                 UserId = memberName,
-                PublicKeyData = publicKeyEntity.Key,
-                PublicKeyIdData = Encoding.UTF8.GetBytes(publicKeyEntity.PublicKeyId.ToString())
+                PublicKeyData = card.PublicKey.PublicKey,
+                PublicKeyIdData = Encoding.UTF8.GetBytes(card.PublicKey.Id.ToString())
             };
             
             return publicKeyInfo;
