@@ -73,18 +73,16 @@ var App = function () {
             return;
         }
         
-        self.currentUserCaption(account.identity.value);
+        self.currentUserCaption(account.card.identity.value);
         self.currentChannelCaption("Choose Channel...");
         self.currentState(appStates.LOADING);
 
         self.loadingText("Initializing IP Messaging...");
 
-        $.getJSON("/api/token?identity=" + account.identity.value, function (token) {
+        $.getJSON("/api/token?identity=" + account.card.identity.value, function (token) {
 
             accessManager = new Twilio.AccessManager(token);
             messagingClient = new Twilio.IPMessaging.Client(accessManager);
-
-            //messagingClient.on('channelAdded', onChannelAdded);
 
             self.loadingText("Loading channels...");
 
@@ -104,33 +102,6 @@ var App = function () {
     var saveAccount = function (account) {
         var stringifiedAccountData = JSON.stringify(account);
         localStorage.setItem("virgil_account_data", stringifiedAccountData);
-    };
-
-    /**
-     * Loads account from file.
-     * @returns {Object} account blob. 
-     */
-    var readAccountFromFile = function () {
-
-        var files = document.getElementById("privateKeyInputFile").files;
-        var file = files[0];
-
-        var reader = new FileReader();
-
-        self.currentState(appStates.LOADING);
-        self.loadingText("Reading File...");
-
-        reader.onload = function (e) {
-            var stringifiedAccount = atob(e.target.result);
-            var accountFormFile = JSON.parse(stringifiedAccount);
-            saveAccount(accountFormFile);
-            initialize(false);
-        };
-
-        var blob = file.slice(0, file.size);
-
-        reader.readAsBinaryString(blob);
-        return blob;
     };
     
     /**
@@ -160,14 +131,14 @@ var App = function () {
             return;
 
         // get member's public key by member's identity.
-
         virgilHub.cards.search({ value: member.identity, type: 'email' })
             .then(function (result) {
                 // extend the channel member with public key.
                 member.publicKey = {
                     id: result[0].public_key.id,
-                    data: result[0].public_key.public_key
+                    data: atob(result[0].public_key.public_key)
                 };
+
                 self.channelMembers.push(member);
             });
     };
@@ -179,8 +150,8 @@ var App = function () {
     var onMessageAdded = function (message) {
         
         // decrypt message with current user's private key.
+        var decryptedBody = virgilCrypto.decrypt(message.body, account.card.id, account.private_key);
 
-        var decryptedBody = virgilCrypto.decrypt(message.body, account.public_key_id, account.private_key);
         var author = message.from ? message.from : message.author;
 
         self.messages.push({
@@ -203,7 +174,7 @@ var App = function () {
 
         self.isCurrentChannelLoading(true);
 
-        var url = "/api/history?channelSid=" + channel.sid + "&memberName=" + account.user_data.value;
+        var url = "/api/history?channelSid=" + channel.sid + "&memberName=" + account.card.identity.value;
         $.getJSON(url, function (data) {
             for (var i = 0; i < data.length; i++) {
                 onMessageAdded(data[i]);
@@ -253,22 +224,24 @@ var App = function () {
 
         if (self.currentChannel().attributes.virgil_public_key) {
             recipients.push({
-                recipientId: self.currentChannel().attributes.virgil_public_key_id,
-                publicKey: atob(self.currentChannel().attributes.virgil_public_key)
+                recipientId: self.currentChannel().attributes.virgil_card_id,
+                publicKey: self.currentChannel().attributes.virgil_public_key
             });
         }
 
         for (var index = 0; index < self.channelMembers().length; index++) {
             recipients.push({
                 recipientId: self.channelMembers()[index].publicKey.id,
-                publicKey: atob(self.channelMembers()[index].publicKey.data)
+                publicKey: self.channelMembers()[index].publicKey.data
             });
         }
-        
-        var crypto = new VirgilSDK.Crypto();
-        crypto.encryptWithKeyMultiRecipientsAsync(btoa(message), recipients)
+
+        virgilCrypto.encryptAsync(message, recipients)
             .then(function (encryptedData) {
                 self.currentChannel().sendMessage(encryptedData);
+            })
+            .catch(function(ex) {
+                alert(ex.message);
             });
     };
 
@@ -281,15 +254,15 @@ var App = function () {
 
         // add channel admin to custom attributes.
 
-        virgilHub.cards.search("virgil-chat-admin@yopmail.com")
+        virgilHub.cards.search({ value: "virgil-twilio0@mailinator.com", type: 'email' })
             .then(function (result) {
-                var friendlyChatName = channelName + " (" + account.identity.value + ")";
+                var friendlyChatName = channelName + " (" + account.card.identity.value + ")";
                 var options = { friendlyName: friendlyChatName };
 
                 if (self.isNewChannelHistory()) {
                     options.attributes = {
-                        virgil_public_key_id: result[0].public_key_id,
-                        virgil_public_key: result[0].public_key.public_key
+                        virgil_card_id: result[0].id,
+                        virgil_public_key: atob(result[0].public_key.public_key)
                     };
                 }
 
@@ -298,27 +271,10 @@ var App = function () {
             .then(function (channel) {
                 self.channels.push(channel);
                 self.setChannel(channel);
+            })
+            .catch(function(ex) {
+                alert(ex.message);
             });
-
-        //virgilHub.searchKey("virgil-chat-admin@yopmail.com")
-        //    .then(function (result) {
-        //        var friendlyChatName = channelName + " (" + account.identity.value + ")";
-
-        //        var options = { friendlyName: friendlyChatName };
-
-        //        if (self.isNewChannelHistory()) {
-        //            options.attributes = {
-        //                virgil_public_key_id: result.id.public_key_id,
-        //                virgil_public_key: result.public_key
-        //            };
-        //        }
-
-        //        return messagingClient.createChannel(options);
-        //    })
-        //    .then(function (channel) {
-        //        self.channels.push(channel);
-        //        self.setChannel(channel);
-        //    });
     };
 
     self.setChannel = function(channel){
@@ -342,137 +298,130 @@ var App = function () {
 
         onChannelSelected(channel);
     };
-
-    self.saveKeys = function(){
-        var stringifiedAccountData = JSON.stringify(account);
-        var blob = new Blob([btoa(stringifiedAccountData)], { type: "application/octet-stream" });
-        saveAs(blob, "keys.vks");
-    };
     
     self.exit = function(){             
         localStorage.removeItem("virgil_account_data");
         location.reload();
     };
 
-    var createVirgilCard = function () {
+    var loginAndRegisterCard = function (identityValue, validationToken) {
 
-        self.currentState(appStates.LOADING);
-        self.errorText("");
+        var generatedKeyPair;
+        var createdCard;
 
-        var keyPair = virgilCrypto.generateKeyPair();
-        virgilHub.cards.create({
-            public_key: keyPair.publicKey,
-            private_key: keyPair.privateKey,
-            identity: {
-                type: 'email',
-                value: account.identity_value,
-                validation_token: account.identity_token
-            }
-        }).then(function (result) {
-            delete account.identity_value;
-            delete account.identity_token;
+        self.loadingText("Generating a Key Pair...");
 
-            account.card_id = result.id;
-            account.identity = result.identity;
-            account.public_key_id = result.public_key.id;
-            account.public_key = result.public_key.public_key;
-            account.private_key = keyPair.private_key;
+        return virgilCrypto
+            .generateKeyPairAsync(virgilCrypto.KeysTypesEnum.ecNist256)
+            .then(function(keyPair) {
+                generatedKeyPair = keyPair;
 
-            saveAccount(account);
+                self.loadingText("Registering a Public Key...");
+                return virgilHub.cards.create({
+                    public_key: keyPair.publicKey,
+                    private_key: keyPair.privateKey,
+                    identity: {
+                        type: "email",
+                        value: identityValue,
+                        validation_token: validationToken
+                    }
+                });
+            })
+            .then(function(card) {
+                createdCard = card;
 
-            self.currentState(appStates.CONFIRMATION);
-        }).catch(function (ex) {
-
-            self.errorText(ex.message);
-            self.currentState(appStates.CONFIRMATION);
-        });
+                self.loadingText("Stashing a Private Key...");
+                return virgilHub.privateKeys.stash({
+                    virgil_card_id: card.id,
+                    private_key: generatedKeyPair.privateKey
+                });
+            })
+            .then(function() {
+                return {
+                    card: createdCard,
+                    private_key: generatedKeyPair.privateKey
+                };
+            });
     };
 
-    /* Sends confirmation code for entered E-mail address.
-    ---------------------------------------------------------------------------------------------------------*/
-    self.confirm = function(){
+    /**
+     * Loads virgil card and private key from Virgil Services.
+     * @param {Object} card The Virgil Card object. 
+     * @param {String} token The validation token.
+     * @returns {Promise} 
+     */
+    var loginWithExistingCard = function (card, token) {
+
+        self.loadingText("Loading a Private Key...");
+
+        return virgilHub.privateKeys
+            .get({
+                virgil_card_id: card.id,
+                identity: {
+                    type: "email",
+                    value: card.identity.value,
+                    validation_token: token
+                }})
+            .then(function (response) {
+                return {
+                    card: card,
+                    private_key: atob(response.private_key)
+                };
+            });
+    };
+
+    /**
+     * Confirms an e-mail address and create
+     */
+    self.confirmAndLogin = function(){
         
         self.currentState(appStates.LOADING);
         self.errorText("");
 
-        virgilHub.identity.confirm({
-            action_id: account.confirm_action_id,
-            confirmation_code: self.confirmCode(),
-            token: { 
-                time_to_live: 3600,
-                count_to_live: 1
-            }
-        }).then(function (result) {
-            delete account.confirm_action_id;
-            account.identity_token = result.identity_token;
-            saveAccount(account);
-            createVirgilCard();
-        }).catch(function (ex) {
-            if (ex.code == 40180) {
-                createVirgilCard();
-            }
+        var validationToken;
 
-            self.errorText(ex.message);
-            self.currentState(appStates.CONFIRMATION);
-        });
-
-        //virgilHub.identity.confirm({ })
-
-        //if (typeof account.action_token !== "undefined") {
-
-        //    self.loadingText("Updating a Public Key...");
-
-        //    virgilHub.persistKey(account.public_key_id, account.action_token, [self.confirmCode()])
-        //        .then(
-        //            function(result) {
-        //                delete account.action_token;
-        //                account.user_data.is_confirmed = true;
-        //                saveAccount(account);
-        //                initialize();
-        //            },
-        //            function(result) {
-        //                self.errorText(result.error.message);
-        //                self.currentState(appStates.CONFIRMATION);
-        //            }
-        //        );
-
-        //    return;
-        //}
-
-        //self.loadingText("Confirmation registration...");
-
-        //virgilHub.persistUserData(account.user_data.id.user_data_id, self.confirmCode()).then(
-        //    function(response) {
-        //        account.user_data.is_confirmed = true;
-        //        saveAccount(account);
-        //        initialize();
-        //    },
-        //    function(response) {
-        //        if (response.code == 20213){                    
-        //            account.user_data.is_confirmed = true;
-        //            saveAccount(account);
-        //            initialize();
-        //        }
-        //        else {
-        //            self.errorText(response.error.message);
-        //            self.currentState(appStates.CONFIRMATION);
-        //        }
-        //    }
-        //);
+        self.loadingText("Checking the identity...");
+        virgilHub.identity
+            .confirm({
+                action_id: account.confirm_action_id,
+                confirmation_code: self.confirmCode(),
+                token: {
+                    time_to_live: 3600,
+                    count_to_live: 1
+                }
+            })
+            .then(function (result) {
+                validationToken = result.validation_token;
+                self.loadingText("Searching for the card...");
+                return virgilHub.cards.search({ value: self.email(), type: "email" });
+            })
+            .then(function(cards) {
+                return cards.length === 0
+                    ? loginAndRegisterCard(self.email(), validationToken)
+                    : loginWithExistingCard(cards[0], validationToken);
+            })
+            .then (function(details) {
+                account = details;
+                saveAccount(account);
+                initialize();
+            })
+            .catch(function (ex) {
+                self.errorText(ex.message);
+                self.currentState(appStates.CONFIRMATION);
+            });
     };
     
-    self.register = function(){
-
-        if (self.hasPrivateKey()){
-            readAccountFromFile();
-            return;
-        }
-
-        self.currentState(appStates.LOADING);
-        self.loadingText("Generating a Key Pair...");
-        self.errorText("");
+    /**
+     * Sends request to verify entered e-mail address.
+     */
+    self.verifyEmail = function(){
         
-        virgilHub.identity.verify({ type: 'email', value: self.email() })
+        self.currentState(appStates.LOADING);
+        self.errorText("");
+
+        self.loadingText("Sending request for verification...");
+        virgilHub.identity
+            .verify({ type: "email", value: self.email() })
             .then(function(response) {
                 account = {
                     confirm_action_id: response.action_id,
@@ -480,82 +429,11 @@ var App = function () {
                 };
                 saveAccount(account);
                 self.currentState(appStates.CONFIRMATION);
+            })
+            .catch(function(ex) {
+                self.errorText(ex.message);
             });
-
-        //virgilCrypto.generateKeyPair(keysTypesEnum.ecNist256).then(function (keyPair) {
-
-        //    virgilHub.cards.create({
-        //        public_key: keyPair.publicKey,
-        //        private_key: keyPair.privateKey,
-        //        identity: {
-        //            type: 'email',
-        //            value: self.email(),
-        //            validation_token: 'token from identity.confirm'
-        //        }
-        //    });
-
-        //    // prepare user data fot public key.
-        //    var userData = [ { 'class': 'user_id', 'type': 'email', 'value': self.email() } ];
-        //    var virgilPublicKey =  new VirgilSDK.PublicKey(keyPair.publicKey, userData);
-        //    var virgilPrivateKey = new VirgilSDK.PrivateKey(keyPair.privateKey);
-
-        //    self.loadingText("Registering a Public Key...");
-
-        //    var publicKeyId = null;
-
-        //    // request for registration public key on 'Virgil Keys Service'
-        //    virgilHub.addKey(virgilPublicKey, virgilPrivateKey.KeyBase64).then(
-        //        function(response){
-                    
-        //            account = {
-        //                'public_key_id': response.id.public_key_id,
-        //                'public_key': keyPair.publicKey,
-        //                'private_key': keyPair.privateKey,
-        //                'user_data': response.user_data[0]
-        //            };
-
-        //            saveAccount(account);
-        //            self.currentState(appStates.CONFIRMATION);
-        //        },
-        //        function(response){
-
-        //            if (response.error.code == 20107){
-
-        //                virgilHub.searchKey(userData[0].value)
-        //                    .then(function(result) {
-
-        //                        publicKeyId = result.id.public_key_id;
-
-        //                        return virgilHub.resetKey(result.id.public_key_id, 
-        //                            btoa(keyPair.publicKey), btoa(keyPair.privateKey));
-        //                    })
-        //                    .then(function(result) {
-        //                        account = {
-        //                            'public_key_id': publicKeyId,
-        //                            'public_key': keyPair.publicKey,
-        //                            'private_key': keyPair.privateKey,
-        //                            'user_data': userData[0],
-        //                            'action_token': result.action_token
-        //                        };
-
-        //                        saveAccount(account);
-        //                        self.currentState(appStates.CONFIRMATION);
-        //                    });
-
-        //                self.currentState(appStates.LOADING);
-        //                self.loadingText('Resetting Public Key...');
-
-        //                return;
-        //            }
-
-        //            self.errorText(response.error.message);
-        //            self.currentState(appStates.STARTUP);
-        //        }
-        //    );
-
-        //});
     };
-   
-
-    initialize(true);
+    
+    initialize();
 };

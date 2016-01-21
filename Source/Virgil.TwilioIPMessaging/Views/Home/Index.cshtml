@@ -32,7 +32,7 @@
                         </div>
                         <div class="auth-form-footer">
                             <hr />
-                            <button type="submit" data-bind="click: register" class="btn btn-primary btn-block">Login</button>
+                            <button type="submit" data-bind="click: verifyEmail" class="btn btn-primary btn-block">Login</button>
                         </div>
                     </div>
                     <div class="form-confirm" data-bind="visible: currentState() == 1" style="display: none">
@@ -47,7 +47,7 @@
                         </div>
                         <div class="auth-form-footer">
                             <hr />
-                            <button type="submit" data-bind="click: confirm, enable: confirmCode" class="btn btn-primary btn-block">Confirm</button>
+                            <button type="submit" data-bind="click: confirmAndLogin, enable: confirmCode" class="btn btn-primary btn-block">Confirm</button>
                         </div>
                     </div>
                     <div class="form-loading" data-bind="visible: currentState() == 2">
@@ -86,7 +86,6 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bind="text: currentUserCaption" aria-haspopup="true" aria-expanded="false"></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="#" data-bind="click: saveKeys">Save Keys As...</a></li>
                                     <li><a href="#" data-bind="click: exit">Exit</a></li>
                                 </ul>
                             </li>
@@ -100,9 +99,9 @@
                     </div>
                     <div class="chat-input-panel">
                         <div class="input-group">
-                            <input type="text" data-bind="enable: currentChannel && !isCurrentChannelLoading(), value: inputMessage, valueUpdate: 'afterkeydown', executeOnEnter: postMessage" class="form-control" placeholder="Type a message here">
+                            <input type="text" data-bind="enable: currentChannel() && !isCurrentChannelLoading(), value: inputMessage, valueUpdate: 'afterkeydown', executeOnEnter: postMessage" class="form-control" placeholder="Type a message here">
                             <span class="input-group-btn">
-                                <button data-bind="click: postMessage, enable: inputMessage().length > 0 && currentChannel && !isCurrentChannelLoading()" class="btn btn-primary btn-chat" type="button">Send</button>
+                                <button data-bind="click: postMessage, enable: inputMessage().length > 0 && currentChannel() && !isCurrentChannelLoading()" class="btn btn-primary btn-chat" type="button">Send</button>
                             </span>
                         </div>
                     </div>
@@ -141,8 +140,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
     <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.9.0/twilio-ip-messaging.min.js"></script>
-    @*<script src="https://cdn.virgilsecurity.com/data/js/virgil-sdk-keys-public/latest/virgil-sdk-keys-public.min.js"></script>*@
-    <script src="/js/virgil-sdk.min.js"></script>    
+    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/latest/virgil-sdk.min.js"></script>
     <script src="/js/knockoutjs.utils.js"></script>
     <script src="/js/FileSaver.js"></script>
     <script src="/js/app.js"></script>

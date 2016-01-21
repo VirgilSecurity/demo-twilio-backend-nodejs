@@ -28,7 +28,7 @@
                 foreach (var message in messages)
                 {
                     var encryptedBodyData = Convert.FromBase64String(message.body);
-                    var recepientIdData = Encoding.UTF8.GetBytes(Constants.TwilioChannelAdminPublicKeyId);
+                    var recepientIdData = Encoding.UTF8.GetBytes(Constants.TwilioChannelAdminCardId);
 
                     try
                     {
