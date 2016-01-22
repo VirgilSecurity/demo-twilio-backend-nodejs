@@ -8,7 +8,7 @@ Let's dive into a few of the key techniques you'll need to employ while working 
   * [Register a Virgil Security developer's account](#user-content-register-a-virgil-security-developers-account)
   * [Install and Initialize](#install-and-initialize)
   * [Generate a new public / private key pair for end-to-end encryption](#user-content-generate-a-new-public-private-key-pair-for-end-to-end-encryption)
-  * [Publish the public key to the Virgil Keys service](#user-content-publish-the-public-key-to-the-virgil-keys-service)
+  * [Publish a Public Key in the form of Virgil Card](#publish-a-public-key-in-the-form-of-virgil-card)
   * [Create a Channel](#user-content-create-a-channel)
   * [Send encrypted Messages to a Channel](#user-content-send-encrypted-messages-to-a-channel)
   * [Receive encrypted Messages on a Channel and decrypt them](#user-content-receive-encrypted-messages-on-a-channel-and-decrypt-them)
@@ -46,8 +46,10 @@ var virgil = new Virgil("%ACCESS_TOKEN%");
 var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 ```
 
-### Publish a Public Key
-Publish a Public Key to Virgil Keys service, using Virgil Identity verification service.
+### Publish a Public Key in the form of Virgil Card
+
+
+
 ```js
 var emailCheckActionId;
 
