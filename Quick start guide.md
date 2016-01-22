@@ -35,6 +35,12 @@ bower install virgil-sdk
 <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/latest/virgil-sdk.min.js"></script>
 ```
 
+### Initialization
+```js
+var Virgil = window.VirgilSDK;
+var virgil = new Virgil("%ACCESS_TOKEN%");
+```
+
 ### Generate a new public private key pair for end-to-end encryption
 ```javascript
 var keyPair = Virgil.Crypto.generateKeys('', 'KEYS_PASSWORD_GOES_HERE');
