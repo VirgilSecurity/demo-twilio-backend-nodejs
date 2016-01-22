@@ -64,6 +64,8 @@ virgil.identity.verify({
 Confirm the identity and Publish a Public Key in the form of Virgil Card
 
 ```js
+var myCard;
+
 // Send confirmation request and get temporary validation token. 
 virgil.identity.confirm({ 
     action_id: emailCheckActionId, 
@@ -80,7 +82,7 @@ virgil.identity.confirm({
         }
     });
 }).then(function (card){
-    var myVirgilCard = card;
+    var myCard = card;
 });
 ```
 
@@ -106,12 +108,12 @@ Once you're a member of a Channel, you can send a Message to it. A Message is a 
 ```javascript
 // Receive the list of Channel's recipients
 myChannel.getMembers().map(function(member) {
-    // Search for the member’s key on Virgil Keys service
-    return virgil.cards.search(member.identity)
+    // Search for the member’s cards on Virgil Keys service
+    return virgil.cards.search({ value: member.identity })
 }).then(function(recipients) {
     var msg = $('#chat-input').val();
-    var encryptedMsg = Virgil.Crypto.encrypt(message, recipients);
-    myChannel.sendMessage(encryptedMsg);    
+    var encryptedMsg = virgil.crypto.encrypt(msg, recipients);
+    myChannel.sendMessage(msg.toString('base64'));    
 });
 ```
 
@@ -126,7 +128,7 @@ You can also be notified of any new incoming Messages with an event handler. Thi
 // Listen for new Messages sent to a Channel
 myChannel.on('messageAdded', function(message) {
     // Decrypt the Message using global public key id and private key values.
-    var decryptedMessage = Virgil.Crypto.decrypt(message.body, keyPair);
+    var decryptedMessage = Virgil.Crypto.decrypt(message.body, myCard.id, keyPair.privateKey);
     console.log(message.author, decryptedMessage);
 });
 ```
