@@ -49,8 +49,9 @@ var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 ### Publish a Public Key
 Publish a Public Key to Virgil Keys service, using Virgil Identity verification service.
 ```js
-// Global variables to store verification action ID.
 var emailCheckActionId;
+
+// Send request for e-mail verification.
 
 virgil.identity.verify({ value: 'email@address.com', type: 'email' })
     .then(function(response){
@@ -59,30 +60,23 @@ virgil.identity.verify({ value: 'email@address.com', type: 'email' })
 
 ...
 
+// Confirm e-mail and publish a Public Key to Virgil Keys service.
+
 virgil.identity.confirm({ action_id: emailCheckActionId, confirmation_code: '{CONFIRMATION_CODE}' })
     .then(function(response){
-     
-    });
-
-// Global variables to store public key id and private key value
-var currentUserPublicKeyId;
-var currentUserPrivateKey;
-
-// Special identity descriptor that is used to match a public key with a user identity
-var userIdentity = [{
-    'class': 'user_id',
-    'type': 'username',
-    'value': 'User nickname'
-}];
-
-// Publish the key to the Virgil Keys infrastructure to make available for other users
-vsKeysService.publish(keyPair, userIdentity).then(
-    function(response) {
-        // Save public and private keys values to the global variables for further encryption / decryption
-        currentUserPublicKeyId = response.id.public_key_id;
-        currentUserPrivateKey = keyPair.privateKey;
+        return virgil.cards.create({ 
+            public_key: keyPair.publicKey,
+            private_key: keyPair.privateKey,
+            identity: {
+                type: 'email',
+                value: 'user@virgilsecurity.com',
+                validation_token: response.validation_token
+            }
+        });
     })
-)); 
+    .then(function (card){
+        var myVirgilCard = card;
+    });
 ```
 
 ## Create a Channel
