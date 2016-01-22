@@ -20,6 +20,12 @@ As a first step, you’ll need to create a development account on https://develo
 an access token to perform calls to Virgil API services. The access token looks like `45fd8a505f50243fa8400594ba0b2b29` 
 and will be used to instantiate Virgil SDK client in the code below.
 
+### Installation
+
+```
+npm install virgil-crypto
+```
+
 ### Generate a new public private key pair for end-to-end encryption
 ```javascript
 var keyPair = Virgil.Crypto.generateKeys('', 'KEYS_PASSWORD_GOES_HERE');
