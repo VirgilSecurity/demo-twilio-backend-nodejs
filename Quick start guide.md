@@ -81,8 +81,8 @@ virgil.identity.confirm({
             validation_token: response.validation_token
         }
     });
-}).then(function (card){
-    var myCard = card;
+}).then(function (createdCard){
+    myCard = createdCard;
 });
 ```
 
