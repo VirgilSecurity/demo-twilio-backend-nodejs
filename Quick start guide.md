@@ -44,6 +44,8 @@ var virgil = new Virgil("%ACCESS_TOKEN%");
 ### Generate a new public private key pair for end-to-end encryption
 ```js
 var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
+console.log('Generated key pair:');
+console.log(keyPair);
 ```
 
 ### Publish a Public Key in the form of Virgil Card
@@ -51,7 +53,6 @@ var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 Initialize the identity verification process for user's e-mail account.
 ```js
 var emailCheckActionId;
-
 // Send request for e-mail verification.
 virgil.identity.verify({ 
     value: 'email@address.com', 
@@ -68,7 +69,6 @@ virgil.identity.confirm({
     action_id: emailCheckActionId, 
     confirmation_code: '{CONFIRMATION_CODE}' 
 }).then(function(response){
-
     // Create a Virgil Card with Identity and Public Key
     return virgil.cards.create({ 
         public_key: keyPair.publicKey,
@@ -88,7 +88,7 @@ virgil.identity.confirm({
 
 Before you can start sending Messages, you first need a Channel. Here is how you create a Channel.
 
-```javascript
+```js
 // Create a Channel
 messagingClient.createChannel({
     uniqueName: 'general',
@@ -105,16 +105,14 @@ Once you're a member of a Channel, you can send a Message to it. A Message is a 
 
 ```javascript
 // Receive the list of Channel's recipients
-myChannel.getMembers()
-    .map(function(member) {
-        // Search for the member’s key on Virgil Keys service
-        return vsKeysService.searchKey(member.identity)
-    })
-    .then(function(recipients) {
-        var msg = $('#chat-input').val();
-        var encryptedMsg = Virgil.Crypto.encrypt(message, recipients);
-        myChannel.sendMessage(encryptedMsg);    
-    });
+myChannel.getMembers().map(function(member) {
+    // Search for the member’s key on Virgil Keys service
+    return virgil.cards.search(member.identity)
+}).then(function(recipients) {
+    var msg = $('#chat-input').val();
+    var encryptedMsg = Virgil.Crypto.encrypt(message, recipients);
+    myChannel.sendMessage(encryptedMsg);    
+});
 ```
 
 Today, a Message is just a string of text. In the future, this may expand to include other media types such as images and binary data. For now, in addition to text Messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
