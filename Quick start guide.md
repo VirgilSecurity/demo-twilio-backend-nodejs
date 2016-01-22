@@ -48,22 +48,17 @@ var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 
 ### Publish a Public Key in the form of Virgil Card
 
-
-
+Initialize the identity verification process for user's e-mail accont.
 ```js
 var emailCheckActionId;
-
-// Send request for e-mail verification.
 
 virgil.identity.verify({ value: 'email@address.com', type: 'email' })
     .then(function(response){
       emailCheckActionId = response.action_id;
     });
-
-...
-
-// Confirm e-mail and publish a Public Key to Virgil Keys service.
-
+```
+Confirm the identity and Publish a Public Key in the form of Virgil Card
+```js
 virgil.identity.confirm({ action_id: emailCheckActionId, confirmation_code: '{CONFIRMATION_CODE}' })
     .then(function(response){
         return virgil.cards.create({ 
