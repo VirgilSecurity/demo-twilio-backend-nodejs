@@ -48,32 +48,40 @@ var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 
 ### Publish a Public Key in the form of Virgil Card
 
-Initialize the identity verification process for user's e-mail accont.
+Initialize the identity verification process for user's e-mail account.
 ```js
 var emailCheckActionId;
 
-virgil.identity.verify({ value: 'email@address.com', type: 'email' })
-    .then(function(response){
-      emailCheckActionId = response.action_id;
-    });
+// Send request for e-mail verification.
+virgil.identity.verify({ 
+    value: 'email@address.com', 
+    type: 'email' 
+}).then(function(response){
+    emailCheckActionId = response.action_id;
+});
 ```
 Confirm the identity and Publish a Public Key in the form of Virgil Card
+
 ```js
-virgil.identity.confirm({ action_id: emailCheckActionId, confirmation_code: '{CONFIRMATION_CODE}' })
-    .then(function(response){
-        return virgil.cards.create({ 
-            public_key: keyPair.publicKey,
-            private_key: keyPair.privateKey,
-            identity: {
-                type: 'email',
-                value: 'user@virgilsecurity.com',
-                validation_token: response.validation_token
-            }
-        });
-    })
-    .then(function (card){
-        var myVirgilCard = card;
+// Send confirmation request and get temporary validation token. 
+virgil.identity.confirm({ 
+    action_id: emailCheckActionId, 
+    confirmation_code: '{CONFIRMATION_CODE}' 
+}).then(function(response){
+
+    // Create a Virgil Card with Identity and Public Key
+    return virgil.cards.create({ 
+        public_key: keyPair.publicKey,
+        private_key: keyPair.privateKey,
+        identity: {
+            type: 'email',
+            value: 'user@virgilsecurity.com',
+            validation_token: response.validation_token
+        }
     });
+}).then(function (card){
+    var myVirgilCard = card;
+});
 ```
 
 ## Create a Channel
