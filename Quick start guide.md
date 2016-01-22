@@ -42,12 +42,28 @@ var virgil = new Virgil("%ACCESS_TOKEN%");
 ```
 
 ### Generate a new public private key pair for end-to-end encryption
-```javascript
+```js
 var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 ```
 
-### Publish the public key to the Virgil Keys service
-```javascript
+### Publish a Public Key
+Publish a Public Key to Virgil Keys service, using Virgil Identity verification service.
+```js
+// Global variables to store verification action ID.
+var emailCheckActionId;
+
+virgil.identity.verify({ value: 'email@address.com', type: 'email' })
+    .then(function(response){
+      emailCheckActionId = response.action_id;
+    });
+
+...
+
+virgil.identity.confirm({ action_id: emailCheckActionId, confirmation_code: '{CONFIRMATION_CODE}' })
+    .then(function(response){
+     
+    });
+
 // Global variables to store public key id and private key value
 var currentUserPublicKeyId;
 var currentUserPrivateKey;
