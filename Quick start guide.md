@@ -35,8 +35,7 @@ bower install virgil-sdk
 ```html
 <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/latest/virgil-sdk.min.js"></script>
 ```
-
-### Initialization
+Use code below to initialize global variable of VirgilSDK.
 ```js
 var Virgil = window.VirgilSDK;
 var virgil = new Virgil("%ACCESS_TOKEN%");
