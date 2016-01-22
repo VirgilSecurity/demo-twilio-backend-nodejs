@@ -43,10 +43,7 @@ var virgil = new Virgil("%ACCESS_TOKEN%");
 
 ### Generate a new public private key pair for end-to-end encryption
 ```javascript
-var keyPair = Virgil.Crypto.generateKeys('', 'KEYS_PASSWORD_GOES_HERE');
-
-// Instantiate Virgil Keys client with developer's access token
-var vsKeysService = new Virgil.PublicKeysService('45fd8a505f50243fa8400594ba0b2b29');
+var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
 ```
 
 ### Publish the public key to the Virgil Keys service
