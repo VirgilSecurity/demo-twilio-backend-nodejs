@@ -60,7 +60,7 @@
             {
                 UserId = memberName,
                 PublicKeyData = card.PublicKey.PublicKey,
-                PublicKeyIdData = Encoding.UTF8.GetBytes(card.PublicKey.Id.ToString())
+                PublicKeyIdData = Encoding.UTF8.GetBytes(card.Id.ToString())
             };
             
             return publicKeyInfo;

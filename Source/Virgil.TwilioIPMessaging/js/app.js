@@ -135,7 +135,7 @@ var App = function () {
             .then(function (result) {
                 // extend the channel member with public key.
                 member.publicKey = {
-                    id: result[0].public_key.id,
+                    id: result[0].id,
                     data: atob(result[0].public_key.public_key)
                 };
 
@@ -150,7 +150,10 @@ var App = function () {
     var onMessageAdded = function (message) {
         
         // decrypt message with current user's private key.
-        var decryptedBody = virgilCrypto.decrypt(message.body, account.card.id, account.private_key);
+
+        var encryptedBuffer = new virgilCrypto.Buffer(message.body, 'base64');
+
+        var decryptedBody = virgilCrypto.decrypt(encryptedBuffer, account.card.id, account.private_key);
 
         var author = message.from ? message.from : message.author;
 
@@ -238,7 +241,7 @@ var App = function () {
 
         virgilCrypto.encryptAsync(message, recipients)
             .then(function (encryptedData) {
-                self.currentChannel().sendMessage(encryptedData);
+                self.currentChannel().sendMessage(encryptedData.toString('base64'));
             })
             .catch(function(ex) {
                 alert(ex.message);
@@ -254,7 +257,7 @@ var App = function () {
 
         // add channel admin to custom attributes.
 
-        virgilHub.cards.search({ value: "virgil-twilio0@mailinator.com", type: 'email' })
+        virgilHub.cards.search({ value: "chat-god@mailinator.com", type: 'email' })
             .then(function (result) {
                 var friendlyChatName = channelName + " (" + account.card.identity.value + ")";
                 var options = { friendlyName: friendlyChatName };
@@ -312,7 +315,7 @@ var App = function () {
         self.loadingText("Generating a Key Pair...");
 
         return virgilCrypto
-            .generateKeyPairAsync(virgilCrypto.KeysTypesEnum.ecNist256)
+            .generateKeyPairAsync("", virgilCrypto.KeysTypesEnum.ecNist256)
             .then(function(keyPair) {
                 generatedKeyPair = keyPair;
 
