@@ -22,8 +22,17 @@ and will be used to instantiate Virgil SDK client in the code below.
 
 ### Installation
 
+##### NPM
 ```
-npm install virgil-crypto
+npm install virgil-sdk
+```
+##### Bower
+```
+bower install virgil-sdk
+```
+##### CDN
+```html
+<script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/latest/virgil-sdk.min.js"></script>
 ```
 
 ### Generate a new public private key pair for end-to-end encryption
