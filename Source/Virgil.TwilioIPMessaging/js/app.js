@@ -1,7 +1,7 @@
 var App = function () {
     var self = this;
     
-    var APP_TOKEN = "eyJhcHBsaWNhdGlvbl9pZCI6MywidGltZV90b19saXZlIjpudWxsLCJjb3VudF90b19saXZlIjpudWxsLCJwcm9sb25nIjpudWxsfQ==.MIGZMA0GCWCGSAFlAwQCAgUABIGHMIGEAkB0XwTzK4zViBu97GE2qTrA82CjDOJ3m0sWLsB+fAQsFMSDNdtWlnf2epYB9rVQr6dm/f1x1hj9V3ACAE3SZDLuAkBmURJCwhj5+B5Xfjg/VacQOIosicXkDMQ+5YZsvT4XOV5g9+xykAFHvGIOHN1G77ABT2G+UosOWNgnz/uPQENH";
+    var APP_TOKEN = "eyJpZCI6IjIxMDk4ZjhlLWFjMzQtNGFkYy04YTBmLWFkZmM1YzBhNWE0OSIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiI2OWRlYzc1MC1hMDNmLTRmNmYtYTJlYi1iNTE2MzJkZmE3MTIiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGaMA0GCWCGSAFlAwQCAgUABIGIMIGFAkEAhc7LGcy2qyRBJLsZu1Casdr6pcoub/pR3j1SB4E0HFx+XlfPqE9xIViG/Em3l+y2EkFvvjbSWdaMkHroO+UmOQJAMMEZB7rAynJuUog8ZbxabsYZ5TUtnOfRCIdkjYq+26BDIA7dn9lSE1s8TstZHP9f/ICmc2SMgAV7okyyomm5uQ==";
     var VirgilSDK = new window.VirgilSDK(APP_TOKEN, {
         identityBaseUrl: 'https://identity-stg.virgilsecurity.com/v1',
         privateKeysBaseUrl: 'https://keys-private-stg.virgilsecurity.com/v3',
@@ -51,11 +51,17 @@ var App = function () {
         if (accountDataString === null) {
             return null;
         }
-
+       
         var accountData = JSON.parse(accountDataString);
+
+        // fix to forse users generate new keys.
+        if (accountData.public_key_id) {
+            return null;
+        }
+
         return accountData;
     };
-
+    
     /**
      * Initializes the chat application. 
      */
@@ -81,9 +87,8 @@ var App = function () {
 
         $.getJSON("/api/token?identity=" + account.card.identity.value, function (token) {
 
-            accessManager = new Twilio.AccessManager(token);
-            messagingClient = new Twilio.IPMessaging.Client(accessManager);
-
+            messagingClient = new window.Twilio.IPMessaging.Client(token);
+            
             self.loadingText("Loading channels...");
 
             messagingClient.getChannels().then(function (channels) {
@@ -105,41 +110,21 @@ var App = function () {
     };
     
     /**
-     * Gets the current channel member by member's sid.
-     * @param {String} member The memeber's SID.
-     * @returns {Object} Returns member from cache otherwise null.
-     */
-    var getMember = function (memberSid) {
-
-        for (var i = 0; i < self.channelMembers().length; i++) {
-            if (self.channelMembers()[i].sid === memberSid) {
-                return self.channelMembers()[i];
-            }
-        };
-
-        return null;
-    };
-    
-    /**
      * Occurs on member joined to the current channel.     
      * @param {Object} member The member which joined to the channel.
      */
     var onMemberJoined = function (member) {
 
-        var channelMember = getMember(member.sid);
-        if (channelMember)
-            return;
-
         // get member's public key by member's identity.
-        virgilHub.cards.search({ value: member.identity, type: 'email' })
+        virgilHub.cards.search({ value: member.identity, type: "email" })
             .then(function (result) {
-                // extend the channel member with public key.
                 member.publicKey = {
                     id: result[0].id,
                     data: atob(result[0].public_key.public_key)
                 };
 
                 self.channelMembers.push(member);
+                $.notify("Hello World", "success");
             });
     };
 
@@ -202,13 +187,45 @@ var App = function () {
                 self.currentChannelCaption(channel.friendlyName);
                 self.currentChannel(channel);
 
+                self.channelMembers.removeAll();
+
                 return channel.getAttributes();
             })
             .then(function () {
                 return channel.getMembers();
             })
+            .then(function(members) {
+                return members.reduce(function(seq, member) {
+                    return seq.then(function() {
+                        return virgilHub.cards.search({ value: member.identity, type: "email" })
+                            .then(function(result) {
+                                member.publicKey = {
+                                    id: result[0].id,
+                                    data: atob(result[0].public_key.public_key)
+                                };
+
+                                self.channelMembers.push(member);
+                            });
+                    });
+                }, Promise.resolve());
+            })
+            //.then(function (members) {
+            //    return Promise.all(members.map(function(member) {
+            //        return virgilHub.cards.search({ value: member.identity, type: "email" })
+            //            .then(function (result) {
+            //                member.publicKey = {
+            //                    id: result[0].id,
+            //                    identity: result[0].identity.value,
+            //                    data: atob(result[0].public_key.public_key)
+            //                };
+
+            //                self.channelMembers.push(member);
+            //                return member.publicKey;
+            //            });
+            //    }));
+            //})
             .then(function (members) {
-                members.forEach(onMemberJoined);
+                // members.forEach(onMemberJoined);
                 onChannelLoaded(channel);
             });
     }
@@ -241,7 +258,7 @@ var App = function () {
 
         virgilCrypto.encryptAsync(message, recipients)
             .then(function (encryptedData) {
-                self.currentChannel().sendMessage(encryptedData.toString('base64'));
+                self.currentChannel().sendMessage(encryptedData.toString("base64"));
             })
             .catch(function(ex) {
                 alert(ex.message);
@@ -250,14 +267,14 @@ var App = function () {
 
     self.createChannel = function () {
 
-        $('#createChannelModal').modal('hide');
+        $("#createChannelModal").modal("hide");
         self.isCurrentChannelLoading(true);
 
         var channelName = self.newChannelName();
 
         // add channel admin to custom attributes.
 
-        virgilHub.cards.search({ value: "chat-god@mailinator.com", type: 'email' })
+        virgilHub.cards.search({ value: "chat-god@mailinator.com", type: "email" })
             .then(function (result) {
                 var friendlyChatName = channelName + " (" + account.card.identity.value + ")";
                 var options = { friendlyName: friendlyChatName };
@@ -315,7 +332,7 @@ var App = function () {
         self.loadingText("Generating a Key Pair...");
 
         return virgilCrypto
-            .generateKeyPairAsync("", virgilCrypto.KeysTypesEnum.ecNist256)
+            .generateKeyPairAsync("", virgilCrypto.KeysTypesEnum.EC_SECP192R1)
             .then(function(keyPair) {
                 generatedKeyPair = keyPair;
 
@@ -333,6 +350,9 @@ var App = function () {
             .then(function(card) {
                 createdCard = card;
 
+                account = { card: card, private_key: generatedKeyPair.privateKey, is_local: true };
+                saveAccount(account);
+                
                 self.loadingText("Stashing a Private Key...");
                 return virgilHub.privateKeys.stash({
                     virgil_card_id: card.id,
@@ -433,7 +453,8 @@ var App = function () {
                 saveAccount(account);
                 self.currentState(appStates.CONFIRMATION);
             })
-            .catch(function(ex) {
+            .catch(function (ex) {
+                self.currentState(appStates.STARTUP);
                 self.errorText(ex.message);
             });
     };

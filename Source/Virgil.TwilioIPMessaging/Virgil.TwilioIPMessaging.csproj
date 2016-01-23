@@ -178,6 +178,7 @@
     <Content Include="js\FileSaver.min.js" />
     <Content Include="js\knockoutjs.utils.js" />
     <Content Include="js\app.js" />
+    <Content Include="js\notify.min.js" />
     <Content Include="js\virgil-sdk.min.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
