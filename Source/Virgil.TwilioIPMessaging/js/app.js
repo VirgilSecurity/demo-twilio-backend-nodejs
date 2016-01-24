@@ -1,7 +1,7 @@
 var App = function () {
     var self = this;
     
-    var APP_TOKEN = "eyJpZCI6IjIxMDk4ZjhlLWFjMzQtNGFkYy04YTBmLWFkZmM1YzBhNWE0OSIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiI2OWRlYzc1MC1hMDNmLTRmNmYtYTJlYi1iNTE2MzJkZmE3MTIiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGaMA0GCWCGSAFlAwQCAgUABIGIMIGFAkEAhc7LGcy2qyRBJLsZu1Casdr6pcoub/pR3j1SB4E0HFx+XlfPqE9xIViG/Em3l+y2EkFvvjbSWdaMkHroO+UmOQJAMMEZB7rAynJuUog8ZbxabsYZ5TUtnOfRCIdkjYq+26BDIA7dn9lSE1s8TstZHP9f/ICmc2SMgAV7okyyomm5uQ==";
+    var APP_TOKEN = "eyJpZCI6IjA3NDliMWRkLThmMzctNDY3Yi1iOGZiLTg3ODJjM2NmNTVjYyIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiIwNzQ5YjFkZC04ZjM3LTQ2N2ItYjhmYi04NzgyYzNjZjU1Y2MiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGZMA0GCWCGSAFlAwQCAgUABIGHMIGEAkA1gPzJThALAqtX3BY6aMYvqnO6TgL5Uzo4osBgk+I74u95LU9ze7NJcVPQlO4056M/lZ5l6jySFnfCIqVK8R9hAkAKoNCbfcoMmkgMwsU7TWbYtIJXosp7LjlM4QHp77dzskuPvADzXByqLKEIEcfsLUOBOGyLGatzWXo1KoUCSYQ3";
     var VirgilSDK = new window.VirgilSDK(APP_TOKEN, {
         identityBaseUrl: 'https://identity-stg.virgilsecurity.com/v1',
         privateKeysBaseUrl: 'https://keys-private-stg.virgilsecurity.com/v3',
@@ -194,38 +194,21 @@ var App = function () {
             .then(function () {
                 return channel.getMembers();
             })
-            .then(function(members) {
-                return members.reduce(function(seq, member) {
-                    return seq.then(function() {
-                        return virgilHub.cards.search({ value: member.identity, type: "email" })
-                            .then(function(result) {
-                                member.publicKey = {
-                                    id: result[0].id,
-                                    data: atob(result[0].public_key.public_key)
-                                };
-
-                                self.channelMembers.push(member);
-                            });
-                    });
-                }, Promise.resolve());
-            })
-            //.then(function (members) {
-            //    return Promise.all(members.map(function(member) {
-            //        return virgilHub.cards.search({ value: member.identity, type: "email" })
-            //            .then(function (result) {
-            //                member.publicKey = {
-            //                    id: result[0].id,
-            //                    identity: result[0].identity.value,
-            //                    data: atob(result[0].public_key.public_key)
-            //                };
-
-            //                self.channelMembers.push(member);
-            //                return member.publicKey;
-            //            });
-            //    }));
-            //})
             .then(function (members) {
-                // members.forEach(onMemberJoined);
+                return Promise.all(members.map(function(member) {
+                    return virgilHub.cards.search({ value: member.identity, type: "email" })
+                        .then(function (result) {
+                            member.publicKey = {
+                                id: result[0].id,
+                                identity: result[0].identity.value,
+                                data: result[0].public_key.public_key
+                            };
+
+                            self.channelMembers.push(member);
+                        });
+                }));
+            })
+            .then(function () {
                 onChannelLoaded(channel);
             });
     }
@@ -274,7 +257,7 @@ var App = function () {
 
         // add channel admin to custom attributes.
 
-        virgilHub.cards.search({ value: "chat-god@mailinator.com", type: "email" })
+        virgilHub.cards.search({ value: "chat-twilio@mailinator.com", type: "email" })
             .then(function (result) {
                 var friendlyChatName = channelName + " (" + account.card.identity.value + ")";
                 var options = { friendlyName: friendlyChatName };
@@ -282,7 +265,7 @@ var App = function () {
                 if (self.isNewChannelHistory()) {
                     options.attributes = {
                         virgil_card_id: result[0].id,
-                        virgil_public_key: atob(result[0].public_key.public_key)
+                        virgil_public_key: result[0].public_key.public_key
                     };
                 }
 

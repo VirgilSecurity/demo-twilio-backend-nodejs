@@ -13,9 +13,10 @@
         <div class="row" data-bind="visible: currentState() < 3">
             <div class="col-md-4 col-md-offset-4">
                 <div class="auth-form">
-                    <h3 class="text-center title">
-                        <b>Virgil</b> IP Messaging
+                    <h3 class="text-center">
+                        <b>Virgil & Twilio</b>
                     </h3>
+                    <h5 class="text-center">IP Messaging</h5>
                     <div data-bind="visible: currentState() == 0" style="display: none">
                         <div class="form-group">
                             <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
@@ -61,7 +62,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <h3 class="text-center title">
-                        <b>Virgil</b> IP Messaging
+                        <b>Virgil & Twilio</b> IP Messaging
                     </h3>
                 </div>
             </div>
@@ -140,7 +141,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
     <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.9.0/twilio-ip-messaging.min.js"></script>
-    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.0.4/virgil-sdk.min.js"></script>
+    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.0.6/virgil-sdk.min.js"></script>
     <script src="/js/knockoutjs.utils.js"></script>
     <script src="/js/notify.min.js"></script>
     <script src="/js/FileSaver.js"></script>
