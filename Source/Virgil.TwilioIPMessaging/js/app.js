@@ -1,5 +1,7 @@
 var App = function () {
     var self = this;
+
+    var version = "0.9.4";
     
     var APP_TOKEN = "eyJpZCI6IjA3NDliMWRkLThmMzctNDY3Yi1iOGZiLTg3ODJjM2NmNTVjYyIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiIwNzQ5YjFkZC04ZjM3LTQ2N2ItYjhmYi04NzgyYzNjZjU1Y2MiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGZMA0GCWCGSAFlAwQCAgUABIGHMIGEAkA1gPzJThALAqtX3BY6aMYvqnO6TgL5Uzo4osBgk+I74u95LU9ze7NJcVPQlO4056M/lZ5l6jySFnfCIqVK8R9hAkAKoNCbfcoMmkgMwsU7TWbYtIJXosp7LjlM4QHp77dzskuPvADzXByqLKEIEcfsLUOBOGyLGatzWXo1KoUCSYQ3";
     var VirgilSDK = new window.VirgilSDK(APP_TOKEN, {
@@ -15,7 +17,6 @@ var App = function () {
     var account = null;
 
     var messagingClient = null;
-    var accessManager = null;
 
     var appStates = { STARTUP: 0, CONFIRMATION: 1, LOADING: 2, CHAT: 3 };
 
@@ -55,7 +56,7 @@ var App = function () {
         var accountData = JSON.parse(accountDataString);
 
         // fix to forse users generate new keys.
-        if (accountData.public_key_id) {
+        if (accountData.version !== version) {
             return null;
         }
 
@@ -105,6 +106,7 @@ var App = function () {
      * @param {Object} account The virgil account data.
      */
     var saveAccount = function (account) {
+        account.version = version;
         var stringifiedAccountData = JSON.stringify(account);
         localStorage.setItem("virgil_account_data", stringifiedAccountData);
     };
@@ -135,9 +137,8 @@ var App = function () {
     var onMessageAdded = function (message) {
         
         // decrypt message with current user's private key.
-
+        
         var encryptedBuffer = new virgilCrypto.Buffer(message.body, 'base64');
-
         var decryptedBody = virgilCrypto.decrypt(encryptedBuffer, account.card.id, account.private_key);
 
         var author = message.from ? message.from : message.author;
@@ -390,7 +391,7 @@ var App = function () {
         virgilHub.identity
             .confirm({
                 action_id: account.confirm_action_id,
-                confirmation_code: self.confirmCode(),
+                confirmation_code: self.confirmCode().trim(),
                 token: {
                     time_to_live: 3600,
                     count_to_live: 1
@@ -424,6 +425,8 @@ var App = function () {
         
         self.currentState(appStates.LOADING);
         self.errorText("");
+
+        self.email(self.email().trim());
 
         self.loadingText("Sending request for verification...");
         virgilHub.identity

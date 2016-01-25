@@ -18,38 +18,35 @@
                     </h3>
                     <h5 class="text-center">IP Messaging</h5>
                     <div data-bind="visible: currentState() == 0" style="display: none">
-                        <div class="form-group">
-                            <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
-                            <p class="help-block">This e-mail address used to register your public key on our service.</p>
-                            <input type="text" data-bind="enable: !hasPrivateKey(), value: email, valueUpdate: 'afterkeydown'" class="form-control" id="Email" placeholder="E-mail">
-                        </div>
-                        @*<div class="checkbox">
-                            <label>
-                                <input data-bind="checked: hasPrivateKey" type="checkbox"> Use enterprise Virgil private key sync or load keys manually.
-                            </label>
-                        </div>
-                        <div data-bind="visible: hasPrivateKey" style="display: none" class="form-group">
-                            <input type="file" id="privateKeyInputFile">
-                        </div>*@
-                        <div class="auth-form-footer">
-                            <hr />
-                            <button type="submit" data-bind="enable: email(), click: verifyEmail" class="btn btn-primary btn-block">Login</button>
-                        </div>
+                        <br />
+                        <form data-bind="submit: verifyEmail">
+                            <div class="form-group">
+                                <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
+                                <p class="help-block">This e-mail address used to register your public key on our service.</p>
+                                <input type="text" data-bind="enable: !hasPrivateKey(), value: email, valueUpdate: 'input'" class="form-control" id="Email" placeholder="E-mail">
+                            </div>
+                            <div class="auth-form-footer">
+                                <hr />
+                                <button type="submit" data-bind="enable: email()" class="btn btn-primary btn-block">Login</button>
+                            </div>
+                        </form>
                     </div>
                     <div class="form-confirm" data-bind="visible: currentState() == 1" style="display: none">
-                        <div class="form-group">
-                            <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
-                            <p class="help-block">Please check your e-mail box and use confirmation code to verify your account.</p>
-                            <input type="text" data-bind="value: confirmCode, valueUpdate: 'input'" class="form-control" placeholder="Confirmation Code">
-
-                        </div>
-                        <div class="form-group">
-                            <a href="#" data-bind="click: exit">Back to Login</a>
-                        </div>
-                        <div class="auth-form-footer">
-                            <hr />
-                            <button type="submit" data-bind="click: confirmAndLogin, enable: confirmCode" class="btn btn-primary btn-block">Confirm</button>
-                        </div>
+                        <form data-bind="submit: confirmAndLogin">
+                            <br />
+                            <div class="form-group">
+                                <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
+                                <p class="help-block">Please check your e-mail box and use confirmation code to verify your account.</p>
+                                <input type="text" data-bind="value: confirmCode, valueUpdate: 'input'" class="form-control" placeholder="Confirmation Code">
+                            </div>
+                            <div class="form-group">
+                                <a href="#" data-bind="click: exit">Back to Login</a>
+                            </div>
+                            <div class="auth-form-footer">
+                                <hr/>
+                                <button type="submit" data-bind="enable: confirmCode" class="btn btn-primary btn-block">Confirm</button>
+                            </div>
+                        </form>
                     </div>
                     <div class="form-loading" data-bind="visible: currentState() == 2">
                         <img src="/img/loading.gif" />
@@ -66,7 +63,7 @@
                     </h3>
                 </div>
             </div>
-            <div class="row" >
+            <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <nav class="navbar navbar-default chat-header">
                         <div class="navbar-form navbar-left" role="search">
@@ -79,7 +76,7 @@
                                         <li><a href="#" data-bind="text: friendlyName, click: $root.setChannel"></a></li>
                                     </ul>
                                 </div>
-                                <button type="button" data-toggle="modal" data-bind="enable: !isCurrentChannelLoading()" data-target="#createChannelModal"  class="btn btn-default">Create</button>
+                                <button type="button" data-toggle="modal" data-bind="enable: !isCurrentChannelLoading()" data-target="#createChannelModal" class="btn btn-default">Create</button>
                                 <img style="width: 20px;" data-bind="visible: isCurrentChannelLoading" src="/img/loading.gif" />
                             </div>
                         </div>
@@ -125,14 +122,14 @@
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input type="checkbox" data-bind="checked: isNewChannelHistory" > History
+                                <input type="checkbox" data-bind="checked: isNewChannelHistory"> History
                             </label>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-bind="click: createChannel, enable: !isCurrentChannelLoading() && newChannelName().length > 0" >Create</button>
+                    <button type="button" class="btn btn-primary" data-bind="click: createChannel, enable: !isCurrentChannelLoading() && newChannelName().length > 0">Create</button>
                 </div>
             </div>
         </div>
@@ -145,7 +142,7 @@
     <script src="/js/knockoutjs.utils.js"></script>
     <script src="/js/notify.min.js"></script>
     <script src="/js/FileSaver.js"></script>
-    <script src="/js/app.js?BD82E303-0200-4999-85CD-2ABFEC0D0789"></script>
+    <script src="/js/app.js?B9E9C15D-7542-400E-99BE-71FC390EAF37"></script>
     <script type="text/javascript">
         ko.applyBindings(new App());
     </script>
