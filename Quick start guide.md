@@ -109,11 +109,15 @@ Once you're a member of a Channel, you can send a Message to it. A Message is a 
 // Receive the list of Channel's recipients
 myChannel.getMembers().map(function(member) {
     // Search for the member’s cards on Virgil Keys service
-    return virgil.cards.search({ value: member.identity })
+    return virgil.cards.search({ 
+        value: member.identity 
+    }).then(function(cards){
+        return { recipientId: cards[0].id, publicKey: cards[0].public_key.public };
+    })
 }).then(function(recipients) {
     var msg = $('#chat-input').val();
-    var encryptedMsg = virgil.crypto.encrypt(msg, recipients);
-    myChannel.sendMessage(msg.toString('base64'));    
+    var encryptedMsg = virgil.crypto.encryptStringToBase64(msg, recipients);
+    myChannel.sendMessage(encryptedMsg);    
 });
 ```
 
@@ -128,7 +132,7 @@ You can also be notified of any new incoming Messages with an event handler. Thi
 // Listen for new Messages sent to a Channel
 myChannel.on('messageAdded', function(message) {
     // Decrypt the Message using global public key id and private key values.
-    var decryptedMessage = Virgil.Crypto.decrypt(message.body, myCard.id, keyPair.privateKey);
+    var decryptedMessage = Virgil.Crypto.decryptStringFromBase64(message.body, myCard.id, keyPair.privateKey);
     console.log(message.author, decryptedMessage);
 });
 ```
