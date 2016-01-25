@@ -17,9 +17,9 @@ Note: All of these samples assume you have created your authenticated IP Messagi
 
 ## Virgil Security Changes
 ### Register a Virgil Security developer's account
-As a first step, you’ll need to create a development account on https://developer.virgilsecurity.com/account/signin to receive 
+As a first step, you’ll need to create a developer's account on https://developer.virgilsecurity.com/account/signin to receive 
 an access token to perform calls to Virgil API services. The access token looks like `45fd8a505f50243fa8400594ba0b2b29` 
-and will be used to instantiate Virgil SDK client in the code below.
+and will be used to instantiate Virgil SDK client [in the code below](#code).
 
 ### Install and Initialize
 
@@ -36,6 +36,7 @@ bower install virgil-sdk
 <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/latest/virgil-sdk.min.js"></script>
 ```
 Use code below to initialize global variable of VirgilSDK.
+<a name="code"></a>
 ```js
 var Virgil = window.VirgilSDK;
 var virgil = new Virgil("%ACCESS_TOKEN%");
