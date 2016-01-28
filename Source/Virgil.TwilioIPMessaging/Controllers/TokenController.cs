@@ -16,8 +16,9 @@
                 identity
             });
 
-            var token = twilio.GenerateToken();
-            return token;
+            var twilioToken = twilio.GenerateToken();
+            
+            return twilioToken;
         }
     }
 }

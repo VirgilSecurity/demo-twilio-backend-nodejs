@@ -8,9 +8,9 @@
         public static string TwilioAccountSID => ConfigurationManager.AppSettings["twilio:AccountSID"];
         public static string TwilioAuthToken => ConfigurationManager.AppSettings["twilio:AuthToken"];
         public static string TwilioIpMessagingServiceSID => ConfigurationManager.AppSettings["twilio:IpMessagingServiceSID"];
-        public static string TwilioChannelAdminCardId => "7e95615b-d1cd-4635-9bf6-8e9f538bd1da";
-        public static string TwilioChannelAdminPublicKeyId => "ce51c3b9-12c8-4519-8fc4-e364a2923f3b";
-        public static byte[] TwilioChannelAdminPrivateKey => Convert.FromBase64String("LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1GOENBUUVFR0NnRkp4MkJkdEFEbFY5cUhxa1ZKYkpZQy94eUhkT3gycUFLQmdncWhrak9QUU1CQWFFMEF6SUEKQkVIVTlTYmdjV1NON1pJK3lBck0xbnkvcld4ZmlLdVd1ZlorQ0s5aVdRZ20vZ3o1cWhYQzRFVEw4MnZRVnJ5RgpZdz09Ci0tLS0tRU5EIEVDIFBSSVZBVEUgS0VZLS0tLS0K");
-        public static string VirgilAppToken => ConfigurationManager.AppSettings["virgil:AppToken"];
+        public static string TwilioChannelAdminCardId => "e99ac8da-5d57-4f7e-898f-25bd7f62cc1a";
+        public static string TwilioChannelAdminPublicKeyId => "256077b6-80b0-481f-91c7-6a2b62a02041";
+        public static byte[] TwilioChannelAdminPrivateKey => Convert.FromBase64String("LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1GOENBUUVFR0c2SUNFWDdKbWVNdDNvMlY1M0V6cnh3UE83Mm5ZcVY1S0FLQmdncWhrak9QUU1CQWFFMEF6SUEKQkI5TitadXFGOFBLMVdaSE9yOGlBM29xNUl3eTYzRERaS25USFlaK1BxRkJURDIvaTBTOEVlZ2pOMFVUOGpVVQp6dz09Ci0tLS0tRU5EIEVDIFBSSVZBVEUgS0VZLS0tLS0K");
+        public static string VirgilAccessToken => ConfigurationManager.AppSettings["virgil:AppToken"];
     }
 }

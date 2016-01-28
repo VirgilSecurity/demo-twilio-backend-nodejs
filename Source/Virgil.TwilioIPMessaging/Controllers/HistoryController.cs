@@ -20,7 +20,7 @@
             var messages = twilioService.GetChennelHistory(channelSid);
 
             var publicKey = await EnsurePublicKey(memberName);
-            
+
             using (var cipher = new VirgilCipher())
             {
                 cipher.AddKeyRecipient(publicKey.PublicKeyIdData, publicKey.PublicKeyData);
@@ -48,11 +48,7 @@
 
         private static async Task<PublicKeyInfo> EnsurePublicKey(string memberName)
         {
-            var virgilHub = Bootsrapper.UseAccessToken(Constants.VirgilAppToken)
-                .WithCustomIdentityServiceUri(new Uri("https://identity-stg.virgilsecurity.com/v3/"))
-                .WithCustomPublicServiceUri(new Uri("https://keys-stg.virgilsecurity.com/v3/"))
-                .Build();
-
+            var virgilHub = VirgilHub.Create(Constants.VirgilAccessToken);
             var cards = await virgilHub.Cards.Search(memberName);
             var card = cards.Single();
                         

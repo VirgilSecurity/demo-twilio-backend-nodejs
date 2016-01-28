@@ -1,16 +1,10 @@
 var App = function () {
     var self = this;
 
-    var version = "0.9.4";
+    var version = "0.9.7";
     
-    var APP_TOKEN = "eyJpZCI6IjA3NDliMWRkLThmMzctNDY3Yi1iOGZiLTg3ODJjM2NmNTVjYyIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiIwNzQ5YjFkZC04ZjM3LTQ2N2ItYjhmYi04NzgyYzNjZjU1Y2MiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGZMA0GCWCGSAFlAwQCAgUABIGHMIGEAkA1gPzJThALAqtX3BY6aMYvqnO6TgL5Uzo4osBgk+I74u95LU9ze7NJcVPQlO4056M/lZ5l6jySFnfCIqVK8R9hAkAKoNCbfcoMmkgMwsU7TWbYtIJXosp7LjlM4QHp77dzskuPvADzXByqLKEIEcfsLUOBOGyLGatzWXo1KoUCSYQ3";
-    var VirgilSDK = new window.VirgilSDK(APP_TOKEN, {
-        identityBaseUrl: 'https://identity-stg.virgilsecurity.com/v1',
-        privateKeysBaseUrl: 'https://keys-private-stg.virgilsecurity.com/v3',
-        publicKeysBaseUrl: 'https://keys-stg.virgilsecurity.com/v3',
-        cardsBaseUrl: 'https://keys-stg.virgilsecurity.com/v3'
-    });
-    
+    var APP_TOKEN = "eyJpZCI6IjYzZWUyYWRiLWI4YzQtNDEyMC04NDc2LTM5NGY3ZjUzYjg4ZCIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiIxMmQxNzkwNy00YjdiLTQ0YTctODRkMS1hZjA4NTc5MjhiOWQiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGaMA0GCWCGSAFlAwQCAgUABIGIMIGFAkAXw3S9XDbJAOM64FFi3tGlSUCnOSPDgEqzuZmfOd2Pyu+zIE91Dr1kXqndLsSO3UOrjIBSmgmOGK7DpuLhUM8nAkEAgg1r9DqiEB4BKA2qD+9R7mwg8Y7ZARyzUIvFzhBeT/wWPjOpi8LYpgwXBRf/32Fr2a5xQD1j11buxnvNT+CX+w==";
+    var VirgilSDK = new window.VirgilSDK(APP_TOKEN);
     var virgilHub = VirgilSDK;
     var virgilCrypto = VirgilSDK.crypto;
 
@@ -87,7 +81,7 @@ var App = function () {
         self.loadingText("Initializing IP Messaging...");
 
         $.getJSON("/api/token?identity=" + account.card.identity.value, function (token) {
-
+            
             messagingClient = new window.Twilio.IPMessaging.Client(token);
             
             self.loadingText("Loading channels...");
@@ -100,7 +94,7 @@ var App = function () {
             });
         });
     };
-
+    
     /**
      * Saves the account to local storage.
      * @param {Object} account The virgil account data.
@@ -110,7 +104,16 @@ var App = function () {
         var stringifiedAccountData = JSON.stringify(account);
         localStorage.setItem("virgil_account_data", stringifiedAccountData);
     };
-    
+
+    var decryptMessage = function (message) {
+
+        var encryptedBuffer = new virgilCrypto.Buffer(message.body, "base64");
+        var decryptedMessage = virgilCrypto.decrypt(encryptedBuffer, account.card.id, account.private_key);
+
+        var messageObject = JSON.parse(decryptedMessage);
+        return messageObject;
+    };
+
     /**
      * Occurs on member joined to the current channel.     
      * @param {Object} member The member which joined to the channel.
@@ -122,11 +125,10 @@ var App = function () {
             .then(function (result) {
                 member.publicKey = {
                     id: result[0].id,
-                    data: atob(result[0].public_key.public_key)
+                    data: result[0].public_key.public_key
                 };
 
                 self.channelMembers.push(member);
-                $.notify("Hello World", "success");
             });
     };
 
@@ -135,19 +137,12 @@ var App = function () {
      * @param {Object} message The channel message.
      */
     var onMessageAdded = function (message) {
-        
-        // decrypt message with current user's private key.
-        
-        var encryptedBuffer = new virgilCrypto.Buffer(message.body, 'base64');
-        var decryptedBody = virgilCrypto.decrypt(encryptedBuffer, account.card.id, account.private_key);
-
-        var author = message.from ? message.from : message.author;
-
-        self.messages.push({
-            sid: message.sid,
-            author: author,
-            body: decryptedBody
-        });
+        var messageObject = decryptMessage(message);
+        // Do not display self messages in order to avoid dublicates.
+        if (messageObject.author === account.card.identity.value) {
+            return;
+        }
+        self.messages.push(messageObject);
     };
 
     /**
@@ -166,7 +161,8 @@ var App = function () {
         var url = "/api/history?channelSid=" + channel.sid + "&memberName=" + account.card.identity.value;
         $.getJSON(url, function (data) {
             for (var i = 0; i < data.length; i++) {
-                onMessageAdded(data[i]);
+                var decryptedMessage = decryptMessage(data[i]);
+                self.messages.push(decryptedMessage);
             }
 
             self.isCurrentChannelLoading(false);
@@ -213,7 +209,7 @@ var App = function () {
                 onChannelLoaded(channel);
             });
     }
-
+    
     self.postMessage = function () {
 
         var message = self.inputMessage();
@@ -240,7 +236,16 @@ var App = function () {
             });
         }
 
-        virgilCrypto.encryptAsync(message, recipients)
+        var messageObject = {
+            body: message,
+            author: account.card.identity.value,
+            id: virgilHub.publicKeys.generateUUID()
+        };
+
+        // preview message 
+        self.messages.push(messageObject);
+
+        virgilCrypto.encryptAsync(JSON.stringify(messageObject), recipients)
             .then(function (encryptedData) {
                 self.currentChannel().sendMessage(encryptedData.toString("base64"));
             })
@@ -258,7 +263,7 @@ var App = function () {
 
         // add channel admin to custom attributes.
 
-        virgilHub.cards.search({ value: "chat-twilio@mailinator.com", type: "email" })
+        virgilHub.cards.search({ value: "virgil-twilio@mailinator.com", type: "email" })
             .then(function (result) {
                 var friendlyChatName = channelName + " (" + account.card.identity.value + ")";
                 var options = { friendlyName: friendlyChatName };
