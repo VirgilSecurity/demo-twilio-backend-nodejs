@@ -1,4 +1,4 @@
-# Virgil IP Messaging
+# Virgil & Twilio IP Messaging
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.
 

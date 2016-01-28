@@ -17,9 +17,9 @@ Note: All of these samples assume you have created your authenticated IP Messagi
 
 ## Virgil Security Changes
 ### Register a Virgil Security developer's account
-As a first step, you’ll need to create a development account on https://developer.virgilsecurity.com/account/signin to receive 
+As a first step, you’ll need to create a developer's account on https://developer.virgilsecurity.com/account/signin to receive 
 an access token to perform calls to Virgil API services. The access token looks like `45fd8a505f50243fa8400594ba0b2b29` 
-and will be used to instantiate Virgil SDK client in the code below.
+and will be used to instantiate Virgil SDK client [in the code below](#code).
 
 ### Install and Initialize
 
@@ -36,6 +36,7 @@ bower install virgil-sdk
 <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/latest/virgil-sdk.min.js"></script>
 ```
 Use code below to initialize global variable of VirgilSDK.
+<a name="code"></a>
 ```js
 var Virgil = window.VirgilSDK;
 var virgil = new Virgil("%ACCESS_TOKEN%");
@@ -109,11 +110,15 @@ Once you're a member of a Channel, you can send a Message to it. A Message is a 
 // Receive the list of Channel's recipients
 myChannel.getMembers().map(function(member) {
     // Search for the member’s cards on Virgil Keys service
-    return virgil.cards.search({ value: member.identity })
+    return virgil.cards.search({ 
+        value: member.identity 
+    }).then(function(cards){
+        return { recipientId: cards[0].id, publicKey: cards[0].public_key.public };
+    })
 }).then(function(recipients) {
     var msg = $('#chat-input').val();
-    var encryptedMsg = virgil.crypto.encrypt(msg, recipients);
-    myChannel.sendMessage(msg.toString('base64'));    
+    var encryptedMsg = virgil.crypto.encryptStringToBase64(msg, recipients);
+    myChannel.sendMessage(encryptedMsg);    
 });
 ```
 
@@ -128,7 +133,7 @@ You can also be notified of any new incoming Messages with an event handler. Thi
 // Listen for new Messages sent to a Channel
 myChannel.on('messageAdded', function(message) {
     // Decrypt the Message using global public key id and private key values.
-    var decryptedMessage = Virgil.Crypto.decrypt(message.body, myCard.id, keyPair.privateKey);
+    var decryptedMessage = virgil.crypto.decryptStringFromBase64(message.body, myCard.id, keyPair.privateKey);
     console.log(message.author, decryptedMessage);
 });
 ```
