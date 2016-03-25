@@ -1,8 +1,8 @@
 var App = function () {
     var self = this;
 
-    var version = "0.9.7";
-    
+    var version = "0.9.8";
+
     var APP_TOKEN = "eyJpZCI6IjYzZWUyYWRiLWI4YzQtNDEyMC04NDc2LTM5NGY3ZjUzYjg4ZCIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiIxMmQxNzkwNy00YjdiLTQ0YTctODRkMS1hZjA4NTc5MjhiOWQiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGaMA0GCWCGSAFlAwQCAgUABIGIMIGFAkAXw3S9XDbJAOM64FFi3tGlSUCnOSPDgEqzuZmfOd2Pyu+zIE91Dr1kXqndLsSO3UOrjIBSmgmOGK7DpuLhUM8nAkEAgg1r9DqiEB4BKA2qD+9R7mwg8Y7ZARyzUIvFzhBeT/wWPjOpi8LYpgwXBRf/32Fr2a5xQD1j11buxnvNT+CX+w==";
     var VirgilSDK = new window.VirgilSDK(APP_TOKEN);
     var virgilHub = VirgilSDK;
@@ -23,7 +23,7 @@ var App = function () {
 
     self.currentState = ko.observable(appStates.STARTUP);
     self.loadingText = ko.observable("");
-    
+
     self.email = ko.observable("");
     self.confirmCode = ko.observable("");
 
@@ -46,7 +46,7 @@ var App = function () {
         if (accountDataString === null) {
             return null;
         }
-       
+
         var accountData = JSON.parse(accountDataString);
 
         // fix to forse users generate new keys.
@@ -56,7 +56,7 @@ var App = function () {
 
         return accountData;
     };
-    
+
     /**
      * Initializes the chat application. 
      */
@@ -73,7 +73,7 @@ var App = function () {
             self.currentState(appStates.CONFIRMATION);
             return;
         }
-        
+
         self.currentUserCaption(account.card.identity.value);
         self.currentChannelCaption("Choose Channel...");
         self.currentState(appStates.LOADING);
@@ -81,9 +81,9 @@ var App = function () {
         self.loadingText("Initializing IP Messaging...");
 
         $.getJSON("/api/token?identity=" + account.card.identity.value, function (token) {
-            
+
             messagingClient = new window.Twilio.IPMessaging.Client(token);
-            
+
             self.loadingText("Loading channels...");
 
             messagingClient.getChannels().then(function (channels) {
@@ -94,7 +94,7 @@ var App = function () {
             });
         });
     };
-    
+
     /**
      * Saves the account to local storage.
      * @param {Object} account The virgil account data.
@@ -173,7 +173,7 @@ var App = function () {
      * Occurs when channel has been selected from UI.
      * @param {Object} channel The channel object. 
      */
-    var onChannelSelected = function(channel) {
+    var onChannelSelected = function (channel) {
         channel.join()
             .then(function () {
                 self.messages.removeAll();
@@ -192,7 +192,7 @@ var App = function () {
                 return channel.getMembers();
             })
             .then(function (members) {
-                return Promise.all(members.map(function(member) {
+                return Promise.all(members.map(function (member) {
                     return virgilHub.cards.search({ value: member.identity, type: "email" })
                         .then(function (result) {
                             member.publicKey = {
@@ -209,7 +209,7 @@ var App = function () {
                 onChannelLoaded(channel);
             });
     }
-    
+
     self.postMessage = function () {
 
         var message = self.inputMessage();
@@ -249,7 +249,7 @@ var App = function () {
             .then(function (encryptedData) {
                 self.currentChannel().sendMessage(encryptedData.toString("base64"));
             })
-            .catch(function(ex) {
+            .catch(function (ex) {
                 alert(ex.message);
             });
     };
@@ -281,24 +281,24 @@ var App = function () {
                 self.channels.push(channel);
                 self.setChannel(channel);
             })
-            .catch(function(ex) {
+            .catch(function (ex) {
                 alert(ex.message);
             });
     };
 
-    self.setChannel = function(channel){
-        
-        if (self.currentChannel() != null && self.currentChannel().sid === channel.sid){
+    self.setChannel = function (channel) {
+
+        if (self.currentChannel() != null && self.currentChannel().sid === channel.sid) {
             return;
         }
-        
+
         self.isCurrentChannelLoading(true);
-        
+
         if (self.currentChannel() != null) {
             self.currentChannel().removeListener("messageAdded", onMessageAdded);
             self.currentChannel().removeListener("memberJoined", onMemberJoined);
             self.currentChannel().leave()
-                .then(function() {
+                .then(function () {
                     onChannelSelected(channel);
                 });
 
@@ -307,8 +307,8 @@ var App = function () {
 
         onChannelSelected(channel);
     };
-    
-    self.exit = function(){             
+
+    self.exit = function () {
         localStorage.removeItem("virgil_account_data");
         location.reload();
     };
@@ -322,7 +322,7 @@ var App = function () {
 
         return virgilCrypto
             .generateKeyPairAsync("", virgilCrypto.KeysTypesEnum.EC_SECP192R1)
-            .then(function(keyPair) {
+            .then(function (keyPair) {
                 generatedKeyPair = keyPair;
 
                 self.loadingText("Registering a Public Key...");
@@ -336,19 +336,19 @@ var App = function () {
                     }
                 });
             })
-            .then(function(card) {
+            .then(function (card) {
                 createdCard = card;
 
                 account = { card: card, private_key: generatedKeyPair.privateKey, is_local: true };
                 saveAccount(account);
-                
+
                 self.loadingText("Stashing a Private Key...");
                 return virgilHub.privateKeys.stash({
                     virgil_card_id: card.id,
                     private_key: generatedKeyPair.privateKey
                 });
             })
-            .then(function() {
+            .then(function () {
                 return {
                     card: createdCard,
                     private_key: generatedKeyPair.privateKey
@@ -373,11 +373,12 @@ var App = function () {
                     type: "email",
                     value: card.identity.value,
                     validation_token: token
-                }})
+                }
+            })
             .then(function (response) {
                 return {
                     card: card,
-                    private_key: atob(response.private_key)
+                    private_key: response.private_key
                 };
             });
     };
@@ -385,8 +386,8 @@ var App = function () {
     /**
      * Confirms an e-mail address and create
      */
-    self.confirmAndLogin = function(){
-        
+    self.confirmAndLogin = function () {
+
         self.currentState(appStates.LOADING);
         self.errorText("");
 
@@ -407,12 +408,12 @@ var App = function () {
                 self.loadingText("Searching for the card...");
                 return virgilHub.cards.search({ value: self.email(), type: "email" });
             })
-            .then(function(cards) {
+            .then(function (cards) {
                 return cards.length === 0
                     ? loginAndRegisterCard(self.email(), validationToken)
                     : loginWithExistingCard(cards[0], validationToken);
             })
-            .then (function(details) {
+            .then(function (details) {
                 account = details;
                 saveAccount(account);
                 initialize();
@@ -422,12 +423,12 @@ var App = function () {
                 self.currentState(appStates.CONFIRMATION);
             });
     };
-    
+
     /**
      * Sends request to verify entered e-mail address.
      */
-    self.verifyEmail = function(){
-        
+    self.verifyEmail = function () {
+
         self.currentState(appStates.LOADING);
         self.errorText("");
 
@@ -436,7 +437,7 @@ var App = function () {
         self.loadingText("Sending request for verification...");
         virgilHub.identity
             .verify({ type: "email", value: self.email() })
-            .then(function(response) {
+            .then(function (response) {
                 account = {
                     confirm_action_id: response.action_id,
                     identity_value: self.email()
@@ -449,6 +450,6 @@ var App = function () {
                 self.errorText(ex.message);
             });
     };
-    
+
     initialize();
 };
