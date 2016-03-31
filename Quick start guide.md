@@ -70,7 +70,13 @@ var myCard;
 // Send confirmation request and get temporary validation token. 
 virgil.identity.confirm({ 
     action_id: emailCheckActionId, 
-    confirmation_code: '{CONFIRMATION_CODE}' 
+    confirmation_code: '{CONFIRMATION_CODE}',
+    token: {
+        // How long this token will live
+        time_to_live: 3600,
+        // How many times it could be used
+        count_to_live: 1
+    }
 }).then(function(response){
     // Create a Virgil Card with Identity and Public Key
     return virgil.cards.create({ 
