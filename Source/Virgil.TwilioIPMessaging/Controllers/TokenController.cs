@@ -1,24 +1,25 @@
 ﻿namespace Virgil.TwilioIPMessaging.Controllers
 {
     using System.Web.Http;
-    using Twilio;
+    using Twilio.Auth;
     using Virgil.TwilioIPMessaging.Common;
 
     public class TokenController : ApiController
     {
         public string Get(string identity)
         {
-            var twilio = new TwilioCapability(Constants.TwilioAccountSID, Constants.TwilioAuthToken);
-            twilio.AllowClientOutgoing("IPMessagingPrivateBeta", new
-            {
-                service_sid = Constants.TwilioIpMessagingServiceSID,
-                endpoint_id = "VIRGIL_CHAT:" + "browser-browser" + ":" + identity,
-                identity
-            });
-
-            var twilioToken = twilio.GenerateToken();
+            // Create an Access Token generator
+            var token = new AccessToken(Constants.TwilioAccountSID, Constants.TwilioApiKey, Constants.TwilioApiKeySecret) { Identity = identity };
             
-            return twilioToken;
+            // Create an IP messaging grant for this token
+            var grant = new IpMessagingGrant
+            {
+                EndpointId = $"VIRGIL_CHAT:{identity}:browser-browser",
+                ServiceSid = Constants.TwilioIpMessagingServiceSID
+            };
+
+            token.AddGrant(grant);
+            return token.ToJWT();
         }
     }
 }

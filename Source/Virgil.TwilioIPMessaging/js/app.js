@@ -1,7 +1,7 @@
 var App = function () {
     var self = this;
 
-    var version = "0.9.8";
+    var version = "0.9.9";
 
     var APP_TOKEN = "eyJpZCI6IjYzZWUyYWRiLWI4YzQtNDEyMC04NDc2LTM5NGY3ZjUzYjg4ZCIsImFwcGxpY2F0aW9uX2NhcmRfaWQiOiIxMmQxNzkwNy00YjdiLTQ0YTctODRkMS1hZjA4NTc5MjhiOWQiLCJ0dGwiOi0xLCJjdGwiOi0xLCJwcm9sb25nIjowfQ==.MIGaMA0GCWCGSAFlAwQCAgUABIGIMIGFAkAXw3S9XDbJAOM64FFi3tGlSUCnOSPDgEqzuZmfOd2Pyu+zIE91Dr1kXqndLsSO3UOrjIBSmgmOGK7DpuLhUM8nAkEAgg1r9DqiEB4BKA2qD+9R7mwg8Y7ZARyzUIvFzhBeT/wWPjOpi8LYpgwXBRf/32Fr2a5xQD1j11buxnvNT+CX+w==";
     var VirgilSDK = new window.VirgilSDK(APP_TOKEN);
@@ -82,7 +82,9 @@ var App = function () {
 
         $.getJSON("/api/token?identity=" + account.card.identity.value, function (token) {
 
-            messagingClient = new window.Twilio.IPMessaging.Client(token);
+            var accessManager = new window.Twilio.AccessManager(token);
+            messagingClient = new window.Twilio.IPMessaging.Client(accessManager);
+            accessManager.on('tokenExpired', self.onTokenExpired);
 
             self.loadingText("Loading channels...");
 
@@ -112,6 +114,10 @@ var App = function () {
 
         var messageObject = JSON.parse(decryptedMessage);
         return messageObject;
+    };
+
+    self.onTokenExpired = function() {
+        alert('Your session has been expired!');
     };
 
     /**
@@ -286,6 +292,18 @@ var App = function () {
             });
     };
 
+    self.deleteChannel = function() {
+        if (self.currentChannel &&
+            self.currentChannel() != null &&
+            self.currentChannel().createdBy === account.card.identity.value) {
+
+            self.currentChannel().delete();
+            self.channels.remove(self.currentChannel());
+            self.currentChannel(null);
+            self.currentChannelCaption("Choose Channel...");
+        }
+    };
+
     self.setChannel = function (channel) {
 
         if (self.currentChannel() != null && self.currentChannel().sid === channel.sid) {
@@ -321,7 +339,7 @@ var App = function () {
         self.loadingText("Generating a Key Pair...");
 
         return virgilCrypto
-            .generateKeyPairAsync("", virgilCrypto.KeysTypesEnum.EC_SECP192R1)
+            .generateKeyPairAsync("", virgilCrypto.KeysTypesEnum.EC_SECP256R1)
             .then(function (keyPair) {
                 generatedKeyPair = keyPair;
 

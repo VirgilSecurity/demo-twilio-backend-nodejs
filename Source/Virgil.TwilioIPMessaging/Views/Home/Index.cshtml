@@ -21,7 +21,7 @@
                         <br />
                         <form data-bind="submit: verifyEmail">
                             <div class="form-group">
-                                <p class="text-danger" data-bind="visible: errorText().length > 0, text: errorText" role="alert"></p>
+                                <p class="text-danger" data-bind="visible: errorText && errorText().length > 0, text: errorText" role="alert"></p>
                                 <p class="help-block">This e-mail address used to register your public key on our service.</p>
                                 <input type="text" data-bind="enable: !hasPrivateKey(), value: email, valueUpdate: 'input'" class="form-control" id="Email" placeholder="E-mail">
                             </div>
@@ -77,6 +77,7 @@
                                     </ul>
                                 </div>
                                 <button type="button" data-toggle="modal" data-bind="enable: !isCurrentChannelLoading()" data-target="#createChannelModal" class="btn btn-default">Create</button>
+                                <button type="button" data-toggle="modal" data-bind="click: deleteChannel, enable: !isCurrentChannelLoading(), visible: currentChannel() && currentChannel().createdBy == currentUserCaption()" class="btn btn-danger">Delete</button>
                                 <img style="width: 20px;" data-bind="visible: isCurrentChannelLoading" src="/img/loading.gif" />
                             </div>
                         </div>
@@ -137,12 +138,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
-    <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.9.2/twilio-ip-messaging.min.js"></script>
-    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.1.4/virgil-sdk.min.js"></script>
+    <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.9.6/twilio-ip-messaging.min.js"></script>
+    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.1.6/virgil-sdk.min.js"></script>
     <script src="/js/knockoutjs.utils.js"></script>
     <script src="/js/notify.min.js"></script>
     <script src="/js/FileSaver.js"></script>
-    <script src="/js/app.js?72EB7E1B-FC57-4E25-BB1C-1F6004699E3D"></script>
+    <script src="/js/app.js?83094A4F-D236-4EE7-AA75-95224DEB881A"></script>
     <script type="text/javascript">
         ko.applyBindings(new App());
     </script>

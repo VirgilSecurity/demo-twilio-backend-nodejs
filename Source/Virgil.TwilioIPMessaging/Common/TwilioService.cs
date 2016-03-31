@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Text;
+
     using Newtonsoft.Json;
 
     using Virgil.TwilioIPMessaging.Models;
@@ -13,7 +14,6 @@
         public IEnumerable<Message> GetChennelHistory(string channelSid)
         {
             var webClient = this.GetWebClient();
-
             var messagesUrl = $"https://ip-messaging.twilio.com/v1/Services/{Constants.TwilioIpMessagingServiceSID}/Channels/{channelSid}/Messages";
 
             var messagesResponse = webClient.DownloadString(new Uri(messagesUrl));
