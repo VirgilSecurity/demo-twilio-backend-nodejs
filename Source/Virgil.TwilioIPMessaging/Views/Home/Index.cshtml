@@ -24,7 +24,7 @@
                                 <p class="text-danger" data-bind="visible: errorText && errorText().length > 0, text: errorText" role="alert"></p>
                                 <p class="help-block">This e-mail address used to register your public key on our service.</p>
                                 <input type="text" data-bind="enable: !hasPrivateKey(), value: email, valueUpdate: 'input'" class="form-control" id="Email" placeholder="E-mail">
-                            </div>
+                            </div> 
                             <div class="auth-form-footer">
                                 <hr />
                                 <button type="submit" data-bind="enable: email()" class="btn btn-primary btn-block">Login</button>
@@ -139,7 +139,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.3.0/knockout-min.js"></script>
     <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/releases/0.9.6/twilio-ip-messaging.min.js"></script>
-    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.1.6/virgil-sdk.min.js"></script>
+    <script src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.2.0/virgil-sdk.min.js"></script>
     <script src="/js/knockoutjs.utils.js"></script>
     <script src="/js/notify.min.js"></script>
     <script src="/js/FileSaver.js"></script>
