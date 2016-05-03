@@ -6,7 +6,6 @@
     public class Constants
     {
         public static string TwilioAccountSID => ConfigurationManager.AppSettings["twilio:AccountSID"];
-        public static string TwilioAuthToken => ConfigurationManager.AppSettings["twilio:AuthToken"];
         public static string TwilioApiKey => ConfigurationManager.AppSettings["twilio:ApiKey"];
         public static string TwilioApiKeySecret => ConfigurationManager.AppSettings["twilio:ApiKeySecret"];
 #if !DEBUG

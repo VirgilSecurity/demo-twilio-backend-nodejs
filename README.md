@@ -14,13 +14,19 @@ There are only two steps required to publish Virgil History Service :)
 
 ## Configuration
 
+```
+$ cd Source/Virgil.TwilioIPMessaging
+$ cp sample.web.config web.config
+```
+
 Set Twilio & Virgil authentication tokens in web.config
 
 ```
   <appSettings>
     ...
     <add key="twilio:AccountSID" value="{TWILIO_ACCOUNT_SID}" />
-    <add key="twilio:AuthToken" value="{TWILIO_AUTH_TOKEN}" />
+    <add key="twilio:ApiKey" value="{TWILIO_API_KEY}" />
+    <add key="twilio:ApiKeySecret" value="{TWILIO_API_KEY_SECRET}" />
     <add key="twilio:IpMessagingServiceSID" value="{TWILIO_IP_MESSAGING_SERVICE_SID}" />
     <add key="virgil:AppToken" value="{VIRGIL_SECURITY_ACCESS_TOKEN}" />
     ...

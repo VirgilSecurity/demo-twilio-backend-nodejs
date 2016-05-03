@@ -5,6 +5,9 @@
 # Project files
 src/packages/
 
+# Config 
+./Source/Virgil.TwilioIPMessaging/Web.config
+
 
 # User-specific files
 *.suo

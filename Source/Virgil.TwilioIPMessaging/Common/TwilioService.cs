@@ -25,7 +25,7 @@
         private WebClient GetWebClient()
         {
             var webClient = new WebClient();
-            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(Constants.TwilioAccountSID + ":" + Constants.TwilioAuthToken));
+            var credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(Constants.TwilioApiKey + ":" + Constants.TwilioApiKeySecret));
             webClient.Headers[HttpRequestHeader.Authorization] = "Basic " + credentials;
 
             return webClient;
