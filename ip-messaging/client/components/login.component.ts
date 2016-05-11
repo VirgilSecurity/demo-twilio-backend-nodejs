@@ -6,6 +6,7 @@ import { AccountService } from '../services/account.service'
 import { VirgilService } from '../services/virgil.service'
 
 @Component({
+    selector: 'login',
     templateUrl: './assets/views/login.component.html'
 })
 

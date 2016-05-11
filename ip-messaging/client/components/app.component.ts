@@ -8,7 +8,6 @@ import { AccountService } from '../services/account.service'
 @Component({
     selector: 'body',
     templateUrl: './assets/views/app.component.html',
-    styleUrls: ['./assets/views/app.component.css'],
     directives: [ ROUTER_DIRECTIVES ]
 })
 
