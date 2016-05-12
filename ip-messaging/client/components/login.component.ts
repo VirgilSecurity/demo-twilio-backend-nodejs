@@ -19,7 +19,8 @@ export class LoginComponent{
     public memberName: string;
     
     onLogin(){
-        this.memberName = '';                                 
+        this.memberName = '';
+        
         this.router.navigate(['/chat'])
     }
 }

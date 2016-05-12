@@ -1,20 +1,24 @@
 <div class="flex-container">
     <div class="flex-row"> 
-        <div class="flex-item">
+        <div class="flex-item login-container">
+          <img class="ui centered tiny image" src="/assets/img/twilio-shield.png" />
+          <h3 class="logo-header">Virgil & Twilio</h3>
+          <h5 class="logo-description">IP Messaging</h5>
+          <br />
           <form class="ui form">
-            <div class="ui info message">
-              This <b>Nickname</b> used to register your public key on our service.
-            </div>
             <div class="field">
+              <label>This <b>Nickname</b> used to register your public key on our service.</label>              
               <input type="text" name="first-name" placeholder="Nickname">
             </div>
-            <div class="field">
-              <div class="ui checkbox">
-                <input type="checkbox" tabindex="0" class="hidden">
-                <label>I agree to the Terms and Conditions</label>
+             <div class="ui segment">
+              <div class="field">
+                <div class="ui toggle checkbox">
+                  <input type="checkbox" name="gift" tabindex="0" class="hidden">
+                  <label>Generate key with password</label>
+                </div>
               </div>
             </div>
-            <button class="fluid ui button primary" type="submit">Submit</button>
+            <button class="fluid ui button primary" type="submit" (click)="onLogin()" >Submit</button>
           </form>
         </div>
     </div>

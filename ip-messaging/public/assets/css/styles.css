@@ -20,6 +20,21 @@ body {
     width: auto;
 }
 .flex-item {
-    width: 350px;
-    margin: 10px;
+    max-width: 350px;
+}
+
+div.login-container{
+    margin-top: -100px;
+}
+
+h3.logo-header{
+    margin-top: 10px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+h5.logo-description{
+    margin-top: 0px;
+    margin-bottom: 10px;
+    text-align: center;
 }
