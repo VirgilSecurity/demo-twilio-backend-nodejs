@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Rx';
 import { Router } from '@angular/router';
 
 import { AccountService } from '../services/account.service'
@@ -16,11 +17,21 @@ export class LoginComponent{
                  private virgil: VirgilService,
                  private router: Router) { }
     
-    public memberName: string;
+    public memberName: string;    
+    public isBusy: boolean;
     
     onLogin(){
-        this.memberName = '';
+        console.log('Login');
+        this.isBusy = true;
         
-        this.router.navigate(['/chat'])
+        this.http.get("/login-it?name=" + this.memberName)
+            .map((res:Response) => res.json())
+            .subscribe(
+                data => {  },
+                err => {  },
+                () => this.isBusy = false
+            );
+        
+        //this.router.navigate(['/chat'])
     }
 }

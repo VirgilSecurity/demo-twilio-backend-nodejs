@@ -8,7 +8,7 @@
 
   var ngVer = '@2.0.0-rc.1'; // lock in the angular package version; do not let it float to current!
 
-  //map tells the System loader where to look for things
+  // map tells the System loader where to look for things
   var  map = {
     'app':                        './assets/js/app', // 'dist',
     'rxjs':                       'https://npmcdn.com/rxjs@5.0.0-beta.6',
@@ -18,7 +18,7 @@
   //packages tells the System loader how to load when no filename and/or no extension
   var packages = {
     'app':                        { main: './assets/app/js/main.js',  defaultExtension: 'js' },
-    'rxjs':                       { defaultExtension: 'js' },
+    'rxjs':                       { main: './assets/app/js/', defaultExtension: 'js' },
     'angular2-in-memory-web-api': { defaultExtension: 'js' },
   };
 
@@ -31,7 +31,7 @@
       '@angular/platform-browser-dynamic',
       '@angular/router',
       '@angular/router-deprecated',
-      '@angular/upgrade',
+      '@angular/upgrade'
   ];
 
   // add map entries for angular packages in the form '@angular/common': 'https://npmcdn.com/@angular/common@0.0.0-3?main=browser'

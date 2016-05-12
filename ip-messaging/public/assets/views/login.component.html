@@ -5,20 +5,14 @@
           <h3 class="logo-header">Virgil & Twilio</h3>
           <h5 class="logo-description">IP Messaging</h5>
           <br />
-          <form class="ui form">
+          <form class="ui form" [class.loading]="isBusy" >
             <div class="field">
-              <label>This <b>Nickname</b> used to register your public key on our service.</label>              
+              <div class="ui pointing below label">
+                This <b>Nickname</b> used to register your public key on our service.
+              </div>      
               <input type="text" name="first-name" placeholder="Nickname">
             </div>
-             <div class="ui segment">
-              <div class="field">
-                <div class="ui toggle checkbox">
-                  <input type="checkbox" name="gift" tabindex="0" class="hidden">
-                  <label>Generate key with password</label>
-                </div>
-              </div>
-            </div>
-            <button class="fluid ui button primary" type="submit" (click)="onLogin()" >Submit</button>
+            <button class="fluid ui button primary" type="submit" (click)="onLogin()" >Start</button>
           </form>
         </div>
     </div>
