@@ -1,48 +1,40 @@
-/**
- * PLUNKER VERSION (based on systemjs.config.js in angular.io)
- * System configuration for Angular 2 samples
- * Adjust as necessary for your application needs.
- * Override at the last minute with global.filterSystemConfig (as plunkers do)
- */
 (function(global) {
 
-  var ngVer = '@2.0.0-rc.1'; // lock in the angular package version; do not let it float to current!
+  var ngVer = '@2.0.0-rc.1';
 
   // map tells the System loader where to look for things
-  var  map = {
-    'app':                        './assets/js/app', // 'dist',
-    'rxjs':                       'https://npmcdn.com/rxjs@5.0.0-beta.6',
-    'angular2-in-memory-web-api': 'https://npmcdn.com/angular2-in-memory-web-api' // get latest
+  var map = {
+      'app'                                  : './assets/js/app',
+      'rxjs'                                 : './assets/rxjs',
+      'angular2-in-memory-web-api'           : './assets/angular2-in-memory-web-api',
+      '@angular'                             : './assets/@angular',
+      '@angular/common'                      : './assets/@angular/common',
+      '@angular/compiler'                    : './assets/@angular/compiler',
+      '@angular/core'                        : './assets/@angular/core',
+      '@angular/http'                        : './assets/@angular/http',
+      '@angular/platform-browser'            : './assets/@angular/platform-browser',
+      '@angular/platform-browser-dynamic'    : './assets/@angular/platform-browser-dynamic',
+      '@angular/router'                      : './assets/@angular/router',
+      '@angular/router-deprecated'           : './assets/@angular/router-deprecated',
+      '@angular/upgrade'                     : './assets/@angular/upgrade',
+      'lodash'                               : './assets/lodash/lodash.js'
   };
-
-  //packages tells the System loader how to load when no filename and/or no extension
+  
+  // packages tells the System loader how to load when no filename and/or no extension
   var packages = {
-    'app':                        { main: './assets/app/js/main.js',  defaultExtension: 'js' },
-    'rxjs':                       { main: './assets/app/js/', defaultExtension: 'js' },
-    'angular2-in-memory-web-api': { defaultExtension: 'js' },
+      'app'                                  : { main: 'main.js',  defaultExtension: 'js' },
+      'rxjs'                                 : { defaultExtension: 'js' },
+      'angular2-in-memory-web-api'           : { defaultExtension: 'js' },
+      '@angular/common'                      : { main: 'common.umd.js', defaultExtension: 'js' },
+      '@angular/compiler'                    : { main: 'compiler.umd.js', defaultExtension: 'js' },
+      '@angular/core'                        : { main: 'core.umd.js', defaultExtension: 'js' },
+      '@angular/http'                        : { main: 'http.umd.js', defaultExtension: 'js' },
+      '@angular/platform-browser'            : { main: 'platform-browser.umd.js', defaultExtension: 'js' },
+      '@angular/platform-browser-dynamic'    : { main: 'platform-browser-dynamic.umd.js', defaultExtension: 'js' },
+      '@angular/router'                      : { main: 'router.umd.js', defaultExtension: 'js' },
+      '@angular/router-deprecated'           : { main: 'router-deprecated.umd.js', defaultExtension: 'js' },
+      '@angular/upgrade'                     : { main: 'upgrade.umd.js', defaultExtension: 'js' }
   };
-
-  var packageNames = [
-      '@angular/common',
-      '@angular/compiler',
-      '@angular/core',
-      '@angular/http',
-      '@angular/platform-browser',
-      '@angular/platform-browser-dynamic',
-      '@angular/router',
-      '@angular/router-deprecated',
-      '@angular/upgrade'
-  ];
-
-  // add map entries for angular packages in the form '@angular/common': 'https://npmcdn.com/@angular/common@0.0.0-3?main=browser'
-  packageNames.forEach(function(pkgName) {
-    map[pkgName] = 'https://npmcdn.com/' + pkgName + ngVer;
-  });
-
-  // add package entries for angular packages in the form '@angular/common': { main: 'index.js', defaultExtension: 'js' }
-  packageNames.forEach(function(pkgName) {
-    packages[pkgName] = { main: 'index.js', defaultExtension: 'js' };
-  });
 
   var config = {
     transpiler: 'typescript',
@@ -59,10 +51,3 @@
   System.config(config);
 
 })(this);
-
-
-/*
-Copyright 2016 Google Inc. All Rights Reserved.
-Use of this source code is governed by an MIT-style license that
-can be found in the LICENSE file at http://angular.io/license
-*/

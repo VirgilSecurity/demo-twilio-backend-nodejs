@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core'
 
 export class Account {
     constructor(public id: string,
-                public name: string) { }
+                public nickname: string) { }
                     
     static fromJson(json: string){
         var accountObject = JSON.parse(json);
-        return new Account(accountObject.id, accountObject.name);
+        return new Account(accountObject.id, accountObject.nickname);
     }
 }
 
@@ -17,7 +17,6 @@ export class AccountService {
     constructor() {
         this.currentAccount = null;
     }
-    
     
     isLoggedIn(){
         return this.currentAccount != null;

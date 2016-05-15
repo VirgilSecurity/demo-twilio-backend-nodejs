@@ -11,5 +11,7 @@ export class VirgilService {
     initialize(accessToken:string){
         this.sdk = new VirgilSDK(accessToken);
         this.crypto = this.sdk.crypto;
+        
+        console.log('Virgil SDK has been successfully initialized.');
     }
 }

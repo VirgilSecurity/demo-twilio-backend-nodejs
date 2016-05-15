@@ -26,10 +26,13 @@
     "rxjs": "5.0.0-beta.6",
     "zone.js": "^0.6.12",
     "angular2-in-memory-web-api": "0.0.7",
+    "lodash": "^4.12.0",
     "bootstrap": "^3.3.6",    
     "express": "^4.13.4",
     "virgil-sdk": "^1.4.3",
-    "jquery": "^2.2.3"
+    "jquery": "^2.2.3",
+    "twilio": "^3.0.0-edge",
+    "dotenv": "^1.2.0"
   },
   "devDependencies": {
     "concurrently": "^2.0.0",
