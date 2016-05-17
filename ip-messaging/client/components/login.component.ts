@@ -9,7 +9,7 @@ import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 
 @Component({
-    selector: 'login',
+    selector: 'ipm-login',
     templateUrl: './assets/views/login.component.html'
 })
 
@@ -23,11 +23,11 @@ export class LoginComponent{
     public nickName: string;    
     public isBusy: boolean;
     
-    onLogin(){        
+    public onLogin(): void {
         this.isBusy = true;
         
         let validationToken: string;
-                
+                     
         this.http.get('/auth?identity=' + this.nickName + '&deviceId=web').toPromise()
             .then((response:Response) => { 
                 let authData = response.json();
