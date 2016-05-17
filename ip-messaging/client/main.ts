@@ -7,11 +7,11 @@ import { HTTP_PROVIDERS } from '@angular/http';
 import 'rxjs/Rx';
 
 import { AppComponent } from './components/app.component';
-import { AccountService } from './services/account.service'
+import { ApplicationContext } from './services/account.service'
 import { TwilioService } from './services/twilio.service'
 import { VirgilService } from './services/virgil.service'
 
 
-bootstrap(AppComponent, [ROUTER_PROVIDERS, HTTP_PROVIDERS, AccountService, TwilioService, VirgilService])
+bootstrap(AppComponent, [ROUTER_PROVIDERS, HTTP_PROVIDERS, ApplicationContext, TwilioService, VirgilService])
     .then(success => console.log('Bootstrap success'))
     .catch(error => console.log(error));

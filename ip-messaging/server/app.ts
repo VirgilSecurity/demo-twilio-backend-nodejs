@@ -15,8 +15,6 @@ import * as express from "express";
 import * as http from "http";
 
 let VirgilSDK = require('virgil-sdk');
-var virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
-
 let AccessToken = require('twilio').AccessToken;
 let IpMessagingGrant = AccessToken.IpMessagingGrant;
 
@@ -52,15 +50,16 @@ app.get('/auth', function (request, response) {
         process.env.TWILIO_API_KEY,
         process.env.TWILIO_API_SECRET
     );
+    
     token.addGrant(ipmGrant);
     token.identity = identity;
     
-    var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY).toString('utf8'); 
+    var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();        
     
     // This validation token is generated using app’s Private Key created on 
     // Virgil Developer portal.
-    var validationToken = virgil.utils.generateValidationToken(identity, 
-        'nickname', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
+    var validationToken = VirgilSDK.utils.generateValidationToken(identity, 'nickname', privateKey,
+        process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 
     response.send({
         identity: identity,        

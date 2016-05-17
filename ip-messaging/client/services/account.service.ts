@@ -2,33 +2,50 @@ import { Injectable } from '@angular/core'
 
 export class Account {
     constructor(public id: string,
-                public nickname: string) { }
+                public identity: string,
+                public publicKey: string,
+                public privateKey: string) { }
                     
     static fromJson(json: string){
         var accountObject = JSON.parse(json);
-        return new Account(accountObject.id, accountObject.nickname);
+        
+        return new Account(
+            accountObject.id, 
+            accountObject.identity, 
+            accountObject.publicKey, 
+            accountObject.privateKey
+        );
     }
 }
 
 @Injectable()
-export class AccountService {
-    public currentAccount: Account;
+export class ApplicationContext {   
     
-    constructor() {
-        this.currentAccount = null;
+    constructor (){
+        this._account = this.loadAccount();
     }
-    
-    isLoggedIn(){
-        return this.currentAccount != null;
-    }
-    
-    login(id: string, name: string, keyPair){
         
+    private _account: Account;
+    get account(): Account {
+        return this._account;
+    }    
+    
+    public hasAccount(){
+        return this._account != null;
     }
     
-    private getAccount(){
+    public setCurrentAccount(account:Account){
+        this._account = account;        
+        this.storeAccount(account);
+    }
+    
+    private storeAccount(storeAccount:Account){
+        localStorage.setItem('account', JSON.stringify(storeAccount))
+    }
+    
+    private loadAccount():Account{
                 
-        var accountJsonString: string = localStorage.getItem('account');
+        let accountJsonString = localStorage.getItem('account');
         if (accountJsonString == null){
             return null;
         }

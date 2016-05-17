@@ -3,15 +3,13 @@ import { Routes, Router, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/ro
 import { LoginComponent } from './login.component';
 import { ChatComponent } from './chat.component';
 
-import { AccountService } from '../services/account.service'
+import { ApplicationContext } from '../services/account.service'
 
 @Component({
     selector: 'body',
     templateUrl: './assets/views/app.component.html',
     directives: [ ROUTER_DIRECTIVES ],
-    providers: [
-        ROUTER_PROVIDERS
-    ]
+    providers: [ ROUTER_PROVIDERS ]
 })
 
 @Routes([
@@ -22,11 +20,11 @@ import { AccountService } from '../services/account.service'
 export class AppComponent implements OnInit { 
     
     constructor(private router: Router,
-                private accountService: AccountService) { }
+                private context: ApplicationContext) { }
             
     ngOnInit(){
         
-        if (this.accountService.isLoggedIn()){
+        if (this.context.hasAccount()){
             this.router.navigate(['/chat']);
             return;
         }

@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
 
-import { AccountService, Account } from '../services/account.service'
+import { ApplicationContext, Account } from '../services/account.service'
 import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 
@@ -15,7 +15,7 @@ import { TwilioService } from '../services/twilio.service'
 
 export class LoginComponent{    
     constructor (private http: Http,
-                 private account: AccountService,
+                 private context: ApplicationContext,
                  private virgil: VirgilService,
                  private twilio: TwilioService,
                  private router: Router) { }
@@ -44,18 +44,31 @@ export class LoginComponent{
                 return this.virgil.sdk.cards.search({ value: authData.identity }); 
             })
             .then(cards => {      
-                
-                console.log("Found " + cards.length + " cards");                
-                                
+                                                
                 if (cards.length == 0) {
+                    
+                    // publish new public key for current user 
+                    
                     return this.publish(this.nickName, validationToken);            
                 }
                 
-                let card =  _.last(_.sortBy(cards, 'created_at'));                
-                return this.download(card, validationToken);
+                // download keys from Virgil services in case when 
+                // user is already exists.
+                
+                let card =  _.last(_.sortBy(cards, 'created_at'));                                
+                return this.download(card, validationToken);                
             })
-            .then(keysBundle => {
+            .then(keysBundle => {                                
                 this.isBusy = false;
+                
+                var account = new Account(
+                    keysBundle.id, 
+                    keysBundle.identity, 
+                    keysBundle.publicKey,
+                    keysBundle.privateKey);
+                
+                this.context.setCurrentAccount(account)
+                this.router.navigate(['/chat']);
             })
             .catch((error) => {
                 throw error;
@@ -63,6 +76,10 @@ export class LoginComponent{
     }
     
     private download(card: any, validationToken: string) : Promise<any> {
+        
+        // download your private key from Virgil services
+        // using validation token recived from application
+        // server.
         
         return this.virgil.sdk.privateKeys.get({
                 virgil_card_id: card.id,
@@ -74,8 +91,10 @@ export class LoginComponent{
             })
             .then(response => {                
                 return { 
-                    card: card, 
-                    privateKey: response.private_key 
+                    id: card.id,
+                    identity: card.identity.value, 
+                    publicKey: card.public_key.public_key,
+                    privateKey: response.private_key                     
                 };                   
             });
     } 
@@ -83,11 +102,15 @@ export class LoginComponent{
     private publish(identity: string, validationToken: string) : Promise<any> {
                
         let keyPair: any = null;
+        let card: any = null;
         
-        return this.virgil.crypto.generateKeyPairAsync()
-            .then(generatedKeyPair => {
-                                
-                keyPair = generatedKeyPair;                
+        // geneareting public/private keyPair for current user.
+        return this.virgil.crypto.generateKeyPairAsync()            
+            .then(generatedKeyPair => {              
+                                                  
+                keyPair = generatedKeyPair;
+                
+                // prepare request for Card creation.                                
                 let cardInfo = {
                     public_key: keyPair.publicKey,
                     private_key: keyPair.privateKey,
@@ -96,14 +119,32 @@ export class LoginComponent{
                         value: identity,
                         validation_token: validationToken
                     }
-                }
-                                
+                }                                
+                
+                // create private card using application validation 
+                // token. See more about validation tokens here 
+                // https://virgilsecurity.com/api-docs/javascript/keys-sdk
+                
                 return this.virgil.sdk.cards.create(cardInfo);
             })
             .then(createdCard => {                
+                card = createdCard;
+                
+                // store private key in a safe storage which lets you 
+                // synchronize your private key between the devices and 
+                // applications.
+                                               
+                return this.virgil.sdk.privateKeys.stash({
+                    virgil_card_id: createdCard.id,
+                    private_key: keyPair.privateKey
+                });
+            })
+            .then(response => {                
                 return { 
-                    card: createdCard, 
-                    privateKey: keyPair.privateKey 
+                    id: card.id,
+                    identity: card.identity.value, 
+                    publicKey: card.public_key.public_key,
+                    privateKey: response.private_key                     
                 };                
             });
     }
