@@ -5,8 +5,8 @@ declare var VirgilSDK: any;
 @Injectable()
 export class VirgilService {   
     
-    public crypto;
-    public sdk;
+    public crypto:any;
+    public sdk:any;
     
     initialize(accessToken:string){
         this.sdk = new VirgilSDK(accessToken);

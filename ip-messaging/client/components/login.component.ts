@@ -41,31 +41,43 @@ export class LoginComponent{
                 this.twilio.initialize(authData.twilio_token);
                 
                 // search for public key for current user nickname              
-                return this.virgil.sdk.search({ value: authData.identity }); 
+                return this.virgil.sdk.cards.search({ value: authData.identity }); 
             })
-            .then(cards => {                      
+            .then(cards => {      
                 
-                if (cards.length == 0) {                                        
+                console.log("Found " + cards.length + " cards");                
+                                
+                if (cards.length == 0) {
                     return this.publish(this.nickName, validationToken);            
                 }
                 
-                let card =  _.last(_.sortBy(cards, 'created_at'));
-                
+                let card =  _.last(_.sortBy(cards, 'created_at'));                
                 return this.download(card, validationToken);
             })
-            .then(cards => {
-                
+            .then(keysBundle => {
+                this.isBusy = false;
             })
             .catch((error) => {
-                this.isBusy = false;
+                throw error;
             });
     }
     
     private download(card: any, validationToken: string) : Promise<any> {
         
-        
-        
-        return null;
+        return this.virgil.sdk.privateKeys.get({
+                virgil_card_id: card.id,
+                identity: {
+                    type: card.identity.type,
+                    value: card.identity.value,
+                    validation_token: validationToken
+                }
+            })
+            .then(response => {                
+                return { 
+                    card: card, 
+                    privateKey: response.private_key 
+                };                   
+            });
     } 
     
     private publish(identity: string, validationToken: string) : Promise<any> {
@@ -86,7 +98,7 @@ export class LoginComponent{
                     }
                 }
                                 
-                return this.virgil.sdk.createCard(cardInfo);
+                return this.virgil.sdk.cards.create(cardInfo);
             })
             .then(createdCard => {                
                 return { 

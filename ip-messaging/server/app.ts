@@ -14,6 +14,9 @@ require("dotenv").load();
 import * as express from "express";
 import * as http from "http";
 
+let VirgilSDK = require('virgil-sdk');
+var virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
+
 let AccessToken = require('twilio').AccessToken;
 let IpMessagingGrant = AccessToken.IpMessagingGrant;
 
@@ -51,10 +54,17 @@ app.get('/auth', function (request, response) {
     );
     token.addGrant(ipmGrant);
     token.identity = identity;
+    
+    var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY).toString('utf8'); 
+    
+    // This validation token is generated using app’s Private Key created on 
+    // Virgil Developer portal.
+    var validationToken = virgil.utils.generateValidationToken(identity, 
+        'nickname', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 
-    // Serialize the token to a JWT string and include it in a JSON response
     response.send({
-        identity: identity,
+        identity: identity,        
+        validation_token: validationToken,
         virgil_token: process.env.VIRGIL_ACCESS_TOKEN,
         twilio_token: token.toJwt()
     });
