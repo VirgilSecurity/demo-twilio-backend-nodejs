@@ -12,16 +12,17 @@ process.env.TWILIO_IPM_SERVICE_SID
 require("dotenv").load();
 
 import * as express from "express";
-import * as http from "http";
+import * as path from "path";
 
 let VirgilSDK = require('virgil-sdk');
 let AccessToken = require('twilio').AccessToken;
 let IpMessagingGrant = AccessToken.IpMessagingGrant;
 
+const root =  path.resolve('./public');
 const app: express.Application = express();
 app.disable("x-powered-by");
 
-app.use(express.static("./public"));
+app.use(express.static(root));
 app.use('/assets/', express.static('./node_modules/'));
 
 /*
@@ -69,6 +70,15 @@ app.get('/auth', function (request, response) {
     });
 });
 
+app.get('*', function (req, res, next) {
+    if (req.accepts('html')) {
+        res.sendFile(root + '/index.html');
+    }
+    else {
+        next();
+    }
+});
+
 app.listen(3000, function () {
-    
+
 });

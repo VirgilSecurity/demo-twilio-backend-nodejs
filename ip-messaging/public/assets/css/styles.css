@@ -38,3 +38,23 @@ h5.logo-description{
     margin-bottom: 10px;
     text-align: center;
 }
+
+#chat-wrapper {
+    padding-top: 30px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+}
+
+.chat > header {
+    flex: 0 0 auto;
+}
+
+.chat > main {
+    flex: 1 1 auto;
+    overflow-y: scroll;
+}
+
+.chat > footer {
+    flex: 0 0 auto;
+}
