@@ -6,7 +6,7 @@ import { ChatComponent } from './chat.component';
 import { ApplicationContext } from '../services/account.service'
 
 @Component({
-    selector: 'body',
+    selector: 'ipm-app',
     templateUrl: './assets/views/app.component.html',
     directives: [ ROUTER_DIRECTIVES ],
     providers: [ ROUTER_PROVIDERS ]

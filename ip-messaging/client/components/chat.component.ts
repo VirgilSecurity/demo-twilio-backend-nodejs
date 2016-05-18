@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 
 @Component({
-    selector: 'chat',
+    selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html'
 })
 
