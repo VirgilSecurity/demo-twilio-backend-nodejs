@@ -1,9 +1,6 @@
 <div id="ipm-chat-container" class="pushable">
-    <div class="ui visible inverted left vertical menu">
-        <div class="item">Darkside</div>
-        <div class="item">Test Test</div>
-        <div class="item">Random</div>
-        <div class="item">Another</div>
+    <div class="ui visible inverted left vertical menu" *ngFor="let channel of channels" >
+        <div class="item">{{channel.friendlyName}}</div>
     </div>
     <div id="chat-wrapper" class="pusher">
         <seciton class="chat">

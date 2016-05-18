@@ -22,20 +22,20 @@ export class Account {
 export class ApplicationContext {   
     
     constructor (){
-        this._account = this.loadAccount();
+        this.internalAccount = this.loadAccount();
     }
         
-    private _account: Account;
+    private internalAccount: Account;
     get account(): Account {
-        return this._account;
+        return this.internalAccount;
     }    
     
     public hasAccount(){
-        return this._account != null;
+        return this.internalAccount != null;
     }
     
     public setCurrentAccount(account:Account){
-        this._account = account;        
+        this.internalAccount = account;        
         this.storeAccount(account);
     }
     

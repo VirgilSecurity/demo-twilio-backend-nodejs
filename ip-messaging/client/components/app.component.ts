@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { Http, Response } from '@angular/http';
 import { Routes, Router, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router';
+import { VirgilService } from '../services/virgil.service'
+import { TwilioService } from '../services/twilio.service'
+
 import { LoginComponent } from './login.component';
 import { ChatComponent } from './chat.component';
 
@@ -20,12 +24,25 @@ import { ApplicationContext } from '../services/account.service'
 export class AppComponent implements OnInit { 
     
     constructor(private router: Router,
+                private http: Http,
+                private virgil: VirgilService,
+                private twilio: TwilioService,
                 private context: ApplicationContext) { }
             
     ngOnInit(){
         
         if (this.context.hasAccount()){
-            this.router.navigate(['/chat']);
+            
+            this.http.get('/auth?identity=' + this.context.account.identity + '&deviceId=web').toPromise()
+                .then((response:Response) => {                    
+                    let authData = response.json();
+                                        
+                    this.virgil.initialize(authData.virgil_token);
+                    this.twilio.initialize(authData.twilio_token);
+                    
+                    this.router.navigate(['/chat']);                    
+                });              
+            
             return;
         }
         

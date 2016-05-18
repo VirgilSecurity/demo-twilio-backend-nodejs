@@ -4,6 +4,8 @@ import { bootstrap } from '@angular/platform-browser-dynamic';
 import { ROUTER_PROVIDERS } from '@angular/router';
 import { HTTP_PROVIDERS } from '@angular/http';
 
+import 'rxjs/Rx';
+
 import { AppComponent } from './components/app.component';
 import { ApplicationContext } from './services/account.service'
 import { TwilioService } from './services/twilio.service'
