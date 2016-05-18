@@ -39,11 +39,20 @@ h5.logo-description{
     text-align: center;
 }
 
+#ipm-chat-container {
+    display: flex;
+}
+
 #chat-wrapper {
-    padding-top: 30px;
+    height: 100%;
+    padding: 20px 30px;
+    flex: 1 1 auto;
+}
+
+.chat {
     display: flex;
     flex-direction: column;
-    max-height: 100%;
+    height: 100%;
 }
 
 .chat > header {
@@ -57,4 +66,25 @@ h5.logo-description{
 
 .chat > footer {
     flex: 0 0 auto;
+}
+
+.ui.feed > .event {
+    padding-right: 10%;
+}
+
+.ui.feed > .event.outgoing {
+    padding-right: 0;
+    padding-left: 10%;
+}
+
+.ui.feed > .event.outgoing > .content .summary {
+    text-align: right;
+}
+
+.ui.feed > .event.outgoing > .content .extra {
+    float: right;
+}
+
+.ui.feed > .event.outgoing > .content .extra > .message {
+    background: #dff0ff;
 }
