@@ -36,7 +36,7 @@ export class LoginComponent{
                 
                 // initialize virgil SDK using token generated on backend.
                 this.virgil.initialize(authData.virgil_token);
-                
+                                
                 // initialize twilio client using token generated on backend.
                 this.twilio.initialize(authData.twilio_token);
                 
