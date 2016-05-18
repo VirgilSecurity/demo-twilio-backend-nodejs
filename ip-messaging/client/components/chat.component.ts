@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, NgZone, ChangeDetectorRef, Input } from '@angular/core'
 import { Observable } from 'rxjs/Observable';
 import { TwilioService, Message, Channel } from '../services/twilio.service'
 import * as _ from 'lodash';
@@ -10,19 +10,21 @@ import * as _ from 'lodash';
 
 export class ChatComponent {
     
-    public messages: Array<any> = new Array<any>();
-    public channels: Array<any> = new Array<any>();
+    public messages = [];
+    @Input() public channels = [];
     public currentChannel: any; 
     
-    public isBusy: boolean;
+    public isBusy: boolean = false;
     
-    constructor (private twilio: TwilioService){
+    constructor (private twilio: TwilioService,
+                 private zone: NgZone,
+                 private cd: ChangeDetectorRef){
         this.twilio.client.on('channelAdded', this.onChannelAdded);
         this.twilio.client.on('channelRemoved', this.onChannelRemoved);
         
         this.loadChannels();
     }
-    
+        
     /**
      * Sets the current channel for chatting.
      */
@@ -41,14 +43,21 @@ export class ChatComponent {
      * Loads the current list of all Channels the Client knows about.
      */
     private loadChannels(): void{
-        this.twilio.client.getChannels().then(channels => {                
+        
+        this.isBusy = true;
+        
+        this.twilio.client.getChannels().then(channels => {
                 channels.forEach(channel => {
-                    this.onChannelAdded(channel);
-                });                                                   
+                    this.onChannelAdded(channel);                        
+                });  
+                    
+                this.isBusy = false;   
+                this.cd.markForCheck();                
             })
-            .catch(error => {
+            .catch(error => this.do(() => {
+                this.isBusy = false;                
                 console.error(error);
-            });     
+            }));     
     }
     
     /**
@@ -73,8 +82,7 @@ export class ChatComponent {
      * Fired when a Channel becomes visible to the Client.
      */
     private onChannelAdded(channel:any): void{
-        this.channels.push(channel);
-        
+        this.channels.push(channel);        
         console.log('Channel '+ channel.friendlyName + ' has been added.');
     }
     
@@ -83,5 +91,9 @@ export class ChatComponent {
      */
     private onChannelRemoved(channel:any): void{
                 
-    }    
+    }   
+    
+    private do(action: () => void) {
+        this.zone.run(action);        
+    }
 }
