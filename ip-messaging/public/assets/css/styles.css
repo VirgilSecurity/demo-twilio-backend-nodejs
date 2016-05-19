@@ -83,6 +83,7 @@ a[href], button {
 #chat-content {
     flex: 1 1 auto;
     position: relative;
+    max-width: calc(100% - 260px);
 }
 
 #chat-container {
@@ -109,6 +110,10 @@ a[href], button {
 
     #chat-menu-toggle {
         display: inline-block;
+    }
+
+    #chat-content {
+        max-width: 100%;
     }
 }
 
@@ -153,8 +158,14 @@ a[href], button {
     flex: 0 0 auto;
 }
 
+.feed-wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
 .ui.feed > .event {
     padding-right: 10%;
+    display: block !important;
 }
 
 .ui.feed > .event.outgoing {
