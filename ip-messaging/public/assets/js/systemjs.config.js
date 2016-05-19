@@ -14,9 +14,9 @@
       '@angular/http'                        : './assets/@angular/http',
       '@angular/platform-browser'            : './assets/@angular/platform-browser',
       '@angular/platform-browser-dynamic'    : './assets/@angular/platform-browser-dynamic',
-      '@angular/router'                      : './assets/@angular/router',
-      '@angular/router-deprecated'           : './assets/@angular/router-deprecated',
-      '@angular/upgrade'                     : './assets/@angular/upgrade',
+      // '@angular/router'                      : './assets/@angular/router',
+      // '@angular/router-deprecated'           : './assets/@angular/router-deprecated',
+      // '@angular/upgrade'                     : './assets/@angular/upgrade',
       'lodash'                               : './assets/lodash/lodash.js'
   };
   
@@ -30,10 +30,10 @@
       '@angular/core'                        : { main: 'core.umd.js', defaultExtension: 'js' },
       '@angular/http'                        : { main: 'http.umd.js', defaultExtension: 'js' },
       '@angular/platform-browser'            : { main: 'platform-browser.umd.js', defaultExtension: 'js' },
-      '@angular/platform-browser-dynamic'    : { main: 'platform-browser-dynamic.umd.js', defaultExtension: 'js' },
-      '@angular/router'                      : { main: 'router.umd.js', defaultExtension: 'js' },
-      '@angular/router-deprecated'           : { main: 'router-deprecated.umd.js', defaultExtension: 'js' },
-      '@angular/upgrade'                     : { main: 'upgrade.umd.js', defaultExtension: 'js' }
+      '@angular/platform-browser-dynamic'    : { main: 'platform-browser-dynamic.umd.js', defaultExtension: 'js' }
+      // '@angular/router'                      : { main: 'router.umd.js', defaultExtension: 'js' },
+      // '@angular/router-deprecated'           : { main: 'router-deprecated.umd.js', defaultExtension: 'js' },
+      // '@angular/upgrade'                     : { main: 'upgrade.umd.js', defaultExtension: 'js' }
   };
 
   var config = {

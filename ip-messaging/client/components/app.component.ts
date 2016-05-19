@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { Router, ROUTER_PROVIDERS, Routes } from '@angular/router';
+import { Component, OnInit, NgZone } from '@angular/core';
+
 import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
+import { BackendService } from '../services/backend.service'
 
 import { LoginComponent } from './login.component';
 import { ChatComponent } from './chat.component';
@@ -11,40 +11,33 @@ import { AccountService } from '../services/account.service'
 
 @Component({
     selector: 'ipm-app',
-    templateUrl: './assets/views/app.component.html',
-    providers: [ ROUTER_PROVIDERS ]
+    templateUrl: './assets/views/app.component.html',   
+    directives: [LoginComponent, ChatComponent]
 })
-@Routes([
-    { path: '/', component: ChatComponent },
-    { path: '/login', component: LoginComponent }    
-])
-export class AppComponent implements OnInit { 
+export class AppComponent {
     
-    constructor(private router: Router,
-                private http: Http,
-                private virgil: VirgilService,
+    public loginCallback: Function;
+    
+    constructor(private virgil: VirgilService,
                 private twilio: TwilioService,
-                private account: AccountService) { }
-            
-    ngOnInit(){
-        
-        console.log('pipka0');
-        
-        // if (this.account.hasAccount()){
-            
-        //     this.http.get('/auth?identity=' + this.account.current.identity + '&deviceId=web').toPromise()
-        //         .then((response:Response) => {                    
-        //             let authData = response.json();
-                                        
-        //             this.virgil.initialize(authData.virgil_token);
-        //             this.twilio.initialize(authData.twilio_token);
+                private account: AccountService,
+                private backend: BackendService,
+                private zone: NgZone) { 
                     
-        //             this.router.navigate(['/chat']);                    
-        //         });              
+                    console.log(zone);
+                    
+        this.loginCallback = this.onLogin.bind(this);    
+    }
+    
+    isLoggedIn:boolean = false;    
             
-        //     return;
-        // }
+    ngAfterViewInit(){        
+        this.isLoggedIn = this.account.hasAccount();
+        console.log(this.isLoggedIn);
+    }
+    
+    onLogin() {
         
-        // this.router.navigate(['/login']);    
-    }   
+        this.zone.run(() => this.isLoggedIn = true);
+    }
 }

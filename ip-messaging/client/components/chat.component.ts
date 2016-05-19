@@ -1,37 +1,65 @@
-import { Component, OnInit } from '@angular/core'
-import { OnActivate } from '@angular/router-deprecated'
-import { TwilioService } from '../services/twilio.service'
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
+import { NgClass } from '@angular/common'
 
 import * as _ from 'lodash';
 
+import { TwilioService } from '../services/twilio.service'
+import { BackendService } from '../services/backend.service'
+import { AccountService } from '../services/account.service'
+import { VirgilService } from '../services/virgil.service'
+
 @Component({
     selector: 'ipm-chat',
-    templateUrl: './assets/views/chat.component.html'
+    templateUrl: './assets/views/chat.component.html',
+    directives: [NgClass]
 })
-export class ChatComponent implements OnInit, OnActivate {
+export class ChatComponent implements OnInit {
     
     // messages = [];
-    // channels = [];
+    channels = [];
     // currentChannel: any; 
     
     isBusy:boolean = false;
     
-    constructor (private twilio: TwilioService){
+    constructor (
+        private twilio: TwilioService,
+        private backend: BackendService,
+        private account: AccountService,
+        private virgil: VirgilService,
+        private cd: ChangeDetectorRef){
+            
         // this.twilio.client.on('channelAdded', this.onChannelAdded);
         // this.twilio.client.on('channelRemoved', this.onChannelRemoved);
-        //console.log('pipka');
-        //this.loadChannels();
-        //this.isBusy = true;
+         console.log('pipka0');
+         this.cd.markForCheck();
+        // this.loadChannels();
+        // this.isBusy = true;
+    }
+    
+    ngOnChanges(){
+        console.log('pipka-1');
     }
     
     public ngOnInit(){
+        
         console.log('pipka');
-        //this.loadChannels();
+                
+        this.backend.auth(this.account.current.identity)
+                .then(authData => {
+                    this.virgil.initialize(authData.virgil_token);
+                    this.twilio.initialize(authData.twilio_token);
+                    
+                    this.loadChannels();
+                })
+                .catch(error => {
+                    alert(error);
+                });
+            
+            return;
     }
     
     public routerOnActivate(){
-        console.log('pipka1');
-        this.isBusy = true;
+        //this.loadChannels();
     }
         
     /**
@@ -57,22 +85,19 @@ export class ChatComponent implements OnInit, OnActivate {
      */
     private loadChannels(): void{
         
-        this.isBusy = true;
-        // this.cd.markForCheck();    
+        this.isBusy = true; 
         
-        // this.twilio.client.getChannels().then(channels => {
-        //         channels.forEach(channel => {
-        //             this.onChannelAdded(channel);                        
-        //         });  
+        this.twilio.client.getChannels().then(channels => {
+                channels.forEach(channel => {
+                    this.onChannelAdded(channel);                        
+                });  
                     
-        //         this.isBusy = false;   
-        //         // this.cd.markForCheck();           
-        //         this.cd.detectChanges();     
-        //     })
-        //     .catch(error => this.do(() => {
-        //         this.isBusy = false;                
-        //         console.error(error);
-        //     }));     
+                this.isBusy = false;
+                this.cd.detectChanges();     
+            })
+            .catch(error => {                
+                console.error(error);
+            });     
     }
     
     /**
@@ -97,8 +122,8 @@ export class ChatComponent implements OnInit, OnActivate {
      * Fired when a Channel becomes visible to the Client.
      */
     private onChannelAdded(channel:any): void{
-        //this.channels.push(channel);        
-        //console.log('Channel '+ channel.friendlyName + ' has been added.');
+        this.channels.push(channel);        
+        console.log('Channel '+ channel.friendlyName + ' has been added.');
     }
     
     /**

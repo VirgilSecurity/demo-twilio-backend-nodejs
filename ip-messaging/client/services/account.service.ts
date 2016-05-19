@@ -22,7 +22,7 @@ export class Account {
 
 @Injectable()
 export class AccountService {   
-    
+        
     constructor (private virgil:VirgilService,
                  private twilio:TwilioService){
         this.currentAccount = this.loadAccount();
@@ -36,7 +36,7 @@ export class AccountService {
     public hasAccount(){
         return this.currentAccount != null;
     }
-    
+        
     public setCurrentAccount(account:Account){
         this.currentAccount = account;        
         this.storeAccount(account);

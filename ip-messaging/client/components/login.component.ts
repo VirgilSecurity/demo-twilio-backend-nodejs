@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, Input } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Router } from '@angular/router';
 
 import * as _ from 'lodash';
 
@@ -14,13 +13,16 @@ import { BackendService } from '../services/backend.service'
     templateUrl: './assets/views/login.component.html'
 })
 
-export class LoginComponent{    
+export class LoginComponent{
+    
+    @Input('onLogin') public loggedIn: Function;
+    
     constructor (private http: Http,
                  private context: AccountService,
                  private virgil: VirgilService,
                  private twilio: TwilioService,
                  private backend: BackendService,
-                 private router: Router) { }
+                 private cd: ChangeDetectorRef) { }
     
     public nickName: string;    
     public isBusy: boolean;
@@ -65,8 +67,8 @@ export class LoginComponent{
                 var account = new Account(keysBundle.id, keysBundle.identity, 
                     keysBundle.publicKey, keysBundle.privateKey);
                 
-                this.context.setCurrentAccount(account)
-                this.router.navigate(['/']);
+                this.context.setCurrentAccount(account);
+                this.loggedIn();
             })
             .catch((error) => {
                 throw error;

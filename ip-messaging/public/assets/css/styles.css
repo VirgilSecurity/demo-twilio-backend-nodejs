@@ -39,20 +39,105 @@ h5.logo-description{
     text-align: center;
 }
 
-#ipm-chat-container {
-    display: flex;
+a[href], button {
+    touch-action: manipulation;
 }
 
 #chat-wrapper {
     height: 100%;
-    padding: 20px 30px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+}
+
+#chat-viewport {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    -webkit-transform: translateX(0);
+    -webkit-transition: .3s ease all;
+    transform: translateX(0);
+    transition: .3s ease all;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    display: flex;
+}
+
+#chat-menu {
+    flex: 0 0 auto;
+    width: 260px;
+    height: 100%!important;
+    max-height: 100%;
+    border-radius: 0!important;
+    margin: 0!important;
+    overflow-y: auto!important;
+}
+
+#chat-menu-toggle {
+    display: none;
+    margin-top: 30px
+}
+
+#chat-content {
     flex: 1 1 auto;
+    position: relative;
+}
+
+#chat-container {
+    display: flex;
+}
+
+@media only screen and (min-width: 768px) {
+    #chat-content .dimmer {
+        display: none !important;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    #chat-wrapper.show-menu #chat-viewport {
+        -webkit-transform: translate3d(260px, 0, 0);
+        transform: translate3d(260px, 0, 0);
+    }
+
+    #chat-menu {
+        position: absolute;
+        top: 0;
+        left: -260px;
+    }
+
+    #chat-menu-toggle {
+        display: inline-block;
+    }
+}
+
+#chat-menu hgroup {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 1rem;
+}
+
+#chat-menu hgroup > h1 {
+    font-size: 1.28571429rem;
+    margin: 0;
+}
+
+#chat-menu hgroup > h2 {
+    font-size: 1rem;
+    font-weight: normal;
+    margin: 0;
+}
+
+#chat-menu .channel-input {
+    margin-bottom: 1rem;
 }
 
 .chat {
     display: flex;
     flex-direction: column;
     height: 100%;
+    padding: 0 20px 30px 20px;
 }
 
 .chat > header {
@@ -61,7 +146,7 @@ h5.logo-description{
 
 .chat > main {
     flex: 1 1 auto;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .chat > footer {
