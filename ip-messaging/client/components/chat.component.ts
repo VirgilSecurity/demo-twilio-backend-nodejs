@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
+import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core'
 import { NgClass } from '@angular/common'
 
 import * as _ from 'lodash';
@@ -25,6 +25,8 @@ export class ChatComponent implements OnInit {
     currentChannel: any;
     
     isBusy:boolean = false;
+
+    @Input() public logout: Function;
     
     constructor (
         private twilio: TwilioService,
