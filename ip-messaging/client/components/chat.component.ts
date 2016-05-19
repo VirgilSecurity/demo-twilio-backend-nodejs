@@ -1,28 +1,37 @@
-import { Component, NgZone, ChangeDetectorRef, Input } from '@angular/core'
-import { Observable } from 'rxjs/Observable';
+import { Component, OnInit } from '@angular/core'
+import { OnActivate, RouteSegment } from '@angular/router'
 import { TwilioService, Message, Channel } from '../services/twilio.service'
+
 import * as _ from 'lodash';
 
 @Component({
     selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html'
 })
-
-export class ChatComponent {
+export class ChatComponent implements OnInit, OnActivate {
     
-    public messages = [];
-    @Input() public channels = [];
-    public currentChannel: any; 
+    // messages = [];
+    // channels = [];
+    // currentChannel: any; 
     
-    public isBusy: boolean = false;
+    isBusy:boolean = false;
     
-    constructor (private twilio: TwilioService,
-                 private zone: NgZone,
-                 private cd: ChangeDetectorRef){
-        this.twilio.client.on('channelAdded', this.onChannelAdded);
-        this.twilio.client.on('channelRemoved', this.onChannelRemoved);
-        
-        this.loadChannels();
+    constructor (private twilio: TwilioService){
+        // this.twilio.client.on('channelAdded', this.onChannelAdded);
+        // this.twilio.client.on('channelRemoved', this.onChannelRemoved);
+        //console.log('pipka');
+        //this.loadChannels();
+        //this.isBusy = true;
+    }
+    
+    public ngOnInit(){
+        console.log('pipka');
+        //this.loadChannels();
+    }
+    
+    public routerOnActivate(){
+        console.log('pipka1');
+        this.isBusy = true;
     }
         
     /**
@@ -30,13 +39,17 @@ export class ChatComponent {
      */
     public setCurrentChannel(channel: any){
         
-        if (this.currentChannel != null){
-            this.currentChannel.removeListener('memberJoined', this.onMemberJoined);
-            this.currentChannel.removeListener('memberLeft', this.onMemberLeft);
-            this.currentChannel.removeListener('messageAdded', this.onMessageAdded);
-        }
+        // if (this.currentChannel != null){
+        //     this.currentChannel.removeListener('memberJoined', this.onMemberJoined);
+        //     this.currentChannel.removeListener('memberLeft', this.onMemberLeft);
+        //     this.currentChannel.removeListener('messageAdded', this.onMessageAdded);
+        // }
         
-        this.currentChannel = channel;
+        // this.currentChannel = channel;
+        
+        // this.currentChannel.on('memberJoined', this.onMemberJoined);
+        // this.currentChannel.on('memberLeft', this.onMemberLeft);
+        // this.currentChannel.on('messageAdded', this.onMessageAdded);
     }
             
     /**
@@ -45,19 +58,21 @@ export class ChatComponent {
     private loadChannels(): void{
         
         this.isBusy = true;
+        // this.cd.markForCheck();    
         
-        this.twilio.client.getChannels().then(channels => {
-                channels.forEach(channel => {
-                    this.onChannelAdded(channel);                        
-                });  
+        // this.twilio.client.getChannels().then(channels => {
+        //         channels.forEach(channel => {
+        //             this.onChannelAdded(channel);                        
+        //         });  
                     
-                this.isBusy = false;   
-                this.cd.markForCheck();                
-            })
-            .catch(error => this.do(() => {
-                this.isBusy = false;                
-                console.error(error);
-            }));     
+        //         this.isBusy = false;   
+        //         // this.cd.markForCheck();           
+        //         this.cd.detectChanges();     
+        //     })
+        //     .catch(error => this.do(() => {
+        //         this.isBusy = false;                
+        //         console.error(error);
+        //     }));     
     }
     
     /**
@@ -82,18 +97,13 @@ export class ChatComponent {
      * Fired when a Channel becomes visible to the Client.
      */
     private onChannelAdded(channel:any): void{
-        this.channels.push(channel);        
-        console.log('Channel '+ channel.friendlyName + ' has been added.');
+        //this.channels.push(channel);        
+        //console.log('Channel '+ channel.friendlyName + ' has been added.');
     }
     
     /**
      * Fired when a Channel is no longer visible to the Client.
      */
     private onChannelRemoved(channel:any): void{
-                
     }   
-    
-    private do(action: () => void) {
-        this.zone.run(action);        
-    }
 }

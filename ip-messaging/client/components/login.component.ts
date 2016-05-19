@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Router } from '@angular/router';
+
 import * as _ from 'lodash';
 
-import { ApplicationContext, Account } from '../services/account.service'
+import { AccountService, Account } from '../services/account.service'
 import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 
@@ -14,7 +15,7 @@ import { TwilioService } from '../services/twilio.service'
 
 export class LoginComponent{    
     constructor (private http: Http,
-                 private context: ApplicationContext,
+                 private context: AccountService,
                  private virgil: VirgilService,
                  private twilio: TwilioService,
                  private router: Router) { }

@@ -7,7 +7,7 @@ import { TwilioService } from '../services/twilio.service'
 import { LoginComponent } from './login.component';
 import { ChatComponent } from './chat.component';
 
-import { ApplicationContext } from '../services/account.service'
+import { AccountService } from '../services/account.service'
 
 @Component({
     selector: 'ipm-app',
@@ -15,37 +15,35 @@ import { ApplicationContext } from '../services/account.service'
     directives: [ ROUTER_DIRECTIVES ],
     providers: [ ROUTER_PROVIDERS ]
 })
-
 @Routes([
     { path: '/login', component: LoginComponent },
     { path: '/chat', component: ChatComponent }
 ])
-
 export class AppComponent implements OnInit { 
     
     constructor(private router: Router,
                 private http: Http,
                 private virgil: VirgilService,
                 private twilio: TwilioService,
-                private context: ApplicationContext) { }
+                private account: AccountService) { }
             
     ngOnInit(){
         
-        if (this.context.hasAccount()){
+        // if (this.account.hasAccount()){
             
-            this.http.get('/auth?identity=' + this.context.account.identity + '&deviceId=web').toPromise()
-                .then((response:Response) => {                    
-                    let authData = response.json();
+        //     this.http.get('/auth?identity=' + this.account.current.identity + '&deviceId=web').toPromise()
+        //         .then((response:Response) => {                    
+        //             let authData = response.json();
                                         
-                    this.virgil.initialize(authData.virgil_token);
-                    this.twilio.initialize(authData.twilio_token);
+        //             this.virgil.initialize(authData.virgil_token);
+        //             this.twilio.initialize(authData.twilio_token);
                     
-                    this.router.navigate(['/chat']);                    
-                });              
+        //             this.router.navigate(['/chat']);                    
+        //         });              
             
-            return;
-        }
+        //     return;
+        // }
         
-        this.router.navigate(['/login']);    
+        // this.router.navigate(['/login']);    
     }   
 }

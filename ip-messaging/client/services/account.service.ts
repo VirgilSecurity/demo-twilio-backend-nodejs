@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core'
+import { VirgilService } from './virgil.service'
+import { TwilioService } from './twilio.service'
 
 export class Account {
     constructor(public id: string,
@@ -19,23 +21,24 @@ export class Account {
 }
 
 @Injectable()
-export class ApplicationContext {   
+export class AccountService {   
     
-    constructor (){
-        this.internalAccount = this.loadAccount();
+    constructor (private virgil:VirgilService,
+                 private twilio:TwilioService){
+        this.currentAccount = this.loadAccount();
     }
         
-    private internalAccount: Account;
-    get account(): Account {
-        return this.internalAccount;
+    private currentAccount: Account;
+    get current(): Account {
+        return this.currentAccount;
     }    
     
     public hasAccount(){
-        return this.internalAccount != null;
+        return this.currentAccount != null;
     }
     
     public setCurrentAccount(account:Account){
-        this.internalAccount = account;        
+        this.currentAccount = account;        
         this.storeAccount(account);
     }
     

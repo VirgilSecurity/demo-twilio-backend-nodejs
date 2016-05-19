@@ -18,8 +18,7 @@ export class TwilioService {
         this.accessManager = new Twilio.AccessManager(accessToken);
         this.client = new Twilio.IPMessaging.Client(this.accessManager);
         
-        this.client.on('tokenExpired', this.onTokenExpired)
-        
+        this.client.on('tokenExpired', this.onTokenExpired);
         console.log('Twilio IP Messaging client has been successfully initialized.');
     }
     
