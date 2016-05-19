@@ -45,6 +45,7 @@ export class ChatComponent implements OnInit {
     }
     
     public ngOnInit(){
+        this.twilio.client.on('channelAdded', this.onChannelAdded.bind(this));
         this.loadChannels();
     }
         
@@ -74,6 +75,19 @@ export class ChatComponent implements OnInit {
             this.setCurrentChannel(channel);
         })
         .catch(this.handleError);
+    }
+    
+    /**
+     * Deletes current channel.
+     */
+    public deleteChannel():void {
+        if (this.currentChannel != null){
+            this.currentChannel.delete().then(() => {
+                _.remove(this.channels, c => c.sid == this.currentChannel.sid);
+                this.currentChannel = null;
+                this.cd.detectChanges();
+            });
+        }
     }
         
     /**
@@ -253,14 +267,8 @@ export class ChatComponent implements OnInit {
      * Fired when a Channel becomes visible to the Client.
      */
     private onChannelAdded(channel:any): void{
-        
-        // if (_.any(this.channels, it => it.sid == channel.sid)){
-        //     return;
-        // }
-        
         this.channels.push(channel);
         this.cd.detectChanges();    
-        console.log(channel);    
     }
     
     /**

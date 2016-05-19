@@ -15,18 +15,26 @@
             </div>
             <div class="channels item">
                 <div class="header">Channels</div>
+                <!--<div class="ui fluid icon input">
+                    <input type="text" placeholder="New channel..." [(ngModel)]="newChannelName" maxlength="25" >
+                    <i class="add link icon" [class.disabled]="!newChannelName" (click)="createChannel()"></i>
+                </div>
                 <div class="channel-input ui fluid action input" [class.disabled]="isChannelCreating" >
                     <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" >
                     <button class="ui icon button" [class.loading]="isChannelCreating" [class.disabled]="!newChannelName" (click)="createChannel()" >
                         <i class="plus icon"></i>
                     </button>
-                </div>
-                <div class="busy-indicator" *ngIf="isBusy">
+                    <div class="ui icon input">
+                        <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" >
+                        <i class="circular search link icon"  [class.loading]="isChannelCreating" [class.disabled]="!newChannelName" (click)="createChannel()"  ></i>
+                    </div>
+                </div>-->
+                <!--<div class="busy-indicator" *ngIf="isBusy">
                     <div class="ui active small inline loader"></div>&nbsp;&nbsp;
                     Loading...
-                </div>
+                </div>-->
                 <div class="channel-list menu" [class.disabled]="isBusy">
-                    <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>
+                    <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
                 </div>
             </div>
         </div>
@@ -41,8 +49,11 @@
                         #{{currentChannel?.friendlyName}}
                         <span class="ui label">
                             <i class="users icon"></i> {{channelMembers.length}}
+
                             <span class="detail">Members</span>
                         </span>
+                                              <button class="ui red mini button" [class.hidden]="account.current.identity != currentChannel?.createdBy" [class.disabled]="!currentChannel" (click)="deleteChannel()" >Red</button>
+ 
                     </h1>
                 </header>
                 <div class="ui divider"></div>

@@ -91,6 +91,12 @@ a[href], button {
     -webkit-overflow-scrolling: touch;
 }
 
+#chat-menu > .channels > .channel-list > .active {
+    background-color: brown;
+    margin-right: 15px;
+    border-radius: 0 5px 5px 0;
+}
+
 
 #chat-menu > .menu-header #logout-btn {
     position: absolute;
