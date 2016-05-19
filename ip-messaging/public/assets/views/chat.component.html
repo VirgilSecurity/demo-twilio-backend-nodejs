@@ -16,7 +16,7 @@
             <div class="item">
                 <div class="header">Channels</div>
                 <div class="channel-input ui fluid action input" [class.disabled]="isChannelCreating" >
-                    <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" >
+                    <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" >
                     <button class="ui icon button" [class.loading]="isChannelCreating" [class.disabled]="!newChannelName" (click)="createChannel()" >
                         <i class="plus icon"></i>
                     </button>
@@ -25,7 +25,7 @@
                     <div class="ui active small inline loader"></div>&nbsp;&nbsp;
                     Loading...
                 </div>
-                <div class="menu" *ngFor="let channel of channels" >
+                <div class="menu" [class.disabled]="isBusy" *ngFor="let channel of channels" >
                     <a class="item" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>                    
                 </div>
                 <div class="ui divider"></div>
@@ -34,24 +34,33 @@
         <div id="chat-content">
             <seciton class="chat">
                 <header>
-                    <button id="chat-menu-toggle" class="ui basic button" (click)="menuVisible = !menuVisible">
+
+                    <div class="header">
+                                            <button id="chat-menu-toggle" class="ui basic button" (click)="menuVisible = !menuVisible">
                         <i class="sidebar icon"></i>
                         Menu
                     </button>
-                    <h1 class="header">#{{currentChannel?.friendlyName}} <small>{{channelMembers.length}} members</small></h1>
+                        #{{currentChannel?.friendlyName}} 
+                        <div class="ui label">
+                            <i class="users icon"></i> {{channelMembers.length}}
+                            <a class="detail">Members</a>
+                        </div> 
+                        
+                        <!--<small>{{channelMembers.length}} members</small>-->
+                    </div>
                 </header>
                 <div class="ui divider"></div>
                 <main>
                     <div class="feed-wrapper">
-                            <div class="ui feed">
-                                <div class="event" *ngFor="let message of messages">
+                            <div class="ui feed"  >
+                                <div class="event" *ngFor="let message of messages" [class.outgoing]="message.author == account.current.identity" >
                                     <div class="content">
                                         <div class="summary">
                                             <div class="user">
                                                 {{message.author}}
                                             </div>
                                             <div class="date">
-                                                {{message.dateUpdated | ipmFromNow }}
+                                                {{message.date | ipmFromNow }}
                                             </div>
                                         </div>
                                         <div class="extra text">
@@ -66,9 +75,9 @@
                 </main>
                 <div class="ui divider"></div>
                 <footer>
-                    <div class="ui fluid action input">
-                        <input type="text" placeholder="Type a message here">
-                        <div class="ui button">Send</div>
+                    <div class="ui fluid action input" [class.disabled]="currentChannel == null" >
+                        <input type="text" placeholder="Type a message here" [(ngModel)]="newMessage" (keydown.enter)="postMessage()" >
+                        <div class="ui button" [class.disabled]="!newMessage" (click)="postMessage()" >Send</div>
                     </div>
                 </footer>
             </seciton>
