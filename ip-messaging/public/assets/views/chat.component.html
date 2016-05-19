@@ -12,21 +12,20 @@
             </div>
             <div class="item">
                 <div class="header">Channels</div>
-                <div class="ui fluid action input">
+                <div class="channel-input ui fluid action input">
                     <input type="text" placeholder="Channel name">
                     <button class="ui icon button">
                         <i class="plus icon"></i>
                     </button>
                 </div>
+                <div class="ui" *ngIf="isBusy">
+                    <div class="ui active small inline loader"></div>&nbsp;&nbsp;
+                    Loading channels...
+                </div>
+                <!--<div class="menu" *ngFor="let channel of channels" >
+                    <a class="item">{{channel.friendlyName}}</a>
+                </div>-->
                 <div class="ui divider"></div>
-            <div class="ui divider"></div>
-            <div class="ui" *ngIf="isBusy" >
-                <div class="ui active small inline loader"></div>&nbsp;&nbsp;
-                Loading channels...
-            </div>
-            <!--<div class="menu" *ngFor="let channel of channels" >
-                <a class="item">{{channel.friendlyName}}</a>
-            </div>-->
             </div>
         </div>
         <div id="chat-content">

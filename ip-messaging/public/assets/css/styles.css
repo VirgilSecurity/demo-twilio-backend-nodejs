@@ -129,6 +129,10 @@ a[href], button {
     margin: 0;
 }
 
+#chat-menu .channel-input {
+    margin-bottom: 1rem;
+}
+
 .chat {
     display: flex;
     flex-direction: column;
