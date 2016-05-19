@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core'
 
+import { BackendService } from './backend.service'
+
 declare var Twilio: any;
 
 @Injectable()
@@ -7,16 +9,21 @@ export class TwilioService {
     
     private accessManager;
     public client;
+    
+    constructor(private backend: BackendService) { }
         
-    initialize(accessToken:string): void {
-        this.accessManager = new Twilio.AccessManager(accessToken);
-        this.client = new Twilio.IPMessaging.Client(this.accessManager);
-        
-        this.client.on('tokenExpired', this.onTokenExpired);
-        console.log('Twilio IP Messaging client has been successfully initialized.');
+    initialize(identity:string): Promise<any> {
+        return this.backend.getTwilioToken(identity, 'web')
+            .then((data) => {
+                this.accessManager = new Twilio.AccessManager(data.twilio_token);
+                this.client = new Twilio.IPMessaging.Client(this.accessManager);
+
+                this.client.on('tokenExpired', this.onTokenExpired);
+                return;
+            });
     }
     
     private onTokenExpired(): void{
-        alert('Your session has been expired!');
+        alert('Your session has expired!');
     }
 }
