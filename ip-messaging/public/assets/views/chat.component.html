@@ -38,91 +38,31 @@
                     <h1 class="header">#{{currentChannel?.friendlyName}} <small>{{channelMembers.length}} members</small></h1>
                 </header>
                 <div class="ui divider"></div>
-                <main class="ui text container">
-                    <div class="ui feed" *ngFor="let message of messages" >
-                        <div class="event">
-                            <div class="content">
-                                <div class="summary">
-                                    <div class="user">
-                                        {{message.author}}
-                                    </div>
-                                    <div class="date">
-                                        {{message.dateUpdated | ipmFromNow }}
-                                    </div>
-                                </div>
-                                <div class="extra text">
-                                    <div class="ui message">
-                                        {{message.body}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--<div class="event outgoing">
-                            <div class="content">
-                                <div class="summary">
-                                    <div class="user">Helen Troy</div>
-                                    <div class="date">
-                                        4 days ago
-                                    </div>
-                                </div>
-                                <div class="extra text">
-                                    <div class="ui message">
-                                        We're always circling back to where we'd we started, then starting all over again. Even if we don't run extra laps that day, we surely will come back for more of the same another day soon.
+                <main>
+                    <div class="feed-wrapper">
+                            <div class="ui feed">
+                                <div class="event" *ngFor="let message of messages">
+                                    <div class="content">
+                                        <div class="summary">
+                                            <div class="user">
+                                                {{message.author}}
+                                            </div>
+                                            <div class="date">
+                                                {{message.dateUpdated | ipmFromNow }}
+                                            </div>
+                                        </div>
+                                        <div class="extra text">
+                                            <div class="ui message">
+                                                {{message.body}}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="event">
-                            <div class="content">
-                                <div class="summary">
-                                    <div class="user">
-                                        Jenny Hess
-                                    </div>
-                                    <div class="date">
-                                        2 Days Ago
-                                    </div>
-                                </div>
-                                <div class="extra text">
-                                    <div class="ui message">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere iusto omnis quas rem totam. Adipisci animi at beatae doloribus, illum libero nihil, officiis porro.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="event">
-                            <div class="content">
-                                <div class="summary">
-                                    <div class="user">Joe Henderson</div>
-                                    <div class="date">
-                                        3 days ago
-                                    </div>
-                                </div>
-                                <div class="extra text">
-                                    <div class="ui message">
-                                        Ours is a life of constant reruns. We're always circling back to where we'd we started, then starting all over again. Even if we don't run extra laps that day, we surely will come back for more of the same another day soon.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="event">
-                            <div class="content">
-                                <div class="summary">
-                                    <div class="user">Justen Kitsune</div>
-                                    <div class="date">
-                                        4 days ago
-                                    </div>
-                                </div>
-                                <div class="extra text">
-                                    <div class="ui message">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid amet architecto cumque deleniti, eaque in iusto odio odit optio possimus quas quisquam quod repellendus sit sunt temporibus, vero voluptas voluptatum!
-                                    </div>
-                                </div>
-                            </div>
-                        </div>-->
                     </div>
                 </main>
                 <div class="ui divider"></div>
-                <footer class="ui text container">
+                <footer>
                     <div class="ui fluid action input">
                         <input type="text" placeholder="Type a message here">
                         <div class="ui button">Send</div>
