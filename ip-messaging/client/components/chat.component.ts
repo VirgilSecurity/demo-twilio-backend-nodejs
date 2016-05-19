@@ -3,21 +3,26 @@ import { NgClass } from '@angular/common'
 
 import * as _ from 'lodash';
 
-import { TwilioService } from '../services/twilio.service'
+import { TwilioService }  from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
 import { AccountService } from '../services/account.service'
-import { VirgilService } from '../services/virgil.service'
+import { VirgilService }  from '../services/virgil.service'
+import { FromNowPipe }  from '../pipes/from-now.pipe'
+
+import * as moment from 'moment'
 
 @Component({
     selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html',
-    directives: [NgClass]
+    directives: [NgClass],
+    pipes: [FromNowPipe]
 })
 export class ChatComponent implements OnInit {
     
-    // messages = [];
+    messages = [];
     channels = [];
-    // currentChannel: any; 
+    channelMembers = [];    
+    currentChannel: any;
     
     isBusy:boolean = false;
     
@@ -57,27 +62,60 @@ export class ChatComponent implements OnInit {
             
             return;
     }
-    
-    public routerOnActivate(){
-        //this.loadChannels();
+        
+    /** */
+    public createChannel(channelName: string){
+        
     }
         
     /**
      * Sets the current channel for chatting.
      */
-    public setCurrentChannel(channel: any){
+    public setCurrentChannel(channel: any){        
+                
+        if (this.currentChannel != null){
+                        
+            this.currentChannel.removeListener('memberJoined', this.onMemberJoined);
+            this.currentChannel.removeListener('memberLeft', this.onMemberLeft);
+            this.currentChannel.removeListener('messageAdded', this.onMessageAdded);
+            
+            this.isBusy = true;
+            
+            this.currentChannel.leave().then(() => this.initializeChannel(channel));            
+            return;
+        }
         
-        // if (this.currentChannel != null){
-        //     this.currentChannel.removeListener('memberJoined', this.onMemberJoined);
-        //     this.currentChannel.removeListener('memberLeft', this.onMemberLeft);
-        //     this.currentChannel.removeListener('messageAdded', this.onMessageAdded);
-        // }
-        
-        // this.currentChannel = channel;
-        
-        // this.currentChannel.on('memberJoined', this.onMemberJoined);
-        // this.currentChannel.on('memberLeft', this.onMemberLeft);
-        // this.currentChannel.on('messageAdded', this.onMessageAdded);
+        this.initializeChannel(channel);
+    }
+    
+    /**
+     * Initializes the currently selected channel.
+     */
+    public initializeChannel(channel: any){
+                        
+        channel.join().then(() => {                       
+            channel.on('memberJoined', this.onMemberJoined);
+            channel.on('memberLeft', this.onMemberLeft);
+            channel.on('messageAdded', this.onMessageAdded);       
+            
+            return Promise.all([
+                channel.getAttributes(),
+                channel.getMembers(),
+                channel.getMessages()
+            ]);
+        })
+        .then(bunch => {       
+            this.channelMembers = bunch[1];
+            this.messages = bunch[2];
+            
+            this.currentChannel = channel;
+            this.isBusy = false;
+            this.cd.detectChanges();
+        })
+        .catch(() => {
+            this.isBusy = false;
+            this.cd.detectChanges();
+        });
     }
             
     /**
@@ -86,12 +124,13 @@ export class ChatComponent implements OnInit {
     private loadChannels(): void{
         
         this.isBusy = true; 
+        this.cd.detectChanges();
         
         this.twilio.client.getChannels().then(channels => {
                 channels.forEach(channel => {
                     this.onChannelAdded(channel);                        
                 });  
-                    
+                                    
                 this.isBusy = false;
                 this.cd.detectChanges();     
             })
@@ -104,6 +143,7 @@ export class ChatComponent implements OnInit {
      * Fired when a new Message has been added to the Channel.
      */
     private onMessageAdded(message: any): void{        
+        console.log(message);
     }    
     
     /**
@@ -123,7 +163,6 @@ export class ChatComponent implements OnInit {
      */
     private onChannelAdded(channel:any): void{
         this.channels.push(channel);        
-        console.log('Channel '+ channel.friendlyName + ' has been added.');
     }
     
     /**

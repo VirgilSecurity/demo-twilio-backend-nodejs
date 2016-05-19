@@ -23,7 +23,8 @@
                     Loading channels...
                 </div>
                 <div class="menu" *ngFor="let channel of channels" >
-                    <a class="item">{{channel.friendlyName}}</a>
+                    <a class="item" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>
+                    
                 </div>
                 <div class="ui divider"></div>
             </div>
@@ -35,29 +36,29 @@
                         <i class="sidebar icon"></i>
                         Menu
                     </button>
-                    <h1 class="header">Channel Name <small>5 members</small></h1>
+                    <h1 class="header">#{{currentChannel?.friendlyName}} <small>{{channelMembers.length}} members</small></h1>
                 </header>
                 <div class="ui divider"></div>
                 <main class="ui text container">
-                    <div class="ui feed">
+                    <div class="ui feed" *ngFor="let message of messages" >
                         <div class="event">
                             <div class="content">
                                 <div class="summary">
                                     <div class="user">
-                                        Elliot Fu
+                                        {{message.author}}
                                     </div>
                                     <div class="date">
-                                        1 Hour Ago
+                                        {{message.dateUpdated | ipmFromNow }}
                                     </div>
                                 </div>
                                 <div class="extra text">
                                     <div class="ui message">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. A architecto consequatur, cumque cupiditate dolore eaque earum, error excepturi in inventore, laboriosam laudantium modi obcaecati praesentium provident quasi quis sed voluptatem.
+                                        {{message.body}}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="event outgoing">
+                        <!--<div class="event outgoing">
                             <div class="content">
                                 <div class="summary">
                                     <div class="user">Helen Troy</div>
@@ -118,7 +119,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                 </main>
                 <div class="ui divider"></div>

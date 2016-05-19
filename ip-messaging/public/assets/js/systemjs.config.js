@@ -6,6 +6,7 @@
   var map = {
       'app'                                  : './assets/js/app',
       'rxjs'                                 : './assets/rxjs',
+      'moment'                               : './assets/moment',
       'angular2-in-memory-web-api'           : './assets/angular2-in-memory-web-api',
       '@angular'                             : './assets/@angular',
       '@angular/common'                      : './assets/@angular/common',
@@ -24,6 +25,7 @@
   var packages = {
       'app'                                  : { main: 'main.js',  defaultExtension: 'js' },
       'rxjs'                                 : { defaultExtension: 'js' },
+      'moment'                               : { main: 'moment.js', defaultExtension: 'js' },
       'angular2-in-memory-web-api'           : { defaultExtension: 'js' },
       '@angular/common'                      : { main: 'common.umd.js', defaultExtension: 'js' },
       '@angular/compiler'                    : { main: 'compiler.umd.js', defaultExtension: 'js' },

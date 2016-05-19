@@ -8,5 +8,8 @@
     "mime": "registry:dt/mime#0.0.0+20160316155526",
     "node": "registry:dt/node#4.0.0+20160412142033",
     "serve-static": "registry:dt/serve-static#1.7.1+20160104095738"
+  },
+  "dependencies": {
+    "moment": "registry:npm/moment#2.10.5+20160211003958"
   }
 }
