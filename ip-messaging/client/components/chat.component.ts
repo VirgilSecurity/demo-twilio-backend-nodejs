@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
+import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core'
 import { NgClass } from '@angular/common'
 
 import { TwilioService }  from '../services/twilio.service'
@@ -18,6 +18,8 @@ import * as moment from 'moment'
 })
 export class ChatComponent implements OnInit {
     
+    @Input() public logout: Function;
+    
     public messages = [];
     public channels = [];    
     public channelMembers = [];        
@@ -26,7 +28,7 @@ export class ChatComponent implements OnInit {
     public isBusy:boolean = false;
     
     public newChannelName: string;
-    public isChannelCreating: boolean;
+    public isChannelCreating: boolean;    
     
     constructor (
         private twilio: TwilioService,

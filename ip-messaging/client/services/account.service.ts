@@ -41,6 +41,10 @@ export class AccountService {
         this.currentAccount = account;        
         this.storeAccount(account);
     }
+
+    public logout(): void {
+        localStorage.removeItem('account');
+    }
     
     private storeAccount(storeAccount:Account){
         localStorage.setItem('account', JSON.stringify(storeAccount))

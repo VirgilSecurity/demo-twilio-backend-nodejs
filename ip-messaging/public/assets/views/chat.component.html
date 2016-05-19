@@ -1,7 +1,7 @@
 <div id="chat-wrapper" [ngClass]="{'show-menu': menuVisible}">
     <div id="chat-viewport">
         <div id="chat-menu" class="ui left inverted vertical menu">
-            <div class="item">
+            <div class="menu-header item">
                 <a class="ui logo icon image" href="/">
                     <img src="/assets/img/twilio-shield.png" width="35" alt="Virgil + Twilio">
                 </a>
@@ -9,6 +9,9 @@
                     <h1>Virgil + Twilio</h1>
                     <h2>IP Messaging</h2>
                 </hgroup>
+                <button id="logout-btn" class="ui icon black button" (click)="logout()">
+                    <i class="icon sign out"></i>
+                </button>
             </div>
             <div class="item">
                 <div class="header">Channels</div>

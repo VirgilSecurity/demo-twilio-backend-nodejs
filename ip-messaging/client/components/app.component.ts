@@ -19,13 +19,15 @@ import { Account, AccountService } from '../services/account.service'
 export class AppComponent implements OnInit {
     
     public loginCallback: Function;
+    public logoutCallback: Function;
     
     constructor(private virgil: VirgilService,
                 private twilio: TwilioService,
                 private account: AccountService,
                 private backend: BackendService,
                 private zone: NgZone) {
-        this.loginCallback = this.onLogin.bind(this);    
+        this.loginCallback = this.onLogin.bind(this);
+        this.logoutCallback = this.onLogout.bind(this);
     }
     
     isLoggedIn:boolean = false;
@@ -84,11 +86,16 @@ export class AppComponent implements OnInit {
         return Promise.all([this.virgil.initialize(), this.twilio.initialize(identity)]);
     }
     
-    onLogin(nickName: string) {
+    onLogin(nickName: string): void {
         this.authenticate(nickName).then(() => {
             this.zone.run(() => this.isLoggedIn = true);
         });
 
+    }
+    
+    onLogout(): void {
+        this.account.logout();
+        window.location.reload();
     }
 
     private download(card: any, validationToken: string) : Promise<any> {
