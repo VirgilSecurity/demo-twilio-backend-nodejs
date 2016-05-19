@@ -13,7 +13,7 @@
                     <i class="icon sign out"></i>
                 </button>
             </div>
-            <div class="item">
+            <div class="channels item">
                 <div class="header">Channels</div>
                 <div class="channel-input ui fluid action input" [class.disabled]="isChannelCreating" >
                     <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" >
@@ -21,38 +21,34 @@
                         <i class="plus icon"></i>
                     </button>
                 </div>
-                <div class="ui" *ngIf="isBusy">
+                <div class="busy-indicator" *ngIf="isBusy">
                     <div class="ui active small inline loader"></div>&nbsp;&nbsp;
                     Loading...
                 </div>
-                <div class="menu" [class.disabled]="isBusy" *ngFor="let channel of channels" >
-                    <a class="item" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>                    
+                <div class="channel-list menu" [class.disabled]="isBusy">
+                    <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>
                 </div>
-                <div class="ui divider"></div>
             </div>
         </div>
         <div id="chat-content">
-            <seciton class="chat">
+            <button id="chat-menu-toggle" class="ui basic button" (click)="menuVisible = !menuVisible">
+                <i class="sidebar icon"></i>
+                Menu
+            </button>
+            <seciton class="chat ui blurring">
                 <header>
-
-                    <div class="header">
-                                            <button id="chat-menu-toggle" class="ui basic button" (click)="menuVisible = !menuVisible">
-                        <i class="sidebar icon"></i>
-                        Menu
-                    </button>
-                        #{{currentChannel?.friendlyName}} 
-                        <div class="ui label">
+                    <h1 class="header">
+                        #{{currentChannel?.friendlyName}}
+                        <span class="ui label">
                             <i class="users icon"></i> {{channelMembers.length}}
-                            <a class="detail">Members</a>
-                        </div> 
-                        
-                        <!--<small>{{channelMembers.length}} members</small>-->
-                    </div>
+                            <span class="detail">Members</span>
+                        </span>
+                    </h1>
                 </header>
                 <div class="ui divider"></div>
                 <main>
                     <div class="feed-wrapper">
-                            <div class="ui feed"  >
+                            <div class="ui feed">
                                 <div class="event" *ngFor="let message of messages" [class.outgoing]="message.author == account.current.identity" >
                                     <div class="content">
                                         <div class="summary">
@@ -80,8 +76,15 @@
                         <div class="ui button" [class.disabled]="!newMessage" (click)="postMessage()" >Send</div>
                     </div>
                 </footer>
+                <div id="placeholder" class="ui dimmer inverted active" *ngIf="currentChannel == null">
+                    <div class="content">
+                        <div class="center">
+                            <h2 class="text">Select a channel from menu to start</h2>
+                        </div>
+                    </div>
+                </div>
             </seciton>
-            <div class="ui inverted dimmer" [ngClass]="{active: menuVisible}" (click)="menuVisible = false"></div>
+            <div id="menu-dimmer" class="ui inverted dimmer" [ngClass]="{active: menuVisible}" (click)="menuVisible = false"></div>
         </div>
     </div>
 </div>
