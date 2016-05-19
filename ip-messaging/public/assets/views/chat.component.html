@@ -18,13 +18,15 @@
                         <i class="plus icon"></i>
                     </button>
                 </div>
-                <div class="menu">
-                    <a class="item">Darkside</a>
-                    <a class="item">Test Test</a>
-                    <a class="item">Random</a>
-                    <a class="item">Another</a>
-                </div>
                 <div class="ui divider"></div>
+            <div class="ui divider"></div>
+            <div class="ui" *ngIf="isBusy" >
+                <div class="ui active small inline loader"></div>&nbsp;&nbsp;
+                Loading channels...
+            </div>
+            <!--<div class="menu" *ngFor="let channel of channels" >
+                <a class="item">{{channel.friendlyName}}</a>
+            </div>-->
             </div>
         </div>
         <div id="chat-content">
