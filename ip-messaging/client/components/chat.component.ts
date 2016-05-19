@@ -1,14 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core'
 import { NgClass } from '@angular/common'
 
-import * as _ from 'lodash';
-
 import { TwilioService }  from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
 import { AccountService } from '../services/account.service'
 import { VirgilService }  from '../services/virgil.service'
 import { FromNowPipe }  from '../pipes/from-now.pipe'
 
+import * as _ from 'lodash';
 import * as moment from 'moment'
 
 @Component({
@@ -19,12 +18,15 @@ import * as moment from 'moment'
 })
 export class ChatComponent implements OnInit {
     
-    messages = [];
-    channels = [];
-    channelMembers = [];    
-    currentChannel: any;
+    public messages = [];
+    public channels = [];    
+    public channelMembers = [];        
+    public currentChannel: any;    
     
-    isBusy:boolean = false;
+    public isBusy:boolean = false;
+    
+    public newChannelName: string;
+    public isChannelCreating: boolean;
     
     constructor (
         private twilio: TwilioService,
@@ -32,46 +34,54 @@ export class ChatComponent implements OnInit {
         private account: AccountService,
         private virgil: VirgilService,
         private cd: ChangeDetectorRef){
-            
-        // this.twilio.client.on('channelAdded', this.onChannelAdded);
-        // this.twilio.client.on('channelRemoved', this.onChannelRemoved);
-         console.log('pipka0');
-         this.cd.markForCheck();
-        // this.loadChannels();
-        // this.isBusy = true;
-    }
-    
-    ngOnChanges(){
-        console.log('pipka-1');
     }
     
     public ngOnInit(){
-        
-        console.log('pipka');
-                
-        this.backend.auth(this.account.current.identity)
-                .then(authData => {
-                    this.virgil.initialize(authData.virgil_token);
-                    this.twilio.initialize(authData.twilio_token);
-                    
-                    this.loadChannels();
-                })
-                .catch(error => {
-                    alert(error);
-                });
-            
-            return;
+        this.loadChannels();
     }
         
-    /** */
-    public createChannel(channelName: string){
+    /** 
+     * Createa a new channel by name. 
+     */
+    public createChannel(){
         
+        this.isChannelCreating = true;        
+        this.virgil.sdk.cards.search({ value: "twilio_chat_admin" }).then((result) => {
+           
+            let latestCard: any = _.last(_.sortBy(result, 'created_at'));           
+            
+            let options = { 
+                friendlyName: this.newChannelName,
+                attributes: {
+                    virgil_card_id: latestCard.id,
+                    virgil_public_key: latestCard.public_key.public_key
+                } 
+            };
+            
+            return this.twilio.client.createChannel(options);   
+        })
+        .then(function (channel) {
+            this.isChannelCreating = false;
+            this.onChannelAdded(channel);
+            this.setCurrentChannel(channel);
+            
+            //self.channels.push(channel);
+            //self.setChannel(channel);
+        })
+        .catch(this.handleError);
     }
         
     /**
      * Sets the current channel for chatting.
      */
-    public setCurrentChannel(channel: any){        
+    public setCurrentChannel(channel: any){
+        
+        if (channel == this.currentChannel) {
+            return;
+        }        
+        
+        this.isBusy = true; 
+        this.cd.detectChanges();
                 
         if (this.currentChannel != null){
                         
@@ -79,9 +89,9 @@ export class ChatComponent implements OnInit {
             this.currentChannel.removeListener('memberLeft', this.onMemberLeft);
             this.currentChannel.removeListener('messageAdded', this.onMessageAdded);
             
-            this.isBusy = true;
-            
-            this.currentChannel.leave().then(() => this.initializeChannel(channel));            
+            this.currentChannel.leave()
+                .then(() => this.initializeChannel(channel));
+                            
             return;
         }
         
@@ -106,16 +116,13 @@ export class ChatComponent implements OnInit {
         })
         .then(bunch => {       
             this.channelMembers = bunch[1];
-            this.messages = bunch[2];
-            
+            this.messages = bunch[2];            
             this.currentChannel = channel;
+            
             this.isBusy = false;
             this.cd.detectChanges();
         })
-        .catch(() => {
-            this.isBusy = false;
-            this.cd.detectChanges();
-        });
+        .catch(this.handleError);
     }
             
     /**
@@ -127,16 +134,14 @@ export class ChatComponent implements OnInit {
         this.cd.detectChanges();
         
         this.twilio.client.getChannels().then(channels => {
-                channels.forEach(channel => {
-                    this.onChannelAdded(channel);                        
-                });  
+            channels.forEach(channel => {
+                this.onChannelAdded(channel);                        
+            });  
                                     
-                this.isBusy = false;
-                this.cd.detectChanges();     
-            })
-            .catch(error => {                
-                console.error(error);
-            });     
+            this.isBusy = false;
+            this.cd.detectChanges();     
+        })
+        .catch(this.handleError);     
     }
     
     /**
@@ -162,6 +167,11 @@ export class ChatComponent implements OnInit {
      * Fired when a Channel becomes visible to the Client.
      */
     private onChannelAdded(channel:any): void{
+        
+        if (_.any(this.channels, it => it.sid == channel.sid)){
+            return;
+        }
+        
         this.channels.push(channel);        
     }
     
@@ -169,5 +179,15 @@ export class ChatComponent implements OnInit {
      * Fired when a Channel is no longer visible to the Client.
      */
     private onChannelRemoved(channel:any): void{
+    }
+    
+    /**
+     * Handles an chat errors.
+     */
+    private handleError(error): void{     
+        this.isBusy = false;
+        this.cd.detectChanges();    
+        
+        console.error(error);    
     }   
 }

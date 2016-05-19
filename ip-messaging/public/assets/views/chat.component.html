@@ -12,19 +12,18 @@
             </div>
             <div class="item">
                 <div class="header">Channels</div>
-                <div class="channel-input ui fluid action input">
-                    <input type="text" placeholder="Channel name">
-                    <button class="ui icon button">
+                <div class="channel-input ui fluid action input" [class.disabled]="isChannelCreating" >
+                    <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" >
+                    <button class="ui icon button" [class.loading]="isChannelCreating" [class.disabled]="!newChannelName" (click)="createChannel()" >
                         <i class="plus icon"></i>
                     </button>
                 </div>
                 <div class="ui" *ngIf="isBusy">
                     <div class="ui active small inline loader"></div>&nbsp;&nbsp;
-                    Loading channels...
+                    Loading...
                 </div>
                 <div class="menu" *ngFor="let channel of channels" >
-                    <a class="item" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>
-                    
+                    <a class="item" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" >{{channel.friendlyName}}</a>                    
                 </div>
                 <div class="ui divider"></div>
             </div>
