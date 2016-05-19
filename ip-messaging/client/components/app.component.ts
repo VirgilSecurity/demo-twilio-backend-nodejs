@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { Routes, Router, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router';
+import { Router, ROUTER_PROVIDERS, Routes } from '@angular/router';
 import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 
@@ -12,12 +12,11 @@ import { AccountService } from '../services/account.service'
 @Component({
     selector: 'ipm-app',
     templateUrl: './assets/views/app.component.html',
-    directives: [ ROUTER_DIRECTIVES ],
     providers: [ ROUTER_PROVIDERS ]
 })
 @Routes([
-    { path: '/login', component: LoginComponent },
-    { path: '/chat', component: ChatComponent }
+    { path: '/', component: ChatComponent },
+    { path: '/login', component: LoginComponent }    
 ])
 export class AppComponent implements OnInit { 
     
@@ -28,6 +27,8 @@ export class AppComponent implements OnInit {
                 private account: AccountService) { }
             
     ngOnInit(){
+        
+        console.log('pipka0');
         
         // if (this.account.hasAccount()){
             

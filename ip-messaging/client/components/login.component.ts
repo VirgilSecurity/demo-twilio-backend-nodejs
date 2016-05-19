@@ -7,6 +7,7 @@ import * as _ from 'lodash';
 import { AccountService, Account } from '../services/account.service'
 import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
+import { BackendService } from '../services/backend.service'
 
 @Component({
     selector: 'ipm-login',
@@ -18,6 +19,7 @@ export class LoginComponent{
                  private context: AccountService,
                  private virgil: VirgilService,
                  private twilio: TwilioService,
+                 private backend: BackendService,
                  private router: Router) { }
     
     public nickName: string;    
@@ -27,11 +29,10 @@ export class LoginComponent{
         this.isBusy = true;
         
         let validationToken: string;
-                     
-        this.http.get('/auth?identity=' + this.nickName + '&deviceId=web').toPromise()
-            .then((response:Response) => { 
-                let authData = response.json();
-                
+        
+        this.backend.auth(this.nickName)
+            .then(authData => { 
+                                
                 validationToken = authData.validation_token;
                 
                 // initialize virgil SDK using token generated on backend.
@@ -61,14 +62,11 @@ export class LoginComponent{
             .then(keysBundle => {                                
                 this.isBusy = false;
                 
-                var account = new Account(
-                    keysBundle.id, 
-                    keysBundle.identity, 
-                    keysBundle.publicKey,
-                    keysBundle.privateKey);
+                var account = new Account(keysBundle.id, keysBundle.identity, 
+                    keysBundle.publicKey, keysBundle.privateKey);
                 
                 this.context.setCurrentAccount(account)
-                this.router.navigate(['/chat']);
+                this.router.navigate(['/']);
             })
             .catch((error) => {
                 throw error;

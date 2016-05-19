@@ -2,12 +2,6 @@ import { Injectable } from '@angular/core'
 
 declare var Twilio: any;
 
-export class Message {    
-}
-
-export class Channel {    
-}
-
 @Injectable()
 export class TwilioService {  
     

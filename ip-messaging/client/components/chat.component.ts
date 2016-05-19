@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
-import { OnActivate, RouteSegment } from '@angular/router'
-import { TwilioService, Message, Channel } from '../services/twilio.service'
+import { OnActivate } from '@angular/router-deprecated'
+import { TwilioService } from '../services/twilio.service'
 
 import * as _ from 'lodash';
 
