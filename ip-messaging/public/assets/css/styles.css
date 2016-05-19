@@ -4,27 +4,16 @@ html, body {
 body {
     margin: 0;
 }
-.flex-container {
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.flex-row {
-    width: auto;
-}
-.flex-item {
-    max-width: 350px;
-}
 
-div.login-container{
-    margin-top: -100px;
+.login-container {
+    height: 100%;
+    width: 100%;
+    margin: 0 !important;
+}
+.login-form-container {
+    max-width: 390px;
+    padding: 0 20px;
+    margin: 0 auto;
 }
 
 h3.logo-header{
@@ -75,9 +64,24 @@ a[href], button {
     overflow-y: auto!important;
 }
 
+#chat-menu .menu-header {
+    position: relative;
+}
+
+#chat-menu .menu-header #logout-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+
+
+#chat-menu .item {
+    font-size: 1em;
+}
+
 #chat-menu-toggle {
     display: none;
-    margin-top: 30px
+    margin-top: 20px
 }
 
 #chat-content {
@@ -88,33 +92,6 @@ a[href], button {
 
 #chat-container {
     display: flex;
-}
-
-@media only screen and (min-width: 768px) {
-    #chat-content .dimmer {
-        display: none !important;
-    }
-}
-
-@media only screen and (max-width: 767px) {
-    #chat-wrapper.show-menu #chat-viewport {
-        -webkit-transform: translate3d(260px, 0, 0);
-        transform: translate3d(260px, 0, 0);
-    }
-
-    #chat-menu {
-        position: absolute;
-        top: 0;
-        left: -260px;
-    }
-
-    #chat-menu-toggle {
-        display: inline-block;
-    }
-
-    #chat-content {
-        max-width: 100%;
-    }
 }
 
 #chat-menu hgroup {
@@ -142,7 +119,7 @@ a[href], button {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 0 20px 30px 20px;
+    padding: 0 20px 20px 20px;
 }
 
 .chat > header {
@@ -152,6 +129,7 @@ a[href], button {
 .chat > main {
     flex: 1 1 auto;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .chat > footer {
@@ -183,4 +161,36 @@ a[href], button {
 
 .ui.feed > .event.outgoing > .content .extra > .message {
     background: #dff0ff;
+}
+
+@media only screen and (min-width: 768px) {
+    #chat-content .dimmer {
+        display: none !important;
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    #chat-wrapper.show-menu #chat-viewport {
+        -webkit-transform: translate3d(260px, 0, 0);
+        transform: translate3d(260px, 0, 0);
+    }
+
+    #chat-menu {
+        position: absolute;
+        top: 0;
+        left: -260px;
+    }
+
+    #chat-menu-toggle {
+        display: inline-block;
+    }
+
+    #chat-content {
+        max-width: 100%;
+    }
+
+    .header {
+        margin-top: 1rem;
+        font-size: 1.71428571em;
+    }
 }
