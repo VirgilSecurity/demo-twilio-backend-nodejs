@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 
 import * as _ from 'lodash';
 
@@ -25,20 +25,31 @@ export class AppComponent implements OnInit {
                 private twilio: TwilioService,
                 private account: AccountService,
                 private backend: BackendService,
-                private zone: NgZone) {
+                private zone: NgZone,
+                private cd: ChangeDetectorRef) {
         this.loginCallback = this.onLogin.bind(this);
         this.logoutCallback = this.onLogout.bind(this);
     }
     
+    isReady:boolean = false;
     isLoggedIn:boolean = false;
             
     ngOnInit() {
-        if (this.account.hasAccount()) {
+        if (this.account.hasAccount()) {            
+                     
             this.initializeServices(this.account.current.identity)
                 .then(() => {
-                    this.isLoggedIn = true;
+                    this.isLoggedIn = true;   
+                    this.isReady = true;
+                    this.cd.detectChanges();
                 });
+                
+             return;
         }
+        
+        this.isReady = true;
+        this.isLoggedIn = false;
+        this.cd.detectChanges();
     }
 
     authenticate(nickName: string): Promise<any> {
@@ -88,7 +99,9 @@ export class AppComponent implements OnInit {
     
     onLogin(nickName: string): void {
         this.authenticate(nickName).then(() => {
-            this.zone.run(() => this.isLoggedIn = true);
+            this.isReady = true;
+            this.isLoggedIn = true;
+            this.cd.detectChanges();
         });
 
     }
