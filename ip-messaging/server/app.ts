@@ -13,6 +13,7 @@ require("dotenv").load();
 
 import * as express from "express";
 import * as path from "path";
+import * as http from "http";
 import * as _ from "lodash";
 
 let VirgilSDK = require('virgil-sdk');
@@ -23,7 +24,7 @@ let AccessToken = Twilio.AccessToken;
 let IpMessagingGrant = Twilio.AccessToken.IpMessagingGrant;
 
 const root =  path.resolve('./public');
-const app: express.Application = express();
+const app = express();
 
 app.disable("x-powered-by");
 
@@ -104,8 +105,7 @@ app.get('*', function (req, res, next) {
     }
 });
 
-app.listen(3000, function () {
-});
+http.createServer(app).listen(80);
 
 function getTwilioToken(appName, identity, deviceId) {
 
