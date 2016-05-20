@@ -6,14 +6,15 @@ import { BackendService } from '../services/backend.service'
 import { AccountService } from '../services/account.service'
 import { VirgilService }  from '../services/virgil.service'
 import { FromNowPipe }  from '../pipes/from-now.pipe'
+import { TooltipDirective } from '../directives/tooltip.directive'
+import { ModalTriggerDirective } from '../directives/modal.directive'
 
 import * as _ from 'lodash';
-import * as moment from 'moment'
 
 @Component({
     selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html',
-    directives: [NgClass],
+    directives: [NgClass, TooltipDirective, ModalTriggerDirective],
     pipes: [FromNowPipe]
 })
 export class ChatComponent implements OnInit {
@@ -31,6 +32,7 @@ export class ChatComponent implements OnInit {
     public isChannelCreating: boolean;    
     
     public newMessage: string;
+    public createChannel: Function;
     
     private memberJoinedHandler: any;
     private memberLeftHandler: any;
@@ -41,40 +43,14 @@ export class ChatComponent implements OnInit {
         private twilio: TwilioService,
         private backend: BackendService,        
         private virgil: VirgilService,
-        private cd: ChangeDetectorRef){
+        private cd: ChangeDetectorRef) {
+
+        this.createChannel = this.createChannelImpl.bind(this);
     }
     
     public ngOnInit(){
         this.twilio.client.on('channelAdded', this.onChannelAdded.bind(this));
         this.loadChannels();
-    }
-        
-    /** 
-     * Createa a new channel by name. 
-     */
-    public createChannel(){
-        
-        this.isChannelCreating = true;        
-        this.virgil.sdk.cards.search({ value: "twilio_chat_admin" }).then((result) => {
-           
-            let latestCard: any = _.last(_.sortBy(result, 'created_at'));           
-            
-            let options = { 
-                friendlyName: this.newChannelName,
-                attributes: {
-                    virgil_card_id: latestCard.id,
-                    virgil_public_key: latestCard.public_key.public_key
-                } 
-            };
-            
-            return this.twilio.client.createChannel(options);   
-        })
-        .then((channel) => {
-            this.isChannelCreating = false;
-            this.onChannelAdded(channel);
-            this.setCurrentChannel(channel);
-        })
-        .catch(this.handleError);
     }
     
     /**
@@ -157,6 +133,39 @@ export class ChatComponent implements OnInit {
         })
         .catch(this.handleError);
         
+    }
+
+    /**
+     * Createa a new channel by name.
+     */
+    private createChannelImpl() {
+        console.log('create channel');
+        if (_.isEmpty(this.newChannelName)) {
+            return false;
+        }
+
+        this.isChannelCreating = true;
+        this.virgil.sdk.cards.search({ value: "twilio_chat_admin" }).then((result) => {
+
+            let latestCard: any = _.last(_.sortBy(result, 'created_at'));
+
+            let options = {
+                friendlyName: this.newChannelName,
+                attributes: {
+                    virgil_card_id: latestCard.id,
+                    virgil_public_key: latestCard.public_key.public_key
+                }
+            };
+
+            return this.twilio.client.createChannel(options);
+        })
+        .then((channel) => {
+            this.isChannelCreating = false;
+            this.newChannelName = '';
+            this.onChannelAdded(channel);
+            this.setCurrentChannel(channel);
+        })
+        .catch(this.handleError);
     }
             
     /**

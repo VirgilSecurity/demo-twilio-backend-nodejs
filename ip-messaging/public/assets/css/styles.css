@@ -91,12 +91,19 @@ a[href], button {
     -webkit-overflow-scrolling: touch;
 }
 
-#chat-menu > .channels > .channel-list > .active {
-    background-color: brown;
+#chat-menu > .channels > .channel-list > .item {
     margin-right: 15px;
     border-radius: 0 5px 5px 0;
+    background: transparent;
 }
 
+#chat-menu > .channels > .channel-list > .item:hover {
+    background: rgba(255,255,255,.08);
+}
+
+#chat-menu > .channels > .channel-list > .item.active {
+    background: #da322c;
+}
 
 #chat-menu > .menu-header #logout-btn {
     position: absolute;
@@ -104,6 +111,27 @@ a[href], button {
     top: 10px;
 }
 
+#chat-menu > .channels > #new-channel-btn {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 18px;
+    line-height: 1;
+    padding: 12px;
+    outline: none !important;
+}
+
+#chat-menu > .channels > #new-channel-btn > .icon{
+    margin-right: 0;
+}
+
+#chat-menu > .channels > #new-channel-btn:hover {
+    color: #fff;
+}
 
 #chat-menu .item {
     font-size: 1em;
@@ -114,13 +142,16 @@ a[href], button {
 
 #chat-menu-toggle {
     display: none;
-    margin: 20px 0 0 20px;
+    margin: 20px 20px 0 20px;
+    flex: 0 0 auto;
 }
 
 #chat-content {
     flex: 1 1 auto;
     position: relative;
     max-width: calc(100% - 260px);
+    display: flex;
+    flex-direction: column;
 }
 
 #chat-container {
