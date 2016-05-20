@@ -8,13 +8,14 @@ import { VirgilService }  from '../services/virgil.service'
 import { FromNowPipe }  from '../pipes/from-now.pipe'
 import { TooltipDirective } from '../directives/tooltip.directive'
 import { ModalTriggerDirective } from '../directives/modal.directive'
+import { ScrollIntoViewDirective } from '../directives/scroll-into-view.directive'
 
 import * as _ from 'lodash';
 
 @Component({
     selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html',
-    directives: [NgClass, TooltipDirective, ModalTriggerDirective],
+    directives: [NgClass, TooltipDirective, ModalTriggerDirective, ScrollIntoViewDirective],
     pipes: [FromNowPipe]
 })
 export class ChatComponent implements OnInit {
