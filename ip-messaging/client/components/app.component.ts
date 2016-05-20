@@ -179,8 +179,8 @@ export class AppComponent implements OnInit {
                 return {
                     id: card.id,
                     identity: card.identity.value,
-                    publicKey: card.public_key.public_key,
-                    privateKey: response.private_key
+                    publicKey: keyPair.publicKey,
+                    privateKey: keyPair.privateKey
                 };
             });
     }

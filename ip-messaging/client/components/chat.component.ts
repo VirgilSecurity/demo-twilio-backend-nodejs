@@ -283,6 +283,11 @@ export class ChatComponent implements OnInit {
      * Fired when a Channel becomes visible to the Client.
      */
     private onChannelAdded(channel:any): void{
+        
+        if (_.some(this.channels, c => c.sid == channel.sid)){
+            return;            
+        }
+        
         this.channels.push(channel);
         this.cd.detectChanges();    
     }
