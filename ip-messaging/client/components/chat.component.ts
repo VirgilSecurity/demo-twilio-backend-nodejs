@@ -76,14 +76,18 @@ export class ChatComponent implements OnInit {
             return;
         }        
         
-        this.isBusy = true; 
-        this.cd.detectChanges();
-                
+        this.isBusy = true;
+        this.channelMembers = [];        
+        this.messages = []; 
+        
         if (this.currentChannel != null){
                         
             this.currentChannel.removeListener('memberJoined', this.memberJoinedHandler);
             this.currentChannel.removeListener('memberLeft', this.memberLeftHandler);
             this.currentChannel.removeListener('messageAdded', this.messageAddedHandler);
+              
+            this.currentChannel = channel;
+            this.cd.detectChanges();
             
             this.currentChannel.leave()
                 .then(() => this.initializeChannel(channel));
@@ -91,6 +95,9 @@ export class ChatComponent implements OnInit {
             return;
         }
         
+        this.currentChannel = channel;
+        this.cd.detectChanges();
+                
         this.initializeChannel(channel);
     }
     
@@ -114,10 +121,7 @@ export class ChatComponent implements OnInit {
                 this.backend.getHistory(this.account.current.identity, channel.sid)
             ]);
         })        
-        .then(bunch => {                                 
-            this.currentChannel = channel;         
-            this.channelMembers = [];        
-            this.messages = [];  
+        .then(bunch => {
             
             let encryptedMessages = _.sortBy(bunch[2], 'dateUpdated');
             _.forEach(bunch[2], m => {
