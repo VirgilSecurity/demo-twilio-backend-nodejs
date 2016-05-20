@@ -13,13 +13,18 @@ require("dotenv").load();
 
 import * as express from "express";
 import * as path from "path";
+import * as _ from "lodash";
 
 let VirgilSDK = require('virgil-sdk');
-let AccessToken = require('twilio').AccessToken;
-let IpMessagingGrant = AccessToken.IpMessagingGrant;
+let virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
+
+let Twilio = require('twilio');
+let AccessToken = Twilio.AccessToken;
+let IpMessagingGrant = Twilio.AccessToken.IpMessagingGrant;
 
 const root =  path.resolve('./public');
 const app: express.Application = express();
+
 app.disable("x-powered-by");
 
 app.use(express.static(root));
@@ -29,7 +34,7 @@ app.use('/assets/', express.static('./node_modules/'));
 Authenticate a chat member by generating an Access tokens. One for Virgil SDK and the 
 second one for Twilio IP messaging client.
 */
-app.get('/auth', function (request, response) {
+app.get('/auth', (request, response) => {
     var identity = request.query.identity;
     var validationToken = getValidationToken(identity);
 
@@ -39,23 +44,55 @@ app.get('/auth', function (request, response) {
     });
 });
 
-app.get('/twilio-token', function (request, response) {
+app.get('/twilio-token', (request, response) => {
     var appName = 'VIRGIL_CHAT';
     var identity = request.query.identity;
     var deviceId = request.query.device;
     var twilioToken = getTwilioToken(appName, identity, deviceId);
 
-    response.send({
-        twilio_token: twilioToken.toJwt()
-    });
+    response.send({ twilio_token: twilioToken.toJwt() });
 });
 
-app.get('/virgil-token', function (request, response) {
+app.get('/virgil-token', (request, response) => {
     var virgilToken = process.env.VIRGIL_ACCESS_TOKEN;
+    response.send({ virgil_token: virgilToken });
+});
 
-    response.send({
-        virgil_token: virgilToken
-    });
+app.get('/history', (request, response, next) => {
+    
+    let identity = request.query.identity;
+    let channelSid = request.query.channelSid;   
+         
+    var client = new Twilio.IpMessagingClient(process.env.TWILIO_API_KEY, process.env.TWILIO_API_SECRET);
+    let service = client.services(process.env.TWILIO_IPM_SERVICE_SID);
+    
+    Promise.all([
+        virgil.cards.search({ value: identity }),
+        service.channels(channelSid).messages.list()
+    ])
+    .then(bundle => {
+        let latestCard: any = _.last(_.sortBy(bundle[0], 'created_at'));
+        let messages: Array<any> = bundle[1].messages;
+        let chatAdminPrivateKey = new Buffer(process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY, 'base64').toString();    
+        
+        _.forEach(messages, m => {           
+            let decryptedBody = virgil.crypto.decryptStringFromBase64(
+                m.body, 
+                process.env.APP_CHANNEL_ADMIN_CARD_ID, 
+                chatAdminPrivateKey);
+            
+            let reEncryptedBody = virgil.crypto.encryptStringToBase64(
+                decryptedBody,
+                latestCard.id, 
+                latestCard.public_key.public_key);
+                
+            m.body = reEncryptedBody;
+        });
+        
+        response.send(messages);
+        next();        
+    })
+    .catch(next);
 });
 
 app.get('*', function (req, res, next) {
@@ -68,7 +105,6 @@ app.get('*', function (req, res, next) {
 });
 
 app.listen(3000, function () {
-
 });
 
 function getTwilioToken(appName, identity, deviceId) {

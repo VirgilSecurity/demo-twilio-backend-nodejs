@@ -133,18 +133,23 @@ export class ChatComponent implements OnInit {
             
             return Promise.all([
                 channel.getAttributes(),
-                channel.getMembers()
+                channel.getMembers(),
+                this.backend.getHistory(this.account.current.identity, channel.sid)
             ]);
         })        
         .then(bunch => {                                 
             this.currentChannel = channel;         
-            this.channelMembers = [];           
+            this.channelMembers = [];        
+            this.messages = [];  
+            
+            let encryptedMessages = _.sortBy(bunch[2], 'dateUpdated');
+            _.forEach(bunch[2], m => {
+                this.onMessageAdded(m);
+            });
                
             return Promise.all(bunch[1].map(m => this.addMember(m)));
         })
         .then(members => {
-            this.messages = [];
-            
             this.isBusy = false;
             this.cd.detectChanges();           
             
@@ -189,6 +194,8 @@ export class ChatComponent implements OnInit {
         this.channelMembers.forEach(m => {
              recipients.push({ recipientId: m.publicKey.id, publicKey: m.publicKey.data });
         })
+        
+        console.log(recipients);
         
         let message = {
             body: this.newMessage,

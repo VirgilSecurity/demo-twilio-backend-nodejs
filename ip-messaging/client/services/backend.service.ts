@@ -4,7 +4,8 @@ import { Http, Response } from '@angular/http'
 @Injectable()
 export class BackendService {
     
-    constructor(private http: Http) {}
+    constructor(
+        private http: Http) {}
     
     /**
      * Gets a validation token for Virgil services.
@@ -30,6 +31,15 @@ export class BackendService {
      * */
     public getVirgilToken(): Promise<any> {
         return this.http.get('/virgil-token')
+            .map((response:Response) => response.json())
+            .toPromise();
+    }
+    
+    /**
+     * Gets decrypted history with current accoount's private key. 
+     */
+    public getHistory(identity:string, channelSid: string): Promise<any> {
+        return this.http.get(`/history?identity=${identity}&channelSid=${channelSid}`)
             .map((response:Response) => response.json())
             .toPromise();
     }
