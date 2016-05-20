@@ -72,7 +72,7 @@
                 <main>
                     <div class="feed-wrapper">
                             <div class="ui feed">
-                                <div class="event" *ngFor="let message of messages" [class.outgoing]="message.author == account.current.identity" >
+                                <div class="event" *ngFor="let message of messages; let l = last" [class.outgoing]="message.author == account.current.identity" ipmScrollIntoView [ipmScrollIf]="l">
                                     <div class="content">
                                         <div class="summary">
                                             <div class="user">
