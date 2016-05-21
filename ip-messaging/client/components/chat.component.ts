@@ -230,7 +230,10 @@ export class ChatComponent implements OnInit {
      * Loads the member's public key and the member to the current member collection.
      */
     private addMember(member):Promise<any> {             
-        return this.virgil.sdk.cards.search({ value: member.identity }).then(result => {
+        return this.virgil.sdk.cards.search({ 
+            value: member.identity,
+            type: 'nickname' 
+        }).then(result => {
             
             var latestCard: any = _.last(_.sortBy(result, 'created_at'));
             if (latestCard){

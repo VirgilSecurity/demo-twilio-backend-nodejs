@@ -64,7 +64,10 @@ export class AppComponent implements OnInit {
             validationToken = authData.validation_token;
 
             // search for public key for current user nickname
-            return this.virgil.sdk.cards.search({ value: authData.identity });
+            return this.virgil.sdk.cards.search({ 
+                value: authData.identity, 
+                type:'nickname' 
+            });
         })
         .then(cards => {
 
