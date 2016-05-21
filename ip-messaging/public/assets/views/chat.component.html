@@ -16,10 +16,12 @@
             <div class="channels item">
                 <div class="header">Channels</div>
                 <button id="new-channel-btn"
+                        class="ui unstyled icon inverted button"
                         aria-label="Create channel"
                         ipmTooltip
                         data-position="top center"
                         data-content="Create new channel"
+                        data-variation="tiny"
                         [ipmModalTrigger]="{selector: 'new-channel-modal'}"
                         [onOk]="createChannel">
                     <i class="add circle icon"></i>
@@ -57,8 +59,24 @@
             </button>
             <seciton class="chat ui blurring">
                 <header>
-                    <h3 class="header">#{{currentChannel?.friendlyName}}</h3>
-                    <h5>{{channelMembers.length}} Members | Owner: {{currentChannel?.createdBy}}</h5>
+                    <div class="header-content">
+                        <h3 class="header">#{{currentChannel?.friendlyName}}</h3>
+                        <h5>{{channelMembers.length}} Members | Owner: {{currentChannel?.createdBy}}</h5>
+                    </div>
+                    <div class="header-toolbar">
+                        <button id="remove-channel-btn"
+                                class="ui unstyled icon button"
+                                aria-label="Delete this channel"
+                                ipmTooltip
+                                data-position="bottom right"
+                                data-content="Delete this channel"
+                                data-variation="tiny inverted"
+                                [class.hidden]="account.current.identity != currentChannel?.createdBy"
+                                [class.disabled]="!currentChannel"
+                                (click)="deleteChannel()">
+                            <i class="trash outline icon"></i>
+                        </button>
+                    </div>
                 </header>
                 <div class="ui divider"></div>
                 <main>
