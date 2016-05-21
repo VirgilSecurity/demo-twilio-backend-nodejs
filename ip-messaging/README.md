@@ -131,7 +131,7 @@ You can also be notified of any new incoming Messages with an event handler. Thi
 // Listen for new Messages sent to a Channel
 generalChannel.on('messageAdded', function(message) {
     
-    // Decrypt the Message using global card id and private key values.
+    // Decrypt the Message using card id and private key values.
     var decryptedMessage = virgil.crypto.decryptStringFromBase64(
         message.body, 
         myCard.id, 
