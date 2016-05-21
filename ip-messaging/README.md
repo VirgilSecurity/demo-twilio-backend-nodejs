@@ -74,7 +74,9 @@ var options = {
 };
 
 virgil.cards.create(options).then(function (card){
+
     // returned a card with represents a Public Key.
+    myCard = card;
 });
 ```
 
