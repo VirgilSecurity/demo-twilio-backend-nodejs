@@ -10,7 +10,7 @@
               <div class="ui pointing below label">
                 This <b>Nickname</b> used to register your public key on our service.
               </div>      
-              <input type="text" name="first-name" [(ngModel)]="nickName" placeholder="Nickname">
+              <input type="text" name="first-name" [(ngModel)]="nickName" maxlength="30" placeholder="Nickname">
             </div>
             <button class="fluid ui button primary" type="submit" (click)="onLogin()" >Start</button>
           </form>
