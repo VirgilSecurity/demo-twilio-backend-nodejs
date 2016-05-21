@@ -68,7 +68,7 @@ app.get('/history', (request, response, next) => {
     let service = client.services(process.env.TWILIO_IPM_SERVICE_SID);
     
     Promise.all([
-        virgil.cards.search({ value: identity }),
+        virgil.cards.search({ value: identity, type: 'member' }),
         service.channels(channelSid).messages.list()
     ])
     .then(bundle => {
