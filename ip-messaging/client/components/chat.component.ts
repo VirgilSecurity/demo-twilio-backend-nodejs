@@ -232,7 +232,7 @@ export class ChatComponent implements OnInit {
     private addMember(member):Promise<any> {             
         return this.virgil.sdk.cards.search({ 
             value: member.identity,
-            type: 'nickname' 
+            type: 'member' 
         }).then(result => {
             
             var latestCard: any = _.last(_.sortBy(result, 'created_at'));

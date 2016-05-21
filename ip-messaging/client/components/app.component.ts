@@ -66,7 +66,7 @@ export class AppComponent implements OnInit {
             // search for public key for current user nickname
             return this.virgil.sdk.cards.search({ 
                 value: authData.identity, 
-                type:'nickname' 
+                type:'member' 
             });
         })
         .then(cards => {
@@ -154,7 +154,7 @@ export class AppComponent implements OnInit {
                     public_key: keyPair.publicKey,
                     private_key: keyPair.privateKey,
                     identity: {
-                        type: 'nickname',
+                        type: 'member',
                         value: identity,
                         validation_token: validationToken
                     }
