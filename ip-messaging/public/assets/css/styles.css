@@ -267,6 +267,11 @@ a[href], button {
     display: none !important;
 }
 
+.login-form-container > img {
+    width: 90px;
+    height: 115px;
+}
+
 @media only screen and (min-width: 768px) {
     #menu-dimmer {
         display: none !important;
