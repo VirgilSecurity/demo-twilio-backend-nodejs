@@ -27,11 +27,11 @@
                     <i class="add circle icon"></i>
                 </button>
 
-                <!--<div class="busy-indicator" *ngIf="isBusy">
+                <div class="busy-indicator" *ngIf="isChannelsLoading">
                     <div class="ui active small inline loader"></div>&nbsp;&nbsp;
-                    Loading...
-                </div>-->
-                <div class="channel-list menu" [class.disabled]="isBusy">
+                    Loading channels...
+                </div>
+                <div class="channel-list menu">
                     <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
                 </div>
 
@@ -113,6 +113,15 @@
                     <div class="content">
                         <div class="center">
                             <h2 class="text">Select a channel from menu<br /> to start chatting</h2>
+                        </div>
+                    </div>
+                </div>
+                <div id="placeholder" class="ui dimmer inverted active" *ngIf="isChannelInitializing">
+                    <div class="content">
+                        <div class="center">
+                            <div class="ui active inverted dimmer">
+                                <div class="ui text loader">Loading...</div>
+                            </div>
                         </div>
                     </div>
                 </div>

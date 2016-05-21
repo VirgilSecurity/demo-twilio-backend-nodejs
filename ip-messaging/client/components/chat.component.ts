@@ -27,11 +27,10 @@ export class ChatComponent implements OnInit {
     public channelMembers = [];        
     public currentChannel: any;    
     
-    public isBusy:boolean = false;
+    public isChannelsLoading:boolean = false;
+    public isChannelInitializing: boolean;
     
     public newChannelName: string;
-    public isChannelCreating: boolean;    
-    
     public newMessage: string;
     public createChannel: Function;
     
@@ -75,8 +74,7 @@ export class ChatComponent implements OnInit {
         if (channel == this.currentChannel) {
             return;
         }        
-        
-        this.isBusy = true;
+        this.isChannelInitializing = true;
         this.channelMembers = [];        
         this.messages = []; 
         
@@ -109,6 +107,9 @@ export class ChatComponent implements OnInit {
         this.memberJoinedHandler = this.onMemberJoined.bind(this);
         this.memberLeftHandler = this.onMemberLeft.bind(this);
         this.messageAddedHandler = this.onMessageAdded.bind(this);
+        
+        this.isChannelInitializing = true;
+        this.cd.detectChanges();  
                         
         channel.join().then(() => {                       
             channel.on('memberJoined', this.memberJoinedHandler);
@@ -131,12 +132,12 @@ export class ChatComponent implements OnInit {
             return Promise.all(bunch[1].map(m => this.addMember(m)));
         })
         .then(members => {
-            this.isBusy = false;
+            this.isChannelInitializing = false;
             this.cd.detectChanges();           
             
             console.log(members);            
         })
-        .catch(this.handleError);
+        .catch(error => this.handleError(error));
         
     }
 
@@ -149,7 +150,7 @@ export class ChatComponent implements OnInit {
             return false;
         }
 
-        this.isChannelCreating = true;
+        this.isChannelInitializing = true;
         this.virgil.sdk.cards.search({ value: "twilio_chat_admin" }).then((result) => {
 
             let latestCard: any = _.last(_.sortBy(result, 'created_at'));
@@ -165,12 +166,12 @@ export class ChatComponent implements OnInit {
             return this.twilio.client.createChannel(options);
         })
         .then((channel) => {
-            this.isChannelCreating = false;
+            this.isChannelsLoading = false;
             this.newChannelName = '';
             this.onChannelAdded(channel);
             this.setCurrentChannel(channel);
         })
-        .catch(this.handleError);
+        .catch(error => this.handleError(error));
     }
             
     /**
@@ -178,7 +179,7 @@ export class ChatComponent implements OnInit {
      */
     private loadChannels(): void{
         
-        this.isBusy = true; 
+        this.isChannelsLoading = true; 
         this.cd.detectChanges();
         
         this.twilio.client.getChannels().then(channels => {
@@ -186,7 +187,7 @@ export class ChatComponent implements OnInit {
                 this.onChannelAdded(channel);                        
             });  
                                     
-            this.isBusy = false;
+            this.isChannelsLoading = false;
             this.cd.detectChanges();     
         })
         .catch(this.handleError);     
@@ -310,8 +311,9 @@ export class ChatComponent implements OnInit {
      * Handles an chat errors.
      */
     private handleError(error): void{     
-        //this.isBusy = false;
-        //this.cd.detectChanges();    
+        this.isChannelInitializing = false;
+        this.isChannelsLoading = false;
+        this.cd.detectChanges();    
         
         console.error(error);    
     }   
