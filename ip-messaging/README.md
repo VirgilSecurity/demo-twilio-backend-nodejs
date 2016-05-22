@@ -1,3 +1,5 @@
+# Quickstart. Adding end-to-end encryption to Twilio IP Messaging.
+
 ## Introducing
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.. Sounds like a plan? Then let’s get cracking!
@@ -13,7 +15,7 @@ First you must create a free Virgil Security developer's account by signing up [
  
 The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account.
  
-Use this token to initialize the SDK client [here](#let-s-get-started).
+Use this token to initialize the SDK client [here](#lets-get-started).
  
 ### Install
  
@@ -34,7 +36,7 @@ bower install virgil-sdk
 ```html
 <script 
 src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.4.6/virgil-sdk.min.js" 
-integrity="sha256-oa5PdJUfmpmSk0q08WejIusp7epaht49i8NKSf6uoJo="
+integrity="sha256-6gsCF73jFoEAcdAmVE8n+LCtUgzQ7j6svoCQxVxvmZ8="
 crossorigin="anonymous"></script>
 ```
 
@@ -72,7 +74,9 @@ var options = {
 };
 
 virgil.cards.create(options).then(function (card){
+
     // returned a card with represents a Public Key.
+    myCard = card;
 });
 ```
 
@@ -129,7 +133,7 @@ You can also be notified of any new incoming Messages with an event handler. Thi
 // Listen for new Messages sent to a Channel
 generalChannel.on('messageAdded', function(message) {
     
-    // Decrypt the Message using global card id and private key values.
+    // Decrypt the Message using card id and private key values.
     var decryptedMessage = virgil.crypto.decryptStringFromBase64(
         message.body, 
         myCard.id, 
