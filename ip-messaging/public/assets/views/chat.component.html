@@ -35,7 +35,7 @@
                     <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
                 </div>
 
-                <div class="ui modal new-channel-modal basic">
+                <div class="ui small modal new-channel-modal basic">
                     <i class="close icon"></i>
                     <div class="ui icon header">
                         Create New Channel
@@ -44,12 +44,22 @@
                         <div class="channel-input ui fluid input" [class.disabled]="isChannelCreating">
                             <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" (keyup.enter)="okbtn.click()">
                         </div>
+                        <div class="ui inverted checkbox">
+                            <input id="include-history-checkbox" type="checkbox" [(ngModel)]="includeChannelHistory">
+                            <label for="include-history-checkbox">Include channel history</label>
+                        </div>
                     </div>
                     <div class="actions">
                         <div #okbtn class="ui green basic inverted ok button">Create</div>
                         <div class="ui red basic inverted cancel button">Cancel</div>
                     </div>
                 </div>
+            </div>
+            <div class="menu-footer item">
+                <a class="github-link" href="https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging">
+                    <img class="github-img" src="./assets/img/github-mark-inverted.png" />
+                </a>
+                <iframe src="https://ghbtns.com/github-btn.html?user=VirgilSecurity&repo=virgil-demo-twilio&type=star&count=true" frameborder="0" scrolling="0" width="80px" height="20px"></iframe>
             </div>
         </div>
         <div id="chat-content">

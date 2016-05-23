@@ -31,6 +31,7 @@ export class ChatComponent implements OnInit {
     public isChannelInitializing: boolean;
     
     public newChannelName: string;
+    public includeChannelHistory: boolean = true;
     public newMessage: string;
     public createChannel: Function;
     
@@ -159,7 +160,8 @@ export class ChatComponent implements OnInit {
                 friendlyName: this.newChannelName,
                 attributes: {
                     virgil_card_id: latestCard.id,
-                    virgil_public_key: latestCard.public_key.public_key
+                    virgil_public_key: latestCard.public_key.public_key,
+                    include_history: this.includeChannelHistory
                 }
             };
 
