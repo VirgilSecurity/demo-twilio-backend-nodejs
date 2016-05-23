@@ -75,7 +75,7 @@ export class ChatComponent implements OnInit {
         if (channel == this.currentChannel) {
             return;
         }        
-        this.isChannelInitializing = true;
+        //this.isChannelInitializing = true;
         this.channelMembers = [];        
         this.messages = []; 
         
@@ -109,36 +109,60 @@ export class ChatComponent implements OnInit {
         this.memberLeftHandler = this.onMemberLeft.bind(this);
         this.messageAddedHandler = this.onMessageAdded.bind(this);
         
-        this.isChannelInitializing = true;
+        this.isChannelInitializing = false;
         this.cd.detectChanges();  
-                        
-        channel.join().then(() => {                       
+        
+        channel.join().then(() => {     
             channel.on('memberJoined', this.memberJoinedHandler);
             channel.on('memberLeft', this.memberLeftHandler);
             channel.on('messageAdded', this.messageAddedHandler);
-            
+        
             return Promise.all([
                 channel.getAttributes(),
                 channel.getMembers(),
                 this.backend.getHistory(this.account.current.identity, channel.sid)
-            ]);
-        })        
-        .then(bunch => {
+            ]);        
+        }).then((bundle) => {    
             
-            let encryptedMessages = _.sortBy(bunch[2], 'dateUpdated');
-            _.forEach(bunch[2], m => {
+             let encryptedMessages = _.sortBy(bundle[2], 'dateUpdated'); 
+             _.forEach(bundle[2], m => {
                 this.onMessageAdded(m);
-            });
-               
-            return Promise.all(bunch[1].map(m => this.addMember(m)));
-        })
-        .then(members => {
-            this.isChannelInitializing = false;
-            this.cd.detectChanges();           
-            
-            console.log(members);            
+             });  
+                    
+             return Promise.all(bundle[1].map(m => this.addMember(m)));
+        }).then(members => {
+             //this.isChannelInitializing = false;
+             this.cd.detectChanges();           
         })
         .catch(error => this.handleError(error));
+                        
+        // channel.join().then(() => {                       
+        //     channel.on('memberJoined', this.memberJoinedHandler);
+        //     channel.on('memberLeft', this.memberLeftHandler);
+        //     channel.on('messageAdded', this.messageAddedHandler);
+            
+        //     return Promise.all([
+        //         channel.getAttributes(),
+        //         channel.getMembers()                
+        //     ]);
+        // })        
+        // .then(bunch => {
+            
+        //     // let encryptedMessages = _.sortBy(bunch[2], 'dateUpdated');            
+        //     // this.backend.getHistory(this.account.current.identity, channel.sid)
+        //     // _.forEach(bunch[2], m => {
+        //     //     this.onMessageAdded(m);
+        //     // });
+               
+        // //     return Promise.all(bunch[1].map(m => this.addMember(m)));
+        // // })
+        // // .then(members => {
+        //      this.isChannelInitializing = false;
+        //      this.cd.detectChanges();           
+            
+        // //     console.log(members);            
+        // })
+        // .catch(error => this.handleError(error));
         
     }
 
@@ -146,25 +170,35 @@ export class ChatComponent implements OnInit {
      * Createa a new channel by name.
      */
     private createChannelImpl() {
-        console.log('create channel');
+                
         if (_.isEmpty(this.newChannelName)) {
             return false;
         }
-
+        
         this.isChannelInitializing = true;
-        this.virgil.sdk.cards.search({ value: "twilio_chat_admin" }).then((result) => {
-
-            let latestCard: any = _.last(_.sortBy(result, 'created_at'));
-
-            let options = {
-                friendlyName: this.newChannelName,
-                attributes: {
-                    virgil_card_id: latestCard.id,
-                    virgil_public_key: latestCard.public_key.public_key,
-                    include_history: this.includeChannelHistory
-                }
+        let prepareNewChannelFunc = () => {         
+               
+            let options: any = {
+                friendlyName: this.newChannelName                
             };
-
+            
+            if (this.includeChannelHistory){                                
+                return this.virgil.sdk.cards.search({ 
+                    value: "twilio_chat_admin"                   
+                }).then(result => {                    
+                    let channelCard: any = _.last(_.sortBy(result, 'created_at'));                    
+                    options.attributes = {
+                        virgil_card_id: channelCard.id,
+                        virgil_public_key: channelCard.public_key.public_key
+                    };                    
+                    return options;
+                });
+            }                        
+            return Promise.resolve(options);
+        };
+        
+        prepareNewChannelFunc().then((options) => {
+            console.log(options);            
             return this.twilio.client.createChannel(options);
         })
         .then((channel) => {
@@ -203,10 +237,12 @@ export class ChatComponent implements OnInit {
         let messageString = this.newMessage;
         let recipients = [];
                 
-        recipients.push({
-            recipientId: this.currentChannel.attributes.virgil_card_id,
-            publicKey: this.currentChannel.attributes.virgil_public_key
-        });
+        if (this.currentChannel.attributes.virgil_card_id){
+            recipients.push({
+                recipientId: this.currentChannel.attributes.virgil_card_id,
+                publicKey: this.currentChannel.attributes.virgil_public_key
+            });
+        }
         
         this.channelMembers.forEach(m => {
              recipients.push({ recipientId: m.publicKey.id, publicKey: m.publicKey.data });
