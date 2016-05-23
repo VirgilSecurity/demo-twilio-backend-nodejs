@@ -97,7 +97,11 @@ export class AppComponent implements OnInit {
     }
 
     initializeServices(identity:string): Promise<any> {
-        return Promise.all([this.virgil.initialize(), this.twilio.initialize(identity)]);
+        return Promise.all([this.virgil.initialize(), this.twilio.initialize(identity)])
+            .then(() => {
+                console.log('Services has been successfully initialized.');                
+                this.twilio.client.on('tokenExpired', this.onLogout.bind(this));
+            });
     }
     
     onLogin(nickName: string): void {

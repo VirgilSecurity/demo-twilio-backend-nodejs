@@ -17,13 +17,7 @@ export class TwilioService {
             .then((data) => {
                 this.accessManager = new Twilio.AccessManager(data.twilio_token);
                 this.client = new Twilio.IPMessaging.Client(this.accessManager);
-
-                this.client.on('tokenExpired', this.onTokenExpired);
                 return;
             });
-    }
-    
-    private onTokenExpired(): void{
-        //alert('Your session has expired!');
     }
 }

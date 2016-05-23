@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core'
-import { VirgilService } from './virgil.service'
-import { TwilioService } from './twilio.service'
 
 export class Account {
     constructor(public id: string,
@@ -23,8 +21,7 @@ export class Account {
 @Injectable()
 export class AccountService {   
         
-    constructor (private virgil:VirgilService,
-                 private twilio:TwilioService){
+    constructor (){
         this.currentAccount = this.loadAccount();
     }
         
@@ -45,7 +42,7 @@ export class AccountService {
     public logout(): void {
         localStorage.removeItem('account');
     }
-    
+        
     private storeAccount(storeAccount:Account){
         localStorage.setItem('account', JSON.stringify(storeAccount))
     }
