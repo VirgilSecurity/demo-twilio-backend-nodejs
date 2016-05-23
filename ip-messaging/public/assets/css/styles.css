@@ -71,12 +71,20 @@ a[href], button {
     right: 0;
 }
 
+#chat-menu > .menu-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
 #chat-menu > .channels {
     position: absolute;
     top: 72px;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 50px;
     display: flex;
     flex-direction: column;
 }
@@ -272,14 +280,18 @@ a[href], button {
     height: 115px;
 }
 
-.login-form-container > a > .github-img {
-    width: 32px;
-    height: 32px;
-}
-
 .login-form-container > iframe {
     margin-bottom: 5px;
     margin-left: 5px;
+}
+
+.github-link {
+    padding: 6px 12px;
+}
+
+.github-link > .github-img {
+    width: 20px;
+    height: 20px;
 }
 
 @media only screen and (min-width: 768px) {
