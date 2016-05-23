@@ -304,7 +304,9 @@ export class ChatComponent implements OnInit {
     /**
      * Fired when a Channel is no longer visible to the Client.
      */
-    private onChannelRemoved(channel:any): void{
+    private onChannelRemoved(channel:any): void{        
+        _(this.channels).remove(ch => ch.sid == channel.sid);
+        this.cd.detectChanges();    
     }
     
     /**

@@ -24,6 +24,6 @@ export class TwilioService {
     }
     
     private onTokenExpired(): void{
-        alert('Your session has expired!');
+        //alert('Your session has expired!');
     }
 }

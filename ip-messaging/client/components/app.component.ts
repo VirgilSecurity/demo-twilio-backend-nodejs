@@ -106,7 +106,6 @@ export class AppComponent implements OnInit {
             this.isLoggedIn = true;
             this.cd.detectChanges();
         });
-
     }
     
     onLogout(): void {

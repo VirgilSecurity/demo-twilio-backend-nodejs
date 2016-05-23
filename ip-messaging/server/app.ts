@@ -134,6 +134,9 @@ function getTwilioToken(appName, identity, deviceId) {
 }
 
 function getValidationToken(identity) {
+    
+    console.log(identity);
+
     var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
 
     // This validation token is generated using app’s Private Key created on
