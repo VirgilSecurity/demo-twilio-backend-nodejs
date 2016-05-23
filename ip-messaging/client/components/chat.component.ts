@@ -50,20 +50,20 @@ export class ChatComponent implements OnInit {
     
     public ngOnInit(){
         this.twilio.client.on('channelAdded', this.onChannelAdded.bind(this));
+        this.twilio.client.on('channelRemoved', this.onChannelRemoved.bind(this));
         this.loadChannels();
     }
     
     /**
      * Deletes current channel.
      */
-    public deleteChannel():void {
-        if (this.currentChannel != null){
-            this.currentChannel.delete().then(() => {
-                _.remove(this.channels, c => c.sid == this.currentChannel.sid);
-                this.currentChannel = null;
-                this.cd.detectChanges();
-            });
-        }
+    public deleteChannel():void {     
+        
+        _.remove(this.channels, ch => ch.sid == this.currentChannel.sid);                    
+        this.currentChannel.delete();    
+        this.currentChannel = null;           
+        
+        this.cd.detectChanges();        
     }
         
     /**
@@ -304,8 +304,20 @@ export class ChatComponent implements OnInit {
     /**
      * Fired when a Channel is no longer visible to the Client.
      */
-    private onChannelRemoved(channel:any): void{        
-        _(this.channels).remove(ch => ch.sid == channel.sid);
+    private onChannelRemoved(channel:any): void{
+        
+        if (this.currentChannel && this.currentChannel.sid === channel.sid) {            
+            if (alert(`Unfortunately, the channel #${channel.friendlyName} has been deleted by the owner. ` + 
+                      `Choose another channel, or feel free to create your own one.`)){
+                          
+                this.currentChannel = null;                
+                return;
+            }
+        }        
+        
+        console.log(channel);        
+        
+        _.remove(this.channels, ch => ch.sid == channel.sid);    
         this.cd.detectChanges();    
     }
     
