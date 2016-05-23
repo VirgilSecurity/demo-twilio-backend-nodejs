@@ -87,7 +87,7 @@
                             <i class="trash outline icon"></i>
                         </button>
                     </div>
-                </header>
+                </header>                
                 <div class="ui divider"></div>
                 <main>
                     <div class="feed-wrapper">
@@ -112,6 +112,13 @@
                             </div>
                     </div>
                 </main>
+                <div class="history" *ngIf="currentChannel?.attributes?.virgil_card_id" >
+                    <div *ngIf="!currentChannel?.historyLoaded" >
+                        <a href="#" (click)="loadHistory()" *ngIf="!isChannelHistoryLoading" ><i>Load History...</i></a>
+                        <span *ngIf="isChannelHistoryLoading" ><i>Loading...</i></span>
+                        <div [class.active]="isChannelHistoryLoading" class="ui small inline loader"></div>
+                    </div>
+                </div>
                 <div class="ui divider"></div>
                 <footer>
                     <div class="ui fluid action input" [class.disabled]="currentChannel == null" >

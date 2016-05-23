@@ -225,6 +225,10 @@ a[href], button {
     vertical-align: middle;
 }
 
+.chat > .history {
+    height: 1.7142em;
+}
+
 .feed-wrapper {
     max-width: 700px;
     margin: 0 auto;

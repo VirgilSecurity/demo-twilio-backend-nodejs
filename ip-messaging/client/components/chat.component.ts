@@ -28,7 +28,7 @@ export class ChatComponent implements OnInit {
     public currentChannel: any;    
     
     public isChannelsLoading:boolean = false;
-    public isChannelInitializing: boolean;
+    public isChannelHistoryLoading: boolean = false;
     
     public newChannelName: string;
     public includeChannelHistory: boolean = true;
@@ -75,26 +75,23 @@ export class ChatComponent implements OnInit {
         if (channel == this.currentChannel) {
             return;
         }        
-        //this.isChannelInitializing = true;
+        
+        console.log(channel);
+        
         this.channelMembers = [];        
         this.messages = []; 
         
-        if (this.currentChannel != null){
-                        
+        if (this.currentChannel != null) {
+            
             this.currentChannel.removeListener('memberJoined', this.memberJoinedHandler);
             this.currentChannel.removeListener('memberLeft', this.memberLeftHandler);
             this.currentChannel.removeListener('messageAdded', this.messageAddedHandler);
-              
-            this.currentChannel = channel;
-            this.cd.detectChanges();
             
-            this.currentChannel.leave()
-                .then(() => this.initializeChannel(channel));
-                            
-            return;
+            this.currentChannel.leave();
         }
         
         this.currentChannel = channel;
+        this.currentChannel.historyLoaded = false;
         this.cd.detectChanges();
                 
         this.initializeChannel(channel);
@@ -109,61 +106,44 @@ export class ChatComponent implements OnInit {
         this.memberLeftHandler = this.onMemberLeft.bind(this);
         this.messageAddedHandler = this.onMessageAdded.bind(this);
         
-        this.isChannelInitializing = false;
-        this.cd.detectChanges();  
-        
-        channel.join().then(() => {     
+        channel.join().then(() => {                
+             
+            // subscribe for channel events.            
             channel.on('memberJoined', this.memberJoinedHandler);
             channel.on('memberLeft', this.memberLeftHandler);
-            channel.on('messageAdded', this.messageAddedHandler);
-        
-            return Promise.all([
-                channel.getAttributes(),
-                channel.getMembers(),
-                this.backend.getHistory(this.account.current.identity, channel.sid)
-            ]);        
-        }).then((bundle) => {    
-            
-             let encryptedMessages = _.sortBy(bundle[2], 'dateUpdated'); 
-             _.forEach(bundle[2], m => {
-                this.onMessageAdded(m);
-             });  
+            channel.on('messageAdded', this.messageAddedHandler);    
                     
-             return Promise.all(bundle[1].map(m => this.addMember(m)));
+            // load channel members.        
+            return channel.getMembers();
+        }).then((members) => {                
+            return Promise.all(members.map(m => this.addMember(m)));            
         }).then(members => {
-             //this.isChannelInitializing = false;
              this.cd.detectChanges();           
         })
-        .catch(error => this.handleError(error));
-                        
-        // channel.join().then(() => {                       
-        //     channel.on('memberJoined', this.memberJoinedHandler);
-        //     channel.on('memberLeft', this.memberLeftHandler);
-        //     channel.on('messageAdded', this.messageAddedHandler);
-            
-        //     return Promise.all([
-        //         channel.getAttributes(),
-        //         channel.getMembers()                
-        //     ]);
-        // })        
-        // .then(bunch => {
-            
-        //     // let encryptedMessages = _.sortBy(bunch[2], 'dateUpdated');            
-        //     // this.backend.getHistory(this.account.current.identity, channel.sid)
-        //     // _.forEach(bunch[2], m => {
-        //     //     this.onMessageAdded(m);
-        //     // });
-               
-        // //     return Promise.all(bunch[1].map(m => this.addMember(m)));
-        // // })
-        // // .then(members => {
-        //      this.isChannelInitializing = false;
-        //      this.cd.detectChanges();           
-            
-        // //     console.log(members);            
-        // })
-        // .catch(error => this.handleError(error));
+        .catch(error => this.handleError(error));        
+    }
+    
+    /**
+     * Loads history from backend service.
+     */
+    public loadHistory(){
         
+        let identity = this.account.current.identity;
+        let channelSid = this.currentChannel.sid;
+        
+        this.isChannelHistoryLoading = true;
+                        
+        this.backend.getHistory(identity, channelSid).then(messages => {
+            
+            let encryptedMessages = _.sortBy(messages, 'dateUpdated'); 
+             _.forEach(messages, m => this.onMessageAdded(m));  
+             
+            this.isChannelHistoryLoading = false;
+            this.currentChannel.historyLoaded = true;
+            
+            this.cd.detectChanges();
+        })
+        .catch(error => this.handleError(error));
     }
 
     /**
@@ -175,7 +155,6 @@ export class ChatComponent implements OnInit {
             return false;
         }
         
-        this.isChannelInitializing = true;
         let prepareNewChannelFunc = () => {         
                
             let options: any = {
@@ -363,7 +342,7 @@ export class ChatComponent implements OnInit {
      * Handles an chat errors.
      */
     private handleError(error): void{     
-        this.isChannelInitializing = false;
+        this.isChannelHistoryLoading = false;
         this.isChannelsLoading = false;
         this.cd.detectChanges();    
         
