@@ -2,7 +2,7 @@
 
 ## Introducing
 
-With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.. Sounds like a plan? Then let’s get cracking!
+With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API. Sounds like a plan? Then let’s get cracking!
 
 ## How it works
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
@@ -40,7 +40,7 @@ integrity="sha256-6gsCF73jFoEAcdAmVE8n+LCtUgzQ7j6svoCQxVxvmZ8="
 crossorigin="anonymous"></script>
 ```
 
-Use code below to initialize global variable of VirgilSDK.
+Use the code below to initialize global variable of VirgilSDK.
 
 ```js
 var virgil = new VirgilSDK("%ACCESS_TOKEN%");
