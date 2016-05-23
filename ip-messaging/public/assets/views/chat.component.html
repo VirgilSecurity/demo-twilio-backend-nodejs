@@ -35,7 +35,7 @@
                     <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
                 </div>
 
-                <div class="ui modal new-channel-modal basic">
+                <div class="ui small modal new-channel-modal basic">
                     <i class="close icon"></i>
                     <div class="ui icon header">
                         Create New Channel
@@ -43,6 +43,10 @@
                     <div class="content">
                         <div class="channel-input ui fluid input" [class.disabled]="isChannelCreating">
                             <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" (keyup.enter)="okbtn.click()">
+                        </div>
+                        <div class="ui inverted checkbox">
+                            <input id="include-history-checkbox" type="checkbox" [(ngModel)]="includeChannelHistory">
+                            <label for="include-history-checkbox">Include channel history</label>
                         </div>
                     </div>
                     <div class="actions">
