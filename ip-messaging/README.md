@@ -54,10 +54,14 @@ Let's dive into a few of the key techniques you'll need to employ while working 
 
 ### Generate a New Key Pair
 Generate a new public private key pair for end-to-end encryption
+
 ```js
 var keyPair = virgil.crypto.generateKeyPair();
+
+console.log(keyPair.publicKey);
+console.log(keyPair.privateKey);
 ```
-The Public/Private Key pair example. 
+*Output:*
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -77,6 +81,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 Publish a Public Key to the Virgil Keys Service where they are available in an open access for other users (e.g. recipient) to verify and encrypt the data for the key owner. See more about publishing Public Keys [here...](https://virgilsecurity.com/api-docs/javascript/keys-sdk#cards-and-public-keys)
 
 `VALIDATION_TOKEN` - used to prevent an unauthorized cards registration. The **Validation Token** generates based on Application's Private Key and client Identity. See how you can generate it using SDK utilities [here...](https://virgilsecurity.com/api-docs/javascript/keys-sdk#obtaining-a-private-validationtoken)
+
 ```js
 var options = {
      public_key: keyPair.publicKey,
@@ -89,10 +94,14 @@ var options = {
 };
 
 virgil.cards.create(options).then(function (card){
-
-    // returned a card with represents a Public Key.
-    myCard = card;
+    console.log(card);
 });
+```
+
+*Output:*
+
+```
+
 ```
 
 ### Create a Channel
