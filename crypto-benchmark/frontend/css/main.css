@@ -1,0 +1,52 @@
+body{
+    padding-top:50px;
+}
+
+@media (min-width: 1000px) {
+    .container{
+        max-width: 680px;
+    }
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 34px;
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+}
+
+h4 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Open Sans', sans-serif;
+}
+
+p.description {
+    font-size: 20px;
+    margin-bottom: 30px;
+    font-weight: 300;
+    line-height: 1.4;
+    font-family: 'Open Sans', sans-serif;
+}
+
+a.baconipsum{
+    cursor: pointer;
+}
+
+td{
+    min-width: 60px;
+}
+
+td.result{
+    margin-left: 40px;
+    color: forestgreen;
+    text-align: right;
+}
+
+p.error-message {
+    margin-top: 20px;
+    color: firebrick;
+}
