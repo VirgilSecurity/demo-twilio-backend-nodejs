@@ -109,10 +109,10 @@ virgil.cards.create(options).then(function (card){
    "created_at":"2016-05-03T14:34:08+0000",
    "public_key":{  
       "id":"359abe31-3344-453a-a292-fd98a83e500a",
-      "public_key":"-----BEGIN PUBLIC KEY-----" +
-                   "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQgZL63vg8NUT6/rlJLyTHCkLB1" +
-                   "TOM0Z79FJeC5fgDTiQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
-                   "-----END PUBLIC KEY-----",
+      "public_key":"-----BEGIN PUBLIC KEY-----
+MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQO8ohmBRyclmcfQ38Lwmvv4Cau
+jyX6vWn8kJrR0RRfFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+-----END PUBLIC KEY-----",
       "created_at":"2016-05-03T14:34:08+0000"
    },
    "identity":{  
