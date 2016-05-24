@@ -103,7 +103,7 @@ virgil.cards.create(options).then(function (card){
 ```json
 {  
    "id":"3e5a5d8b-e0b9-4be6-aa6b-66e3374c05b3",
-   "authorized_by":"com.denzil.twilio-ip-messaging-demo",
+   "authorized_by":"com.virgilsecurity.twilio-ip-messaging-demo",
    "hash":"QiWtZjZyIQhqZK7+3nZmIEWFBU+qI64EzSuqBcY+E7ZtKPwd4ZyU6gdfU/VzbTn6dHtfahCzHasN...",
    "data":null,
    "created_at":"2016-05-03T14:34:08+0000",
@@ -115,7 +115,7 @@ virgil.cards.create(options).then(function (card){
    "identity":{  
       "id":"965ea277-ab78-442c-93fe-6bf1d70aeb4b",
       "type":"member",
-      "value":"@",
+      "value":"Darth Vader",
       "created_at":"2016-05-03T14:34:08+0000"
    }
 }
