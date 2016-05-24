@@ -1,6 +1,6 @@
 {
-  "name": "virgil-crypto-tester",
-  "version": "0.0.0",
+  "name": "virgil-crypto-benchmark",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
