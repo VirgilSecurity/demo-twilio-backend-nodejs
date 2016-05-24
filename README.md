@@ -2,36 +2,38 @@
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.
 
-## How it works
-![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
-
 ## Publish
 
-There are only two steps required to publish Virgil History Service :)
+There are only few steps required to setup Virgil History service :)
 
-- Run **Virgil.TwilioService.sln** in Visual Studio Community 2015 (it is free)
-- Right click on **Virgil.TwilioIPMessaging** project > then **Publish** (with your Azure credentials)
+```
+$ cd ./ip-messaging
+
+$ npm install
+$ npm start
+```
 
 ## Configuration
 
 ```
-$ cd Source/Virgil.TwilioIPMessaging
-$ cp sample.web.config web.config
+$ cp .env.example .env
 ```
 
-Set Twilio & Virgil authentication tokens in web.config
+Set Twilio & Virgil environmen veriables.
 
 ```
-  <appSettings>
-    ...
-    <add key="twilio:AccountSID" value="{TWILIO_ACCOUNT_SID}" />
-    <add key="twilio:ApiKey" value="{TWILIO_API_KEY}" />
-    <add key="twilio:ApiKeySecret" value="{TWILIO_API_KEY_SECRET}" />
-    <add key="twilio:IpMessagingServiceSID" value="{TWILIO_IP_MESSAGING_SERVICE_SID}" />
-    <add key="virgil:AppToken" value="{VIRGIL_SECURITY_ACCESS_TOKEN}" />
-    ...
-  </appSettings>
+TWILIO_ACCOUNT_SID=
+TWILIO_API_KEY=
+TWILIO_API_SECRET=
+TWILIO_IPM_SERVICE_SID=
+
+VIRGIL_ACCESS_TOKEN=
+VIRGIL_APP_PRIVATE_KEY=
+VIRGIL_APP_PRIVATE_KEY_PASSWORD=
+
+APP_CHANNEL_ADMIN_CARD_ID=
+APP_CHANNEL_ADMIN_PRIVATE_KEY=
 ```
 
 ## Quick start guide
-To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](./Quick%20start%20guide.md).
+To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging).
