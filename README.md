@@ -26,11 +26,11 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | TWILIO_API_KEY                    | Used to authenticate - [generate one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys). |
 | TWILIO_API_SECRET                 | Used to authenticate - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
 | TWILIO_IPM_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/user/account/ip-messaging/services) |
-| VIRGIL_ACCESS_TOKEN               |  |
+| VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
 | VIRGIL_APP_PRIVATE_KEY            | Used to generate **Validation Token**, which is required to publish authorized **Public Keys** to Virgil Keys Service.  |
-| VIRGIL_APP_PRIVATE_KEY_PASSWORD   |            |
-| APP_CHANNEL_ADMIN_CARD_ID         |                   |
-| APP_CHANNEL_ADMIN_PRIVATE_KEY     |           |
+| VIRGIL_APP_PRIVATE_KEY_PASSWORD   | The application's Private Key password.  |
+| APP_CHANNEL_ADMIN_CARD_ID         | The Virgil Card identifier which represents a Channel admin. (Uses only for channels with history support)  |
+| APP_CHANNEL_ADMIN_PRIVATE_KEY     | The Channel admin's Private Key |
 
 ## Quick start guide
 To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging).
