@@ -87,7 +87,7 @@ cryptoTester.controller("mainCtrl", ["$scope", function($scope) {
     };
     
     $scope.loremIpsum = function(){
-        $.getJSON("http://baconipsum.com/api/?callback=?", 
+        $.getJSON("https://baconipsum.com/api/?callback=?", 
 			{ "type":"meat-and-filler", "start-with-lorem":"1", "paras":"1" }, 
 			function(baconGoodness)
 		{
