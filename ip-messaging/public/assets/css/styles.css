@@ -83,7 +83,7 @@ a[href], button {
 
 #chat-menu > .channels > .channel-list > .item {
     margin-right: 15px;
-    border-radius: 0 5px 5px 0;
+    border-radius: 0 5px 5px 0 !important;
     background: transparent;
 }
 
@@ -282,6 +282,10 @@ a[href], button {
     padding: .5em .8em;
 }
 
+.ui.icon.button > .icon {
+    height: 1em;
+}
+
 .ui.inverted.checkbox > label {
     cursor: pointer;
     -webkit-touch-callout: none; /* iOS Safari */
@@ -294,7 +298,7 @@ a[href], button {
 
 @media only screen and (min-width: 768px) {
     #chat-menu {
-        width: 260px;
+        width: 300px;
         position: absolute;
         left: 0;
         top: 0;
@@ -305,7 +309,7 @@ a[href], button {
 
     #chat-viewport > .pusher {
         position: absolute;
-        left: 260px;
+        left: 300px;
         right: 0;
         top: 0;
         bottom: 0;
