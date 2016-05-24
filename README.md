@@ -18,7 +18,7 @@ $ npm start
 ```
 $ cp .env.example .env
 ```
-Set Twilio & Virgil environment variables declared in **.env**.
+Set Twilio & Virgil environment variables declared in `.env` file.
 
 ```
 TWILIO_ACCOUNT_SID=
