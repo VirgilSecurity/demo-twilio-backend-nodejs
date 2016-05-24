@@ -186,6 +186,11 @@ generalChannel.on('messageAdded', function(message) {
         keyPair.privateKey
     );
         
-    console.log(message.author, decryptedMessage);
+    console.log(message.author + ': ' + decryptedMessage);
 });
+```
+
+*Output:*
+```
+Darth Vader: Luke. I am your father!
 ```
