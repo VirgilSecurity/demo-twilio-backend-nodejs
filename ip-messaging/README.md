@@ -57,6 +57,20 @@ Generate a new public private key pair for end-to-end encryption
 ```js
 var keyPair = virgil.crypto.generateKeyPair();
 ```
+The Public/Rrivate Key pair example. 
+
+```
+-----BEGIN PUBLIC KEY-----
+MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQO8ohmBRyclmcfQ38Lwmvv4Cau
+jyX6vWn8kJrR0RRfFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+-----END PUBLIC KEY-----
+
+-----BEGIN EC PRIVATE KEY-----
+MHkCAQEEIFB+lOUvbb4WX+e3zLkAcYpvZR3qpQI8Ru/tcnciCMkIoAwGCisGAQQB
+l1UBBQGhRANCAAQO8ohmBRyclmcfQ38Lwmvv4CaujyX6vWn8kJrR0RRfFQAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+-----END EC PRIVATE KEY-----
+```
 
 ### Publish a Public Key
 
