@@ -101,7 +101,24 @@ virgil.cards.create(options).then(function (card){
 *Output:*
 
 ```
-
+{  
+   "id":"3e5a5d8b-e0b9-4be6-aa6b-66e3374c05b3",
+   "authorized_by":"com.virgilsecurity.twilio-ip-messaging-demo",
+   "hash":"QiWtZjZyIQhqZK7+3nZmIEWFBU+qI64EzSuqBcY+E7ZtKPwd4ZyU6gdfU/VzbTn6dHtfahCzHasNIOmO8ySB3A==",
+   "data":null,
+   "created_at":"2016-05-03T14:34:08+0000",
+   "public_key":{  
+      "id":"359abe31-3344-453a-a292-fd98a83e500a",
+      "public_key":"-----BEGIN PUBLIC KEY-----\nMFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQgZL63vg8NUT6/rlJLyTHCkLB1\nTOM0Z79FJeC5fgDTiQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n-----END PUBLIC KEY-----\n",
+      "created_at":"2016-05-03T14:34:08+0000"
+   },
+   "identity":{  
+      "id":"965ea277-ab78-442c-93fe-6bf1d70aeb4b",
+      "type":"member",
+      "value":"Darth Vader",
+      "created_at":"2016-05-03T14:34:08+0000"
+   }
+}
 ```
 
 ### Create a Channel
