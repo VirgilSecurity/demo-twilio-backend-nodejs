@@ -1,5 +1,6 @@
 html, body {
     height: 100%;
+    font-size: 16px;
 }
 body {
     margin: 0;
@@ -32,36 +33,17 @@ a[href], button {
     touch-action: manipulation;
 }
 
-#chat-wrapper {
-    height: 100%;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    -webkit-transform: translate3d(0,0,0);
-    transform: translate3d(0,0,0);
-}
-
 #chat-viewport {
     width: 100%;
     height: 100%;
     position: relative;
-    -webkit-transform: translateX(0);
-    -webkit-transition: .3s ease all;
-    transform: translateX(0);
-    transition: .3s ease all;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    display: flex;
 }
 
-#chat-menu {
-    flex: 0 0 auto;
-    width: 260px;
-    height: 100%!important;
-    max-height: 100%;
-    border-radius: 0!important;
-    margin: 0!important;
-    position: relative;
+#menu-toggle-container {
+    display: none;
+    position: fixed;
+    top: 10px;
+    left: 20px;
 }
 
 #chat-menu > .menu-header {
@@ -131,24 +113,17 @@ a[href], button {
 }
 
 #chat-menu .item {
-    font-size: 1em;
+    font-size: 1rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#chat-menu-toggle {
-    display: none;
-    margin: 20px 20px 0 20px;
-    flex: 0 0 auto;
-}
-
 #chat-content {
-    flex: 1 1 auto;
     position: relative;
-    max-width: calc(100% - 260px);
     display: flex;
     flex-direction: column;
+    background: white;
 }
 
 #chat-container {
@@ -180,7 +155,7 @@ a[href], button {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 0 20px 20px 20px;
+    padding: 0 20px;
     position: relative;
 }
 
@@ -193,14 +168,14 @@ a[href], button {
     justify-content: space-between;
 }
 
-.chat > header > .header-content > h3 {
+.chat > header > .header-content > h2 {
     margin-top:0;
     margin-bottom:0;    
     font-weight: 700;
 }
 
 .chat > header > .header-content > h5 {
-    font-size: 11px;
+    font-size: 0.85714286rem;
     font-weight: normal;
     margin-top:0;
     margin-bottom:0;
@@ -208,6 +183,7 @@ a[href], button {
 }
 
 .chat > main {
+    position: relative;
     flex: 1 1 auto;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -302,6 +278,10 @@ a[href], button {
     margin-bottom: 20px;
 }
 
+.ui.message {
+    padding: .5em .8em;
+}
+
 .ui.inverted.checkbox > label {
     cursor: pointer;
     -webkit-touch-callout: none; /* iOS Safari */
@@ -313,33 +293,38 @@ a[href], button {
 }
 
 @media only screen and (min-width: 768px) {
-    #menu-dimmer {
-        display: none !important;
+    #chat-menu {
+        width: 260px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        visibility: visible;
+        transform: none;
+    }
+
+    #chat-viewport > .pusher {
+        position: absolute;
+        left: 260px;
+        right: 0;
+        top: 0;
+        bottom: 0;
     }
 }
 
 @media only screen and (max-width: 767px) {
-    #chat-wrapper.show-menu #chat-viewport {
-        -webkit-transform: translate3d(260px, 0, 0);
-        transform: translate3d(260px, 0, 0);
-    }
 
-    #chat-menu {
-        position: absolute;
-        top: 0;
-        left: -260px;
-    }
-
-    #chat-menu-toggle {
+    #menu-toggle-container {
         display: inline-block;
     }
 
-    #chat-content {
-        max-width: 100%;
+    .chat > header {
+        padding-left: 60px;
     }
 
     .header {
         margin-top: 1rem;
-        font-size: 1.71428571em;
+        font-size: 1.71428571rem;
+
     }
 }
