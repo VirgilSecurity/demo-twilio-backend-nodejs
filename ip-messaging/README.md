@@ -52,7 +52,7 @@ In a Twilio IP Messaging application, a Channel is where all the action happens.
 
 Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. Let's also apply end-to-end encryption using Virgil Security's infrastructure.
 
-### Generate a new key pair
+### Generate a New Key Pair
 Generate a new public private key pair for end-to-end encryption
 ```js
 var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
