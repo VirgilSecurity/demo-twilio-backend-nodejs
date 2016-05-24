@@ -62,6 +62,7 @@ var keyPair = virgil.crypto.generateKeyPair();
 
 Publish a Public Key to the Virgil Keys Service where they are available in an open access for other users (e.g. recipient) to verify and encrypt the data for the key owner. See more about publishing Public Keys [here...](https://virgilsecurity.com/api-docs/javascript/keys-sdk#cards-and-public-keys)
 
+`VALIDATION_TOKEN` - used to prevent an unauthorized cards registration. The **Validation Token** generates based on Application's Private Key and client Identity. See how you can generate it using SDK utilities [here...](https://virgilsecurity.com/api-docs/javascript/keys-sdk#obtaining-a-private-validationtoken)
 ```js
 var options = {
      public_key: keyPair.publicKey,
