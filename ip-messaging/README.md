@@ -88,7 +88,7 @@ var options = {
      private_key: keyPair.privateKey,
      identity: {
          type: 'member',
-         value: identity,
+         value: 'Darth Vader',
          validation_token: '%VALIDATION_TOKEN%'
      }
 };
