@@ -1,4 +1,4 @@
-# Quickstart. Adding end-to-end encryption to Twilio IP Messaging.
+# Quickstart. Adding End-to-End Encryption to Twilio IP Messaging.
 
 ## Introducing
 
@@ -94,7 +94,7 @@ twilioClient.createChannel({
 });
 ```
 
-### Send encrypted Messages
+### Send Encrypted Messages
 Once you're a member of a Channel, you can send a Message to it. A Message is a bit of data that is sent first to the Twilio backend, where it is stored for later access by members of the Channel, and then pushed out in real time to all currently online Channel members. Only users subscribed to your Channel will receive your Messages.
 
 ```js
@@ -126,7 +126,7 @@ Promise.all(generalChannel.getMembers().map(function(member) {
 
 Today, a Message is just a string of text. In the future, this may expand to include other media types such as images and binary data. For now, in addition to text Messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
 
-### Receive encrypted Messages
+### Receive Encrypted Messages
 You can also be notified of any new incoming Messages with an event handler. This is likely where you would handle updating your user interface to display new Messages.
 
 ```js
