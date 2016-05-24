@@ -55,7 +55,7 @@ Let's dive into a few of the key techniques you'll need to employ while working 
 ### Generate a New Key Pair
 Generate a new public private key pair for end-to-end encryption
 ```js
-var keyPair = virgil.crypto.generateKeyPair('KEYS_PASSWORD_GOES_HERE');
+var keyPair = virgil.crypto.generateKeyPair();
 ```
 
 ### Publish a Public Key
