@@ -94,6 +94,7 @@ var options = {
 };
 
 virgil.cards.create(options).then(function (card){
+    myCard = card;
     console.log(card);
 });
 ```
@@ -129,8 +130,6 @@ Before you can start sending Messages, you first need a Channel. Here is how you
 twilioClient.createChannel({
     friendlyName: 'general'
 }).then(function(channel) {
-    
-    // channel has been successfully created.
     generalChannel = channel;
 });
 ```
@@ -141,28 +140,26 @@ Once you're a member of a Channel, you can send a Message to it. A Message is a 
 ```js
 // Receive the list of Channel's recipients
 Promise.all(generalChannel.getMembers().map(function(member) {
-    
     // Search for the member’s cards on Virgil Keys service
-    return virgil.cards.search({ 
-        value: member.identity,
-        type: 'member'
-    }).then(function(cards){
-        return { 
-            recipientId: cards[0].id, 
-            publicKey: cards[0].public_key.public_key
-        };
+    return virgil.cards.search({ value: member.identity, type: 'member' })
+        .then(function(cards){
+            return { 
+                recipientId: cards[0].id, 
+                publicKey: cards[0].public_key.public_key
+            };
     });
-    
 }).then(function(recipients) {
-    var msg = $('#chat-input').val();
-    
-    var encryptedMsg = virgil.crypto.encryptStringToBase64(
-        msg, 
-        recipients
-    );
+    var message = $('#chat-input').val();
+    var encryptedMessage = virgil.crypto.encryptStringToBase64(message, recipients);
         
-    generalChannel.sendMessage(encryptedMsg);    
+    generalChannel.sendMessage(encryptedMessage);    
+    console.log(encryptedMessage);
 });
+```
+*Output:*
+
+```
+MIIDBQIBADCCAv4GCSqGSIb3DQEHA6CCAu8wggLrAgECMYICvDCCAVoCAQKgJgQkMDg3YjgwYmMtMzNjYi00MTI1LWI4YTgtYTE3OTEwM2Y3ZjRkMBUGByqGSM49AgEGCisGAQQBl1UBBQEEggEUMIIBEAIBADBbMBUGByqGSM49AgEGCisGAQQBl1UBBQEDQgAEcd8fhKqYlZxvcmmodg7Z3PNhE1LXLJqobouEcRfZaRMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAYBgcogYxxAgUCMA0GCWCGSAFlAwQCAgUAMEEwDQYJYIZIAWUDBAICBQAEMEaJMAvX7S+52BpI5hYyFOc0noIc+qdFFrQanNAtNGBAX/Pxeg5yJ2iAJijyZ8ut9zBRMB0GCWCGSAFlAwQBKgQQ81bklcNOyU/QTatCigSzoAQwHnAcbXk0daExIIS+sr6aIvVuF/o6j+1Rs5bvq2WVN41k/Oir5x7KZTSR7v3nx+fTMIIBWgIBAqAmBCRmNzM4YTUwNi1hMDYwLTQ1MDgtYTJkYS04NjY1NjZlYzg0ODMwFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQSCARQwggEQAgEAMFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARJ5C3hsYuI2Sf14k60Dz5Mv5yD/AsVAzPfsmlreGTC2gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMBgGByiBjHECBQIwDQYJYIZIAWUDBAICBQAwQTANBglghkgBZQMEAgIFAAQwhu7WM1rff9RYsQ+dmfX9Os3Irwm4cm5bIvUlcGXlCfmEsrjTyTg5MGjYLtxbYtL9MFEwHQYJYIZIAWUDBAEqBBCfKdP/gZnkVwJvv4Hdf2eWBDC3czBjV/yPGeGTqBIilHSsrqwK7lVMTBuKR+mR3eNdh+yBIAcOk4rveSUbDuWagDIwJgYJKoZIhvcNAQcBMBkGCWCGSAFlAwQBLgQMfjkCvK3UgXdorcYUmtCHHuSm4yfBacMsniMADAeos7qN7OmNsFU1
 ```
 
 Today, a Message is just a string of text. In the future, this may expand to include other media types such as images and binary data. For now, in addition to text Messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
