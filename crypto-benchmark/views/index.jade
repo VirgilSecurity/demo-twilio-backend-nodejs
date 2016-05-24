@@ -16,10 +16,7 @@ block content
         div(class='form-group')
            label Key Pair type
            select(class='form-control', ng-model='keysType')
-             option(value='Default') Default
-             option(value='RSA_256') RSA_256 (RSA 256 bit)
-             option(value='RSA_512') RSA_512 (RSA 512 bit)
-             option(value='RSA_1024') RSA_1024 (RSA 1024 bit)
+             option(value='Default') Default (Curve25519)
              option(value='RSA_2048') RSA_2048 (RSA 2048 bit)
              option(value='RSA_3072') RSA_3072 (RSA 3072 bit)
              option(value='RSA_4096') RSA_4096 (RSA 4096 bit)
@@ -50,6 +47,10 @@ block content
              option 8
              option 9
              option 10
+             option 25
+             option 50
+             option 100
+             option 150
            
     div(class='form-group')
         label Enter some text to encrypt or generate with&nbsp;
