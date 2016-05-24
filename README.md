@@ -2,6 +2,9 @@
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.
 
+## Quick start guide
+To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging).
+
 [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
 
 ## Publish
@@ -33,6 +36,3 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | VIRGIL_APP_PRIVATE_KEY_PASSWORD   | The application's Private Key password.  |
 | APP_CHANNEL_ADMIN_CARD_ID         | The Virgil Card identifier which represents a Channel admin. (Uses only for channels with history support)  |
 | APP_CHANNEL_ADMIN_PRIVATE_KEY     | The Channel admin's Private Key |
-
-## Quick start guide
-To review the changes required to use Virgil Security's security infrastructure with Twilio IP Messaging please visit [this document](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging).
