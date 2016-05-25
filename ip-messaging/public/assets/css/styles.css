@@ -272,6 +272,11 @@ a[href], button {
 }
 
 .github-link > .github-img {
+    width: 32px;
+    height: 32px;
+}
+
+.github-link > .github-img-small {
     width: 20px;
     height: 20px;
 }
