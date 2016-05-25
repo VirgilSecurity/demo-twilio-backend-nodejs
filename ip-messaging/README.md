@@ -1,10 +1,10 @@
 # Quickstart. Adding End-to-End Encryption to Twilio IP Messaging.
 
-## Introducing
+## Introduction
 
-With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API. Sounds like a plan? Then let’s get cracking!
+With these instructions, you'll learn how to install and integrate the Virgil Crypto API and Twilio IP messaging API. Let's go!
 
-## How it Works
+## How it Works - Basics
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
 
 ##Prerequisites
