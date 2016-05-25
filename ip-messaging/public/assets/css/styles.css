@@ -124,6 +124,7 @@ a[href], button {
     display: flex;
     flex-direction: column;
     background: white;
+    height: 100%;
 }
 
 #chat-container {
@@ -154,9 +155,10 @@ a[href], button {
 .chat {
     display: flex;
     flex-direction: column;
-    height: 100%;
     padding: 0 20px;
     position: relative;
+    overflow: hidden;
+    height: 100%;
 }
 
 .chat > header {
