@@ -86,6 +86,9 @@ Publish a Public Key to the Virgil Keys Service where they are available in an o
 var options = {
      public_key: keyPair.publicKey,
      private_key: keyPair.privateKey,
+     data: {
+         public_key_signature: "%PUBLIC_KEY_SIGNATURE%"
+     }
      identity: {
          type: 'member',
          value: 'Darth Vader',
@@ -106,7 +109,9 @@ virgil.cards.create(options).then(function (card){
    "id":"3e5a5d8b-e0b9-4be6-aa6b-66e3374c05b3",
    "authorized_by":"com.virgilsecurity.twilio-ip-messaging-demo",
    "hash":"QiWtZjZyIQhqZK7+3nZmIEWFBU+qI64EzSuqBcY+E7ZtKPwd4ZyU6gdfU/VzbTn6dHtfahCzHasN...",
-   "data":null,
+   "data": {
+      "public_key_signature": "MFcwDQYJYIZIAWUDBAICBQAERjBEAiBc3KaIF1EYzFZ+x4FzSwS4HBBJ..."
+   },
    "created_at":"2016-05-03T14:34:08+0000",
    "public_key":{  
       "id":"359abe31-3344-453a-a292-fd98a83e500a",
