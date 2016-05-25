@@ -88,7 +88,7 @@ var options = {
      private_key: keyPair.privateKey,
      data: {
          public_key_signature: "%PUBLIC_KEY_SIGNATURE%"
-     }
+     },
      identity: {
          type: 'member',
          value: 'Darth Vader',
