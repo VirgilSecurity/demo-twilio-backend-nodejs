@@ -33,5 +33,3 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
 | VIRGIL_APP_PRIVATE_KEY            | Used to generate **Validation Token**, which is required to publish authorized **Public Keys** to Virgil Keys Service.  |
 | VIRGIL_APP_PRIVATE_KEY_PASSWORD   | The application's Private Key password.  |
-| APP_CHANNEL_ADMIN_CARD_ID         | The Virgil Card identifier which represents a Channel admin. (Uses only for channels with history support)  |
-| APP_CHANNEL_ADMIN_PRIVATE_KEY     | The Channel admin's Private Key |
