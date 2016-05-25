@@ -61,7 +61,7 @@ export class BackendService {
         
         let virgilCrypto = VirgilService.Crypto;
         
-        let responseSign = new virgilCrypto.Buffer(response.headers.get('X-IPM-RESPONSE-SIGN'), 'base64');
+        let responseSign = new virgilCrypto.Buffer(response.headers.get('x-ipm-response-sign'), 'base64');
         let isValid = virgilCrypto.verify(response.text(), BackendService.AppPublicKey, responseSign);
         if (!isValid){
             throw "Response signature is not valid."

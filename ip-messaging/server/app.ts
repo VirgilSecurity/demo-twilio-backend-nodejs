@@ -128,7 +128,7 @@ function signAndSend(res: express.Response, data:any) {
     let responseSign = virgil.crypto
         .sign(responseBody, privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD).toString('base64');
                 
-    res.setHeader('X-IPM-RESPONSE-SIGN', responseSign);
+    res.setHeader('x-ipm-response-sign', responseSign);
     res.send(responseBody);
 }
 
