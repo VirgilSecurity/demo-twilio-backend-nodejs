@@ -16,6 +16,8 @@ import * as path from "path";
 import * as http from "http";
 import * as _ from "lodash";
 
+var bodyParser = require('body-parser');
+
 let VirgilSDK = require('virgil-sdk');
 let virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
 
@@ -28,6 +30,8 @@ const app = express();
 
 app.disable("x-powered-by");
 
+app.use(bodyParser.json());
+
 app.use(express.static(root));
 app.use('/assets/', express.static('./node_modules/'));
 
@@ -35,18 +39,24 @@ app.use('/assets/', express.static('./node_modules/'));
 Authenticate a chat member by generating an Access tokens. One for Virgil SDK and the 
 second one for Twilio IP messaging client.
 */
-app.get('/auth', (request, response) => {
-    var identity = request.query.identity;
+app.post('/auth', (request, response) => {
+    
+    console.log(request.body.public_key);
+    console.log(request.body.identity);
+       
+     
+    var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
+    let appSign = virgil.crypto
+        .sign(request.body.public_key, privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD).toString('base64');
+        
+    var identity = request.body.identity;
     var validationToken = getValidationToken(identity);
-
-    response.send({
+    
+    signAndSend(response, {
         identity: identity,        
+        application_sign: appSign,
         validation_token: validationToken
     });
-});
-
-app.get('/channel-admin', (request, response) => {
-    
 });
 
 app.get('/twilio-token', (request, response) => {
@@ -55,12 +65,12 @@ app.get('/twilio-token', (request, response) => {
     var deviceId = request.query.device;
     var twilioToken = getTwilioToken(appName, identity, deviceId);
 
-    response.send({ twilio_token: twilioToken.toJwt() });
+    signAndSend(response, { twilio_token: twilioToken.toJwt() });
 });
 
 app.get('/virgil-token', (request, response) => {
     var virgilToken = process.env.VIRGIL_ACCESS_TOKEN;
-    response.send({ virgil_token: virgilToken });
+    signAndSend(response,{ virgil_token: virgilToken });
 });
 
 app.get('/history', (request, response, next) => {
@@ -72,7 +82,7 @@ app.get('/history', (request, response, next) => {
     let service = client.services(process.env.TWILIO_IPM_SERVICE_SID);
     
     Promise.all([
-        virgil.cards.search({ value: identity, type: 'member' }),
+        virgil.cards.search({ value: identity, type: 'chat_member' }),
         service.channels(channelSid).messages.list()
     ])
     .then(bundle => {
@@ -94,7 +104,7 @@ app.get('/history', (request, response, next) => {
             m.body = reEncryptedBody;
         });
         
-        response.send(messages);
+        signAndSend(response, messages);
         next();        
     })
     .catch(next);
@@ -111,9 +121,17 @@ app.get('*', function (req, res, next) {
 
 http.createServer(app).listen(8080);
 
-/**
- * Grabs a channel's admin public/private keypair. 
- */
+function signAndSend(res: express.Response, data:any) {
+    let responseBody = JSON.stringify(data);
+    var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
+    
+    let responseSign = virgil.crypto
+        .sign(responseBody, privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD).toString('base64');
+                
+    res.setHeader('X-IPM-RESPONSE-SIGN', responseSign);
+    res.send(responseBody);
+}
+
 function grabChannelAdminKeys(): Promise<any> {
     return null;
 }
@@ -150,7 +168,7 @@ function getValidationToken(identity) {
     // This validation token is generated using app’s Private Key created on
     // Virgil Developer portal.
     var validationToken = VirgilSDK.utils.generateValidationToken(identity,
-        'member',
+        'chat_member',
         privateKey,
         process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 

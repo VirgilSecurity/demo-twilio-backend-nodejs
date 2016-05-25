@@ -83,7 +83,7 @@ export class ChatComponent implements OnInit {
             return;
         }        
         
-        console.log(channel);
+        console.log("Channel Selected", channel);
         
         this.channelMembers = [];        
         this.messages = []; 
@@ -233,9 +233,7 @@ export class ChatComponent implements OnInit {
         this.channelMembers.forEach(m => {
              recipients.push({ recipientId: m.publicKey.id, publicKey: m.publicKey.data });
         })
-        
-        console.log(recipients);
-        
+                
         let message = {
             body: this.newMessage,
             date: Date.now(),
@@ -247,7 +245,9 @@ export class ChatComponent implements OnInit {
         this.messages.push(message);
         
         this.virgil.crypto.encryptAsync(JSON.stringify(message), recipients).then(encryptedMessage => {
-            this.currentChannel.sendMessage(encryptedMessage.toString('base64'));     
+            let encryptedMessageBase64 = encryptedMessage.toString('base64');
+            console.log('Encrypted Message Sent', encryptedMessageBase64);
+            this.currentChannel.sendMessage(encryptedMessageBase64);     
         });     
     }
     
@@ -257,11 +257,23 @@ export class ChatComponent implements OnInit {
     private addMember(member):Promise<any> {             
         return this.virgil.sdk.cards.search({ 
             value: member.identity,
-            type: 'member' 
+            type: 'chat_member' 
         }).then(result => {
             
             var latestCard: any = _.last(_.sortBy(result, 'created_at'));
             if (latestCard){
+                
+                console.log('Recipient', latestCard);
+                
+                let publicKeySign = new this.virgil.crypto.Buffer(latestCard.data.public_key_signature, 'base64');
+                let isValid = this.virgil.crypto.verify(latestCard.public_key.public_key, BackendService.AppPublicKey, publicKeySign);
+                
+                if (!isValid){
+                    throw "Member's Public Key is not valid";
+                }
+                
+                console.log("Member's Public Key is valid");
+                
                 member.publicKey = {
                     id: latestCard.id,
                     identity: latestCard.identity.value,
@@ -290,6 +302,8 @@ export class ChatComponent implements OnInit {
         if (_.some(this.messages, m => m.id == messageObject.id)){
             return;
         }            
+        
+        console.log('Encrypted Message Received', message);
         
         this.messages.push(messageObject);
         this.cd.detectChanges();

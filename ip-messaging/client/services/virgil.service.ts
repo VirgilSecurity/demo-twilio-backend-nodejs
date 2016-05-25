@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
-
 import { BackendService } from './backend.service'
 
 declare var VirgilSDK: any;
+declare var VirgilCrypto: any;
 
 @Injectable()
 export class VirgilService {   
@@ -14,10 +14,14 @@ export class VirgilService {
 
     initialize(): Promise<any> {
         return this.backend.getVirgilToken()
-            .then((data) => {
+            .then(data => {
                 this.sdk = new VirgilSDK(data.virgil_token);
                 this.crypto = this.sdk.crypto;
                 return;
             });
+    }
+    
+    public static get Crypto(): any {
+        return new VirgilSDK('NONE').crypto;
     }
 }

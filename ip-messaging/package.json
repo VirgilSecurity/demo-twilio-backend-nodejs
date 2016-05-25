@@ -32,7 +32,8 @@
     "systemjs": "0.19.27",
     "twilio": "^2.9.1",
     "virgil-sdk":"^1.4.6",
-    "zone.js": "^0.6.12"
+    "zone.js": "^0.6.12",
+    "body-parser": "^1.15.1"
   },
   "devDependencies": {
     "concurrently": "^2.0.0",

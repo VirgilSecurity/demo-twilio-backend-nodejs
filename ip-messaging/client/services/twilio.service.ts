@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-
 import { BackendService } from './backend.service'
 
 declare var Twilio: any;
