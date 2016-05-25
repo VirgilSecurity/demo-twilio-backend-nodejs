@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core'
 export class Account {
     constructor(public id: string,
                 public identity: string,
+                public identityType: string,
                 public publicKey: string,
                 public privateKey: string) { }
                     
@@ -12,6 +13,7 @@ export class Account {
         return new Account(
             accountObject.id, 
             accountObject.identity, 
+            accountObject.identityType,
             accountObject.publicKey, 
             accountObject.privateKey
         );
@@ -31,7 +33,7 @@ export class AccountService {
     }    
     
     public hasAccount(){
-        return this.currentAccount != null;
+        return this.currentAccount != null && this.currentAccount.identityType;
     }
         
     public setCurrentAccount(account:Account){

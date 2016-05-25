@@ -78,7 +78,7 @@ export class AppComponent implements OnInit {
             }
         })
         .then(keysBundle => {
-            var userAccount = new Account(keysBundle.id, keysBundle.identity,
+            var userAccount = new Account(keysBundle.id, keysBundle.identity, 'chat_member',
                 keysBundle.publicKey, keysBundle.privateKey);
                 
             return this.account.setCurrentAccount(userAccount);
