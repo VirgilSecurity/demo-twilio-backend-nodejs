@@ -45,6 +45,10 @@ app.get('/auth', (request, response) => {
     });
 });
 
+app.get('/channel-admin', (request, response) => {
+    
+});
+
 app.get('/twilio-token', (request, response) => {
     var appName = 'VIRGIL_CHAT';
     var identity = request.query.identity;
@@ -106,6 +110,13 @@ app.get('*', function (req, res, next) {
 });
 
 http.createServer(app).listen(8080);
+
+/**
+ * Grabs a channel's admin public/private keypair. 
+ */
+function grabChannelAdminKeys(): Promise<any> {
+    return null;
+}
 
 function getTwilioToken(appName, identity, deviceId) {
 
