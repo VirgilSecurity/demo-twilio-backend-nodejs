@@ -1,4 +1,4 @@
-# Quickstart. Adding End-to-End Encryption to Twilio IP Messaging.
+# Quickstart: Adding End-to-End Encryption to Twilio IP Messaging.
 
 ## Introduction
 
