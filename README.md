@@ -11,6 +11,7 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 There are only few steps required to setup Virgil History service :)
 
 ```
+$ git clone https://github.com/VirgilSecurity/virgil-demo-twilio.git
 $ cd ./ip-messaging
 
 $ npm install
