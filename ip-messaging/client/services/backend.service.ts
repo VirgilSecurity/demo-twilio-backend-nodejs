@@ -26,7 +26,7 @@ export class BackendService {
         let headers = new Headers({ 'Content-Type': 'application/json' });
         let options = new RequestOptions({ headers: headers });
         
-        return this.http.post("/auth", body, options)
+        return this.http.post("/auth/login", body, options)
             .toPromise().then(r => this.verifyAndMapToJson(r));        
     }
 
@@ -34,7 +34,7 @@ export class BackendService {
      * Gets an access token for Twilio service.
     * */
     public getTwilioToken(identity: string, device: string): Promise<any> {
-        return this.http.get(`/twilio-token?identity=${identity}&deviceId=${device}`)
+        return this.http.get(`/auth/twilio-token?identity=${identity}&deviceId=${device}`)
             .toPromise().then(r => this.verifyAndMapToJson(r));   
     }
 
@@ -42,7 +42,7 @@ export class BackendService {
      * Gets an access token for Virgil services.
      * */
     public getVirgilToken(): Promise<any> {
-        return this.http.get('/virgil-token')
+        return this.http.get('/auth/virgil-token')
             .toPromise().then(r => this.verifyAndMapToJson(r));   
     }
     
