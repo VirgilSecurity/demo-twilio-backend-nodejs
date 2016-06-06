@@ -1,4 +1,4 @@
-///<reference path="../typings/browser.d.ts" />
+///<reference path="../typings/index.d.ts" />
 
 import { enableProdMode } from '@angular/core';
 import { bootstrap } from '@angular/platform-browser-dynamic';

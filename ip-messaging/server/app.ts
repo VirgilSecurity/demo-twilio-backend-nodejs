@@ -1,4 +1,4 @@
-/// <reference path="../typings/main.d.ts" />
+/// <reference path="../typings/index.d.ts" />
 /*
 Load Twilio & Virgil configuration from .env config file - the following environment
 variables should be set:
