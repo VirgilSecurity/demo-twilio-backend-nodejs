@@ -18,12 +18,10 @@ import * as parser from 'body-parser'
 import * as express from 'express'
 import * as path from 'path'
 import * as http from 'http'
+import * as _ from 'lodash'
 
-import * as indexRoute from './routes/index-route'
-import * as historyRoute from './routes/history-route'
-import * as authRoute from './routes/auth-route'
-
-import { VirgilService } from './services/virgil-service'
+let VirgilSDK = require('virgil-sdk');
+let Twilio = require('twilio');
 
 /**
  * The application Server.
@@ -31,67 +29,233 @@ import { VirgilService } from './services/virgil-service'
  * @class Server 
  */
 class Server {
-    
-    private rootDir: string;
+
     private app: any;    
-    
-    private virgilService: VirgilService;
-        
+    private virgil: any;
+    private ipMessaging: any;
+
+    private rootDir: string;
+
+    /**
+     * Creates a new @Server instance.
+     */
     public static bootstrap(): Server {
         return new Server();
     }
    
+    /**
+     * Initialized a new instance of @Server class.
+     */
     constructor() {        
         this.app = express();
         
-        //configure application
         this.config();
-        
-        //configure routes
         this.routes();        
     }
     
+    /**
+     * Starts the HTTP server on specified port.
+     */
     public start(port:number): void {
         http.createServer(this.app).listen(port);
     }
     
+    /**
+     * Configurates an application services.
+     */
     private config(): void {        
-        require('dotenv').load();
-        
-        this.rootDir = path.resolve('./public');      
+        require('dotenv').load();           
+
         this.app.disable("x-powered-by");
-        
-        let VirgilSDK = require('virgil-sdk');
-        this.virgilService = new VirgilService(new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN));
+        this.rootDir = path.resolve('./public'); 
+ 
+        this.virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
+
+        var client = new Twilio.IpMessagingClient(process.env.TWILIO_API_KEY, process.env.TWILIO_API_SECRET);
+        this.ipMessaging = client.services(process.env.TWILIO_IPM_SERVICE_SID);
     }
     
+    /**
+     * Configurates an application routes.
+     */
     private routes(): void {
-        
-        //get router
-        let router: express.Router;
-        router = express.Router();
-        
-        console.log(this.virgilService);
         
         this.app.use(express.static(this.rootDir));
         this.app.use('/assets/', express.static('./node_modules/'));
         
-        //create routes
-        var index: indexRoute.IndexRoute = new indexRoute.IndexRoute(this.rootDir, this.virgilService);
-        var history: historyRoute.HistoryRoute = new historyRoute.HistoryRoute(this.rootDir, this.virgilService);
-        var auth: authRoute.AuthRoute = new authRoute.AuthRoute(this.rootDir, this.virgilService);
-        
         //register routes
-        router.get("/auth/login", auth.login.bind(auth.login));
-        router.get("/auth/virgil-token", auth.virgilToken.bind(auth.virgilToken));
-        router.get("/auth/twilio-token", auth.twilioToken.bind(auth.twilioToken));
-        router.get("/history", history.history.bind(history.history));
-        router.get("*", index.index.bind(index.index));
+        this.app.get("/auth/login", (req, res, next) => this.authLoginHandler(req, res, next));
+        this.app.get("/auth/virgil-token", (req, res, next) => this.authVirgilTokenHandler(req, res, next));
+        this.app.get("/auth/twilio-token", (req, res, next) => this.authTwilioTokenHandler(req, res, next));
+        this.app.get("/history", (req, res, next) => this.historyHandler(req, res, next));
+        this.app.get("*", (req, res, next) => this.indexHandler(req, res, next));
+    }
+
+    /**
+     * Handles requests for default HTML page.
+     */
+    private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){
+        if (request.accepts('html')) {                           
+            response.sendFile(this.rootDir + '/index.html');
+        }
+        else {
+            next();
+        }
+    }
+
+    /**
+     * Handles requests for member login to the application.
+     */
+    private authLoginHandler(request: express.Request, response: express.Response, next: express.NextFunction) {
+
+        // TODO: add here your own authentication mechanism.
+
+        let identity = request.body.identity;
         
-        //use router middleware
-        this.app.use(router);
+        let applicationSign = this.signTextUsingAppPrivateKey(request.body.public_key);
+        let validationToken = this.generateValidationToken(identity);
+            
+        this.signAndSend(response, {
+            identity: identity,        
+            application_sign: applicationSign,
+            validation_token: validationToken
+        });
+    }
+
+    /**
+     * Handles requests for Virgil Access Token.
+     */
+    private authVirgilTokenHandler(request: express.Request, response: express.Response, next: express.NextFunction) {
+        var virgilToken = process.env.VIRGIL_ACCESS_TOKEN;
+        this.signAndSend(response, { virgil_token: virgilToken });
+    }
+
+    /**
+     * Handles requests for Twilio IP Messaging Token. 
+     */
+    private authTwilioTokenHandler(request: express.Request, response: express.Response, next: express.NextFunction){
+        var appName = 'VIRGIL_CHAT';
+        var identity = request.query.identity;
+        var deviceId = request.query.device;
+                
+        // create a unique ID for the client on their current device
+        var endpointId = appName + ':' + identity + ':' + deviceId;
+
+        // create a "grant" which enables a client to use IPM as a given user,
+        // on a given device
+        var ipmGrant = new Twilio.AccessToken.IpMessagingGrant({
+            serviceSid: process.env.TWILIO_IPM_SERVICE_SID,
+            endpointId: endpointId
+        });
+
+        // create an access token which we will sign and return to the client,
+        // containing the grant we just created
+        var token = new Twilio.AccessToken(
+            process.env.TWILIO_ACCOUNT_SID,
+            process.env.TWILIO_API_KEY,
+            process.env.TWILIO_API_SECRET
+        );
+
+        token.addGrant(ipmGrant);
+        token.identity = identity;
+
+        this.signAndSend(response, { twilio_token: token.toJwt() });
+    }
+
+    /**
+     * Handles requests for channel's message history.
+     */
+    private historyHandler(request: express.Request, response: express.Response, next: express.NextFunction) {
+
+        let identity = request.query.identity;
+        let channelSid = request.query.channelSid;   
+                            
+        Promise.all([
+            this.searchChannelMemberCard(identity),
+            this.ipMessaging.channels(channelSid).messages.list()
+        ])
+        .then(bundle => {
+                
+            let recipientCard: any = bundle[0];                
+            let messages: Array<any> = bundle[1].messages;                   
+                    
+            _.forEach(messages, m => {           
+                let decryptedBody = this.decryptTextForChannelAdmin(m.body);                        
+                let encryptedBody = this.virgil.crypto.encryptStringToBase64(
+                    decryptedBody, recipientCard.id, recipientCard.public_key.public_key);
+                            
+                m.body = encryptedBody;
+            });
+                     
+            this.signAndSend(response, messages);
+            next();        
+        })
+        .catch(next);
+    }
+     
+     /**
+      * Decrypts a message using channel admin's Private Key.  
+      */
+     private decryptTextForChannelAdmin(encryptedText: string): string {
+         
+         let chatAdminPrivateKey = new Buffer(process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY, 'base64').toString();   
+         
+         return this.virgil.crypto.decryptStringFromBase64(
+             encryptedText, 
+             process.env.APP_CHANNEL_ADMIN_CARD_ID, 
+             chatAdminPrivateKey);
+     }
+
+    /**
+     * Loads latest member's Public Key from Virgil Services.
+     */
+    private searchChannelMemberCard(member: string) {
+        return this.virgil.cards.search({ value: member, type: 'chat_member' }).then(cards => {
+            let latestCard: any = _.last(_.sortBy(cards, 'created_at'));
+            return latestCard;
+        })
+    }
+
+    /**
+     * Sends a response to the client with the signed body, to prevent MitM attacks.
+     */
+    private signAndSend(response: express.Response, data: any) {
+        
+        let responseBody = JSON.stringify(data);        
+        let responseSign = this.signTextUsingAppPrivateKey(responseBody);
+                        
+        response.setHeader('x-ipm-response-sign', responseSign);
+        response.send(responseBody);
+    }
+
+    /**
+     * Signs a text using application Private Key defined in .env file.
+     */
+    private signTextUsingAppPrivateKey(text: string){
+        let privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
+                  
+        let signBase64 = this.virgil.crypto.sign(text, privateKey, 
+            process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD).toString('base64');         
+         
+        return signBase64;
+    }
+
+    /**
+     * Generates a Validation Token for specified identity.
+     */
+    private generateValidationToken(identity) {
+        
+        var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
+
+        // this validation token is generated using app’s Private Key created on
+        // Virgil Developer portal.
+        
+        var validationToken = VirgilSDK.Utils.generateValidationToken(identity, 
+            'chat_member', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
+
+        return validationToken;
     }
 }
 
 let server = Server.bootstrap();
-server.start(8080);
+server.start(8080); 
