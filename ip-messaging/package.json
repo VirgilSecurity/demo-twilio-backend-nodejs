@@ -38,6 +38,6 @@
   "devDependencies": {
     "concurrently": "^2.0.0",
     "typescript": "^1.8.10",
-    "typings": "^0.8.1"
+    "typings" : "^1.0.4"
   }
 }

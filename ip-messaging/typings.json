@@ -1,15 +1,14 @@
 {
-  "ambientDependencies": {
-    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654",
+  "globalDependencies": {
+    "body-parser": "registry:dt/body-parser#0.0.0+20160317120654",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160602141504",
     "express": "registry:dt/express#4.0.0+20160317120654",
-    "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160322035842",
-    "jasmine": "registry:dt/jasmine#2.2.0+20160412134438",
+    "express-serve-static-core": "registry:dt/express-serve-static-core#0.0.0+20160602151406",
+    "jasmine": "registry:dt/jasmine#2.2.0+20160505161446",
     "lodash": "registry:dt/lodash#3.10.0+20160330154726",
     "mime": "registry:dt/mime#0.0.0+20160316155526",
-    "node": "registry:dt/node#4.0.0+20160412142033",
-    "serve-static": "registry:dt/serve-static#1.7.1+20160104095738"
-  },
-  "dependencies": {
-    "moment": "registry:npm/moment#2.10.5+20160211003958"
+    "moment": "registry:dt/moment#2.8.0+20160316155526",
+    "node": "registry:dt/node#6.0.0+20160602155235",
+    "serve-static": "registry:dt/serve-static#0.0.0+20160501131543"
   }
 }
