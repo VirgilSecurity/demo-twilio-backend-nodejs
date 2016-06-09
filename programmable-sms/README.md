@@ -2,18 +2,6 @@
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable SMS. Let's go!
 
-## Prerequisites
-
-If you haven't yet, read over the REST Quickstart for voice calls, as this example utilizes concepts introduced in that guide.
-
-### Obtaining an Access Token
- 
-First you must create a free Virgil Security developer's account by signing up [here](https://developer.virgilsecurity.com/account/signup). Once you have your account you can [sign in](https://developer.virgilsecurity.com/account/signin) and generate an access token for your application.
- 
-The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account.
- 
-Use this token to initialize the SDK client [here](#lets-get-started).
-
 ### Install
  
 Use NuGet Package Manager (Tools -> Library Package Manager -> Package Manager Console) to install Virgil.SDK and Twilio packages, running the command:
@@ -31,14 +19,14 @@ I think it's time we threw a Star Wars party. We are going to invite our friends
 
 ```csharp
 // set our AccountSid and AuthToken
-string accountSid = "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
-string authToken = "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY";
+string accountSid = "%TWILIO_ACCOUNT_SID%";
+string authToken = "%TWILIO_AUTH_TOKEN%";
 
 // instantiate a new Twilio Rest Client
 var twilio = new TwilioRestClient(accountSid, authToken);
 
 // instantiate a new Virgil Rest Client
-var virgil = ServiceHub.Create("%ACCESS_TOKEN%");
+var virgil = ServiceHub.Create("%VIRGIL_ACCESS_TOKEN%");
 ```
 
 ### Send SMS Messages
@@ -86,7 +74,8 @@ foreach (var personCards in peopleCards)
 
 Lets look at the details:
 
-  - First, head over to the Twilio website and log into your [Twilio Account page](https://www.twilio.com/user/account/). On the Dashboard near the top you will find your AccountSid and AuthToken. Copy those values and paste them into AccountSid and AuthToken variables.
+  - First, head over to the Twilio website and log into your [Twilio Account page](https://www.twilio.com/user/account/). On the Dashboard near the top you will find your AccountSid and AuthToken. Copy those values and paste them into %TWILIO_ACCOUNT_SID% and %TWILIO_AUTH_TOKEN% placeholders.
+  - Second, you must create a free Virgil Security developer's account by signing up [here](https://developer.virgilsecurity.com/account/signup). Once you have your account you can [sign in](https://developer.virgilsecurity.com/account/signin) and generate an access token for your application. Paste it into "%VIRGIL_ACCESS_TOKEN%" placeholder.
   - Next, we instantiate a new TwilioRestClient and Virgil ServiceHub REST clients.
   - Next, we search for peaple Public Keys and encrypt messages for them.
   - Next, we call the SendMessage method with the To, From and Body of the message.
