@@ -25,7 +25,7 @@ PM> Install-Package Twilio
 
 ## Let's Get Started 
 
-I think it's time we threw a Star Wars party. We are going to invite our friends via SMS messages. We are seriouse about his event, so we gonna send encrypted messages to make sure that only True people show up. Using Twilio & Virgil will make this this task a piece of cake.
+I think it's time we threw a Star Wars party. We are going to invite our friends via SMS messages. We are serious about this event, so we're gonna send encrypted messages to make sure that only True people show up. Using Twilio & Virgil will make this task a piece of cake.
 
 ### Initialization
 
@@ -88,7 +88,7 @@ Lets look at the details:
 
   - First, head over to the Twilio website and log into your [Twilio Account page](https://www.twilio.com/user/account/). On the Dashboard near the top you will find your AccountSid and AuthToken. Copy those values and paste them into AccountSid and AuthToken variables.
   - Next, we instantiate a new TwilioRestClient and Virgil ServiceHub REST clients.
-  - Next, we search for peaple Public Keys and encrypt messages for them.
+  - Next, we search for people's Public Keys and encrypt messages for them.
   - Next, we call the SendMessage method with the To, From and Body of the message.
 
-If your REST request was successful, the SMS has been successfully queued for transmission. The SMS will be sent as soon as possible at a maximum rate of [1 message per second](https://www.twilio.com/faq/sms/) per 'From' phone number.
+If your REST request is successful, the SMS will successfully be queued for transmission. The SMS will be sent as soon as possible at a maximum rate of [1 message per second](https://www.twilio.com/faq/sms/) per 'From' phone number.
