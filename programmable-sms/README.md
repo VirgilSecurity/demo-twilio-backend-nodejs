@@ -74,8 +74,8 @@ foreach (var personCards in peopleCards)
 
 Lets look at the details:
 
-  - First, head over to the Twilio website and log into your [Twilio Account page](https://www.twilio.com/user/account/). On the Dashboard near the top you will find your AccountSid and AuthToken. Copy those values and paste them into %TWILIO_ACCOUNT_SID% and %TWILIO_AUTH_TOKEN% placeholders.
-  - Second, you must create a free Virgil Security developer's account by signing up [here](https://developer.virgilsecurity.com/account/signup). Once you have your account you can [sign in](https://developer.virgilsecurity.com/account/signin) and generate an access token for your application. Paste it into "%VIRGIL_ACCESS_TOKEN%" placeholder.
+  - First, head over to the Twilio website and log into your [Twilio Account page](https://www.twilio.com/user/account/). On the Dashboard near the top you will find your AccountSid and AuthToken. Copy those values and paste them into ```%TWILIO_ACCOUNT_SID%``` and ```%TWILIO_AUTH_TOKEN%``` placeholders.
+  - Second, you must create a free Virgil Security developer's account by signing up [here](https://developer.virgilsecurity.com/account/signup). Once you have your account you can [sign in](https://developer.virgilsecurity.com/account/signin) and generate an access token for your application. Paste it into ```%VIRGIL_ACCESS_TOKEN%``` placeholder.
   - Next, we instantiate a new TwilioRestClient and Virgil ServiceHub REST clients.
   - Next, we search for people's Public Keys and encrypt messages for them.
   - Next, we call the SendMessage method with the To, From and Body of the message.
