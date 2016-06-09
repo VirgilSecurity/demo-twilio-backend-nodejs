@@ -16,10 +16,11 @@ Use this token to initialize the SDK client [here](#lets-get-started).
 
 ### Install
  
-Use NuGet Package Manager (Tools -> Library Package Manager -> Package Manager Console) to install Virgil.SDK package, running the command::
+Use NuGet Package Manager (Tools -> Library Package Manager -> Package Manager Console) to install Virgil.SDK and Twilio packages, running the command:
  
-```sh
+```
 PM> Install-Package Virgil.SDK
+PM> Install-Package Twilio
 ```
 
 ## Let's Get Started 
@@ -74,7 +75,7 @@ foreach (var personCards in peopleCards)
         var encryptedMessage = Convert.ToBase64String(tinyCipher.GetPackage(0));
 
         // Send a new outgoing SMS by POSTing to the Messages resource
-        client.SendMessage(
+        twilio.SendMessage(
             SMS.Constants.TwilioPhoneNumber, // From number, must be an SMS-enabled Twilio number
             personCard.Identity.Value,       // To person's phone number
             encryptedMessage);
