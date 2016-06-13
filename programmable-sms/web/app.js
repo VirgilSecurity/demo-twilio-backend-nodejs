@@ -24,7 +24,7 @@ app.get('/validate-phone-number', function (req, res, next) {
     var phoneNumber = req.query.phoneNumber;
     var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
 
-    var validationToken = virgil.utils.generateValidationToken(phoneNumber, 
+    var validationToken = virgil.utils.generateValidationToken('+' + phoneNumber, 
         'phone', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 
     res.send(validationToken);        
