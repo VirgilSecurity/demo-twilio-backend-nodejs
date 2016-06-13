@@ -10,9 +10,9 @@
     using Virgil.Crypto;
     using Virgil.SDK.Identities;
     using Virgil.SDK.Models;
-    using Virgil.SDK.Utils;
     using Virgil.Demo.SMS.Common;
     using Virgil.SDK;
+
     using Xamarin.Forms;
 
     /// <summary>
@@ -20,12 +20,8 @@
     /// </summary>
     public class MainPageModel : INotifyPropertyChanged
     {
-        private static readonly string VirgilAccessToken = "%VIRGIL_ACCESS_TOKEN%";
-        private static readonly string VirgilAppPrivateKey = "%VIRGIL_APP_PRIVATE_KEY%";
-        private static readonly string VirgilAppPrivateKeyPassword = "%VIRGIL_APP_PRIVATE_KEY_PASSWORD%";
-        
         private readonly IPhoneService phoneService;
-        private readonly ServiceHub serviceHub;
+        private ServiceHub serviceHub;
 
         private bool isLoading;
         private string loadingText;
@@ -36,7 +32,6 @@
 
         public MainPageModel(IPhoneService phoneService)
         {
-            this.serviceHub = ServiceHub.Create(VirgilAccessToken);
             this.phoneService = phoneService;
         }
 
@@ -79,8 +74,13 @@
             this.tinyCipher = new VirgilTinyCipher(120);
 
             var number = this.phoneService.GetPhoneNumber();
+            
+            var client = new System.Net.Http.HttpClient();
+            var virgilToken = await client.GetStringAsync("https://demo-sms.virgilsecurity.com/virgil-token");
 
-            await LoadKeys(number);
+            this.serviceHub = ServiceHub.Create(virgilToken);
+
+            await this.LoadKeys(number);
 
             this.phoneService.SmsReceived += this.OnSmsReceived;
         }
@@ -108,11 +108,13 @@
             var cards = await this.serviceHub.Cards.Search(phoneNumber);
             this.myCard = cards.OrderBy(it => it.CreatedAt).LastOrDefault();
 
+            var validationToken = await this.ValidatePhoneNumber(phoneNumber);
+
             var identityInfo = new IdentityInfo
             {
                 Type = "phone",
                 Value = phoneNumber,
-                ValidationToken = this.GetValidationToken(phoneNumber)
+                ValidationToken = validationToken
             };
 
             if (this.myCard != null)
@@ -144,12 +146,12 @@
             this.LoadingText = "Waiting for incoming messages";
         }
 
-        private string GetValidationToken(string phoneNumber)
+        private async Task<string> ValidatePhoneNumber(string phoneNumber)
         {
-            var appPrivateKey = Encoding.UTF8.GetBytes(VirgilAppPrivateKey);
-            var appPrivateKeyPassword = VirgilAppPrivateKeyPassword;
+            var client = new System.Net.Http.HttpClient();
+            var virgilToken = await client.GetStringAsync($"https://demo-sms.virgilsecurity.com/validate-phone-number?phoneNumber={phoneNumber}");
 
-            return ValidationTokenGenerator.Generate(phoneNumber, "phone", appPrivateKey, appPrivateKeyPassword);
+            return virgilToken;
         }
 
         #region INotifyPropertyChanged Implementation
