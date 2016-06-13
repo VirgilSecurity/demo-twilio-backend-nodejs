@@ -6,6 +6,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('lodash');
 var twilio = require('twilio');
+var virgil = require('virgil-sdk');
 var bodyParser = require('body-parser');
 
 var app = express();
@@ -21,11 +22,12 @@ app.get('/virgil-token', function (req, res, next) {
 app.get('/validate-phone-number', function (req, res, next) {        
 
     var phoneNumber = req.query.phoneNumber;
+    var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
 
-    var validationToken = VirgilSDK.Utils.generateValidationToken(phoneNumber, 
-        'phone', process.env.VIRGIL_APP_PRIVATE_KEY, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
+    var validationToken = virgil.utils.generateValidationToken(phoneNumber, 
+        'phone', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 
-    return validationToken;        
+    res.send(validationToken);        
 });
 
 app.post('/send-sms', function (req, res, next) {
