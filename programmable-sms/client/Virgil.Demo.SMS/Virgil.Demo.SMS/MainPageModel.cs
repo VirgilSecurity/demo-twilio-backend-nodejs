@@ -74,11 +74,18 @@
             this.tinyCipher = new VirgilTinyCipher(120);
 
             var number = this.phoneService.GetPhoneNumber();
-            
-            var client = new System.Net.Http.HttpClient();
-            var virgilToken = await client.GetStringAsync("https://demo-sms.virgilsecurity.com/virgil-token");
 
-            this.serviceHub = ServiceHub.Create(virgilToken);
+            try
+            {
+                var client = new System.Net.Http.HttpClient();
+                var virgilToken = await client.GetStringAsync("https://demo-sms.virgilsecurity.com/virgil-token");
+
+                this.serviceHub = ServiceHub.Create(virgilToken);
+            }
+            catch (Exception ex)
+            {
+                ;
+            }
 
             await this.LoadKeys(number);
 
@@ -148,8 +155,10 @@
 
         private async Task<string> ValidatePhoneNumber(string phoneNumber)
         {
+            var number = phoneNumber.Replace("+", "");
+
             var client = new System.Net.Http.HttpClient();
-            var virgilToken = await client.GetStringAsync($"https://demo-sms.virgilsecurity.com/validate-phone-number?phoneNumber={phoneNumber}");
+            var virgilToken = await client.GetStringAsync($"https://demo-sms.virgilsecurity.com/validate-phone-number?phoneNumber={number}");
 
             return virgilToken;
         }
