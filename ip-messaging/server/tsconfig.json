@@ -2,8 +2,8 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "moduleResolution": "node",
         "sourceRoot": "./server",
+        "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
@@ -11,8 +11,8 @@
         "noImplicitAny": false
     },
     "exclude": [
-        "./node_modules",
-        "./typings/browser",
-        "./typings/browser.d.ts"
+        "../node_modules",
+        "../typings/browser",
+        "../typings/browser.d.ts"
     ]
 }

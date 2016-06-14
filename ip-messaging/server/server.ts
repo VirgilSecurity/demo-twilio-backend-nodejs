@@ -1,4 +1,4 @@
-/// <reference path="./typings/index.d.ts" />
+/// <reference path="../typings/index.d.ts" />
 /*
 This application should give you a ready-made starting point for writing your own end-to-end 
 encrypted messaging apps with Virgil Security & Twilio IP Messaging. Before we begin, we need 
@@ -67,7 +67,7 @@ class Server {
         require('dotenv').load();           
 
         this.app.disable("x-powered-by");
-        this.rootDir = path.resolve('./public'); 
+        this.rootDir = path.resolve('../public'); 
  
         this.virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
 
@@ -80,8 +80,11 @@ class Server {
      */
     private routes(): void {
         
+        console.log(this.rootDir);
+        
+
         this.app.use(express.static(this.rootDir));
-        this.app.use('/assets/', express.static('./node_modules/'));
+        this.app.use('/assets/', express.static('../node_modules/'));
 
         this.app.use(parser.json())
         
