@@ -11,8 +11,8 @@
         "noImplicitAny": false
     },
     "exclude": [
-        "../node_modules",
-        "../typings/browser",
-        "../typings/browser.d.ts"
+        "./node_modules",
+        "./typings/browser",
+        "./typings/browser.d.ts"
     ]
 }
