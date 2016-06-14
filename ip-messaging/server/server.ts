@@ -82,6 +82,8 @@ class Server {
         
         this.app.use(express.static(this.rootDir));
         this.app.use('/assets/', express.static('./node_modules/'));
+
+        this.app.use(parser.json())
         
         //register routes
         this.app.post("/auth/login", (req, res, next) => this.authLoginHandler(req, res, next));
