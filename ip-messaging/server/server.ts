@@ -252,7 +252,7 @@ class Server {
         // this validation token is generated using app’s Private Key created on
         // Virgil Developer portal.
         
-        var validationToken = VirgilSDK.Utils.generateValidationToken(identity, 
+        var validationToken = VirgilSDK.utils.generateValidationToken(identity, 
             'chat_member', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 
         return validationToken;
