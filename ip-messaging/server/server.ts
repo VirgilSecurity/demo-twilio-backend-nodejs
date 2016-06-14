@@ -84,7 +84,7 @@ class Server {
         this.app.use('/assets/', express.static('./node_modules/'));
         
         //register routes
-        this.app.get("/auth/login", (req, res, next) => this.authLoginHandler(req, res, next));
+        this.app.post("/auth/login", (req, res, next) => this.authLoginHandler(req, res, next));
         this.app.get("/auth/virgil-token", (req, res, next) => this.authVirgilTokenHandler(req, res, next));
         this.app.get("/auth/twilio-token", (req, res, next) => this.authTwilioTokenHandler(req, res, next));
         this.app.get("/history", (req, res, next) => this.historyHandler(req, res, next));
