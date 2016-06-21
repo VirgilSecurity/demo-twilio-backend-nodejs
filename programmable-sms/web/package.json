@@ -1,0 +1,16 @@
+{
+  "name": "virgil-twilio-programmable-sms",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.13.4",
+    "dotenv": "^2.0.0",
+    "lodash": "^4.13.1",
+    "twilio": "^2.9.1",
+    "virgil-sdk": "^1.4.7",
+    "body-parser": "^1.15.1"
+  }
+}

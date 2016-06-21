@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Virgil & Twilio SMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css"/>
+    <link rel="stylesheet" href="/css/main.css"/>
+    
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"   
+            integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   
+            crossorigin="anonymous"></script>    
+    <script src="https://downloads.virgilsecurity.com/packages/javascript/sdk/1.5.0/virgil-sdk.min.js" 
+            integrity="sha256-i2F+5hePBKug9xDH1SqDomaDygfc9yZ68ugZNjJtjFc="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/lodash/4.13.1/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.js"></script>
+</head>
+<body>
+    <div class="ui middle aligned center aligned grid">
+        <div class="column">
+            <img src="/img/twilio-shield.png" />
+            <h3>Virgil & Twilio</h3>
+            <h5>Programmable SMS</h5>
+            <form id="form" class="ui form">
+                <input id="phone-code" type="hidden" value="{{ PHONE_CODE }}" />
+                <div class="ui success message">
+                    <p>The SMS message has been successfully sent.</p>
+                </div>
+                <div class="ui error message">
+                    <p id="error-msg" ></p>
+                </div>
+                <div class="field">
+                    <div class="ui labeled input">
+                        <div class="ui label">
+                            {{ PHONE_CODE }}
+                        </div>                        
+                        <input id="to" name="to" type="text" placeholder="Phone Number" />
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="field">
+                        <textarea id="msg" name="msg" rows="4" maxlength="71" placeholder="Enter text message here"></textarea>
+                    </div>
+                </div>
+                <button id="sendMessageButton" class="ui button" type="button">Send Message</button>
+            </form>
+        </div>
+    </div>
+    <script src="/js/main.js"></script>
+    <script>
+        var app = SMSApp.bootstrap();
+        app.initialize();
+    </script>
+</body>
+</html>

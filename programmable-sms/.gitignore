@@ -1,0 +1,10 @@
+node_modules
+public/assets/js/app
+.idea
+typings
+server/**/*.js
+server/**/*.js.map
+npm-debug.log
+.env
+
+/client/Virgil.Demo.SMS.Sender/App.config
