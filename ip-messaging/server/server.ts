@@ -64,10 +64,10 @@ class Server {
      * Configurates an application services.
      */
     private config(): void {        
-        require('dotenv').load();           
+        require('dotenv').load();          
 
         this.app.disable("x-powered-by");
-        this.rootDir = path.resolve('../public'); 
+        this.rootDir = path.resolve(__dirname + '/../public'); 
  
         this.virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
 
@@ -79,12 +79,8 @@ class Server {
      * Configurates an application routes.
      */
     private routes(): void {
-        
-        console.log(this.rootDir);
-        
-
         this.app.use(express.static(this.rootDir));
-        this.app.use('/assets/', express.static('../node_modules/'));
+        this.app.use('/assets/', express.static(__dirname + '/../node_modules/'));
 
         this.app.use(parser.json())
         

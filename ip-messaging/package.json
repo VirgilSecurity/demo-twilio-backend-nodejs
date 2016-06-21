@@ -2,7 +2,7 @@
   "name": "virgil-twilio-ip-messaging",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"tsc -w -p ./client\" \"tsc -w -p ./server\"",
+    "start": "concurrently \"tsc -p ./client\" \"tsc -p ./server\" \"node ./server/server.js\" ",
     "postinstall": "typings install",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
