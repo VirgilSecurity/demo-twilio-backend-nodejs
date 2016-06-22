@@ -21,7 +21,7 @@ $ npm start
 ## Configuration
 
 ```
-$ cp .env.example .env
+$ cp ./server/.env.example ./server/.env
 ```
 Set Twilio & Virgil environment variables declared in `.env` file.
 
