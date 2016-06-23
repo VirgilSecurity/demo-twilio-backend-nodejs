@@ -191,3 +191,7 @@ $RECYCLE.BIN/
 # =========================
 # Setup temp files
 # =========================
+
+*.virgilpass
+*.virgilkey
+*.virgilcard
