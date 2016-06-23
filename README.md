@@ -18,6 +18,8 @@ $ npm install
 $ npm start
 ```
 
+Use url [http://localhost:8080](http://localhost:8080) to open your IP Messaging Chat
+
 ## Configuration
 
 ```
