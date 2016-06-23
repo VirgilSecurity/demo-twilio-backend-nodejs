@@ -8,3 +8,7 @@ client/**/*.js
 client/**/*.js.map
 npm-debug.log
 .env
+.virgilpass
+.virgilkey
+.virgilcard
+.vkeys

@@ -2,12 +2,14 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import * as _ from 'lodash';
 
-import { VirgilService } from '../services/virgil.service'
+import { VirgilService, VirgilSDK } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
 import { LoginComponent } from './login.component';
 import { ChatComponent } from './chat.component';
 import { Account, AccountService } from '../services/account.service'
+
+declare var APP_CARD_ID: any;
 
 @Component({
     selector: 'ipm-app',
@@ -89,10 +91,25 @@ export class AppComponent implements OnInit {
     }
 
     initializeServices(identity:string): Promise<any> {
-        return Promise.all([this.virgil.initialize(), this.twilio.initialize(identity)])
-            .then(() => {
-                console.log('Services has been successfully initialized.');                
+        
+        return this.backend.getVirgilToken()
+            .then(data => {
+                this.virgil.initialize(data.virgil_token);
+
+                return this.virgil.sdk.searchGlobal({
+                    value: APP_CARD_ID,
+                    type: VirgilSDK.IdentityTypes.application
+                });              
+            })
+            .then(cards => {
+                this.backend.setAppPublicKey(cards[0].public_key.public_key);
+                return this.backend.getTwilioToken(identity, 'web');
+            })
+            .then(data => {
+                this.twilio.initialize(data.twilio_token);
                 this.twilio.client.on('tokenExpired', this.onLogout.bind(this));
+
+                console.log('Services has been successfully initialized.');  
             });
     }
     

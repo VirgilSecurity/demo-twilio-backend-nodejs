@@ -5,15 +5,8 @@ import * as _ from 'lodash'
 
 @Injectable()
 export class BackendService {
-    
-    // hardcoded application's Public Key, uses to prevent 
-    // men-in-the-middle attacs.
-    
-    public static AppPublicKey: string = 
-        "-----BEGIN PUBLIC KEY-----"+
-        "\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEQLTCR+NkPokcgHPTWi6kwSPByatN" + 
-        "\ns5TT38K9QXqEyM/pqQtbwPQ35W0iv/wgG9+jk1dPMklnBIeK3RlXsRu8sg==\n" + 
-        "-----END PUBLIC KEY-----"; 
+        
+    private appPublicKey: string; 
         
     constructor(
         private http: Http) {}
@@ -43,7 +36,8 @@ export class BackendService {
      * */
     public getVirgilToken(): Promise<any> {
         return this.http.get('/auth/virgil-token')
-            .toPromise().then(r => this.verifyAndMapToJson(r));   
+            .toPromise()
+            .then(r => Promise.resolve(r.json()));   
     }
     
     /**
@@ -53,7 +47,21 @@ export class BackendService {
         return this.http.get(`/history?identity=${identity}&channelSid=${channelSid}`)
             .toPromise().then(r => this.verifyAndMapToJson(r));   
     }
-    
+
+    /**
+     * Sets the Application Public Key, uses to prevent men-in-the-middle attacs.
+     */
+    public setAppPublicKey(publicKey: string) {
+        this.appPublicKey = publicKey;
+    }
+
+    /**
+     * Gets an application's Public Key. 
+     */
+    public get AppPublicKey(): string {
+        return this.appPublicKey;
+    } 
+
     /**
      * Verifies resoponse using application's Public Key.
      */
@@ -62,7 +70,7 @@ export class BackendService {
         let virgilCrypto = VirgilService.Crypto;
         
         let responseSign = new virgilCrypto.Buffer(response.headers.get('x-ipm-response-sign'), 'base64');
-        let isValid = virgilCrypto.verify(response.text(), BackendService.AppPublicKey, responseSign);
+        let isValid = virgilCrypto.verify(response.text(), this.appPublicKey, responseSign);
         if (!isValid){
             throw "Response signature is not valid."
         }

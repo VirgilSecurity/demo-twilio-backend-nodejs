@@ -11,12 +11,8 @@ export class TwilioService {
     
     constructor(private backend: BackendService) { }
         
-    initialize(identity:string): Promise<any> {
-        return this.backend.getTwilioToken(identity, 'web')
-            .then((data) => {
-                this.accessManager = new Twilio.AccessManager(data.twilio_token);
-                this.client = new Twilio.IPMessaging.Client(this.accessManager);
-                return;
-            });
+    initialize(accessToken: string) {
+        this.accessManager = new Twilio.AccessManager(accessToken);
+        this.client = new Twilio.IPMessaging.Client(this.accessManager);
     }
 }

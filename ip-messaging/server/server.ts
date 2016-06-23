@@ -10,10 +10,11 @@ TWILIO_API_SECRET=
 TWILIO_IPM_SERVICE_SID=
 
 VIRGIL_ACCESS_TOKEN=
-VIRGIL_APP_PRIVATE_KEY=
-VIRGIL_APP_PRIVATE_KEY_PASSWORD=
+VIRGIL_APP_KEY_PATH=
+VIRGIL_APP_KEY_PASSWORD=
 */
 
+import * as fs from 'fs'
 import * as parser from 'body-parser'
 import * as express from 'express'
 import * as path from 'path'
@@ -30,7 +31,8 @@ let Twilio = require('twilio');
  */
 class Server {
 
-    private app: any;    
+    private app: any;   
+    private virgilAppPass: any; 
     private virgil: any;
     private ipMessaging: any;
 
@@ -64,7 +66,10 @@ class Server {
      * Configurates an application services.
      */
     private config(): void {        
-        require('dotenv').load();          
+        require('dotenv').load();         
+
+        let fileText = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
+        this.virgilAppPass = JSON.parse(fileText.toString());
 
         this.app.disable("x-powered-by");
         this.rootDir = path.resolve(__dirname + '/../public'); 
@@ -79,8 +84,9 @@ class Server {
      * Configurates an application routes.
      */
     private routes(): void {
-        this.app.use(express.static(this.rootDir));
-        this.app.use('/assets/', express.static(__dirname + '/../node_modules/'));
+        //this.app.use(express.static(this.rootDir));
+        this.app.use(express.static(this.rootDir + '/assets/'));
+        this.app.use(express.static(__dirname + '/../node_modules/'));
 
         this.app.use(parser.json())
         
@@ -89,19 +95,20 @@ class Server {
         this.app.get("/auth/virgil-token", (req, res, next) => this.authVirgilTokenHandler(req, res, next));
         this.app.get("/auth/twilio-token", (req, res, next) => this.authTwilioTokenHandler(req, res, next));
         this.app.get("/history", (req, res, next) => this.historyHandler(req, res, next));
-        this.app.get("*", (req, res, next) => this.indexHandler(req, res, next));
+        this.app.get("/", (req, res, next) => this.indexHandler(req, res, next));
     }
 
     /**
      * Handles requests for default HTML page.
      */
-    private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){
-        if (request.accepts('html')) {                           
-            response.sendFile(this.rootDir + '/index.html');
-        }
-        else {
-            next();
-        }
+    private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){       
+
+        fs.readFile(this.rootDir + '/index.html', 'utf8', (err, data) => { 
+            response.writeHead(200, {'Content-Type': 'text/html'});
+            var indexData = data.replace(/{{ APP_CARD_ID }}/g, this.virgilAppPass.card.id);
+            response.write(indexData);
+            response.end();
+        });
     }
 
     /**
@@ -175,8 +182,7 @@ class Server {
             this.searchChannelMemberCard(identity),
             this.ipMessaging.channels(channelSid).messages.list()
         ])
-        .then(bundle => {
-                
+        .then(bundle => {                
             let recipientCard: any = bundle[0];                
             let messages: Array<any> = bundle[1].messages;                   
                     
@@ -232,11 +238,9 @@ class Server {
     /**
      * Signs a text using application Private Key defined in .env file.
      */
-    private signTextUsingAppPrivateKey(text: string){
-        let privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
-                  
-        let signBase64 = this.virgil.crypto.sign(text, privateKey, 
-            process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD).toString('base64');         
+    private signTextUsingAppPrivateKey(text: string){                  
+        let signBase64 = this.virgil.crypto.sign(text, this.virgilAppPass.privateKey, 
+            process.env.VIRGIL_APP_KEY_PASSWORD).toString('base64');         
          
         return signBase64;
     }
@@ -246,13 +250,11 @@ class Server {
      */
     private generateValidationToken(identity) {
         
-        var privateKey = new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64').toString();
-
         // this validation token is generated using app’s Private Key created on
         // Virgil Developer portal.
         
         var validationToken = VirgilSDK.utils.generateValidationToken(identity, 
-            'chat_member', privateKey, process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
+            'chat_member', this.virgilAppPass.privateKey, process.env.VIRGIL_APP_KEY_PASSWORD);
 
         return validationToken;
     }

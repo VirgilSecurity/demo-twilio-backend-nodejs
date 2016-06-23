@@ -266,7 +266,7 @@ export class ChatComponent implements OnInit {
                 console.log('Recipient', latestCard);
                 
                 let publicKeySign = new this.virgil.crypto.Buffer(latestCard.data.public_key_signature, 'base64');
-                let isValid = this.virgil.crypto.verify(latestCard.public_key.public_key, BackendService.AppPublicKey, publicKeySign);
+                let isValid = this.virgil.crypto.verify(latestCard.public_key.public_key, this.backend.AppPublicKey, publicKeySign);
                 
                 if (!isValid){
                     throw "Member's Public Key is not valid";
