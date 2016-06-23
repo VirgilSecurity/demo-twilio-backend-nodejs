@@ -18,6 +18,8 @@ $ npm install
 $ npm start
 ```
 
+Use url [http://localhost:8080](http://localhost:8080) to open your IP Messaging Chat
+
 ## Configuration
 
 ```
@@ -32,5 +34,5 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | TWILIO_API_SECRET                 | Used to authenticate - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
 | TWILIO_IPM_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/user/account/ip-messaging/services) |
 | VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
-| VIRGIL_APP_PRIVATE_KEY            | Used to generate **Validation Token**, which is required to publish authorized **Public Keys** to Virgil Keys Service.  |
-| VIRGIL_APP_PRIVATE_KEY_PASSWORD   | The application's Private Key password.  |
+| VIRGIL_APP_KEY_PATH               | The path to your Private Key(*.vkeys) file, you generated for your application  |
+| VIRGIL_APP_KEY_PASSWORD   | The application's Private Key password.  |
