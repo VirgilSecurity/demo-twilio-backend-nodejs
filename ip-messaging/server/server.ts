@@ -72,7 +72,7 @@ class Server {
         this.virgilAppPass = JSON.parse(fileText.toString());
 
         this.app.disable("x-powered-by");
-        this.rootDir = path.resolve(__dirname + '/../public'); 
+        this.rootDir = path.resolve(__dirname + '/../'); 
  
         this.virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
 
@@ -85,9 +85,8 @@ class Server {
      */
     private routes(): void {
         //this.app.use(express.static(this.rootDir));
-        this.app.use(express.static(this.rootDir + '/assets/'));
-        this.app.use(express.static(__dirname + '/../node_modules/'));
-
+        this.app.use(express.static(this.rootDir + '/public/'));
+        this.app.use('/assets/', express.static(this.rootDir + '/node_modules/'));
         this.app.use(parser.json())
         
         //register routes
@@ -101,11 +100,10 @@ class Server {
     /**
      * Handles requests for default HTML page.
      */
-    private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){       
-
-        fs.readFile(this.rootDir + '/index.html', 'utf8', (err, data) => { 
+    private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){   
+        fs.readFile(this.rootDir + '/server/index.html', 'utf8', (err, data) => { 
             response.writeHead(200, {'Content-Type': 'text/html'});
-            var indexData = data.replace(/{{ APP_CARD_ID }}/g, this.virgilAppPass.card.id);
+            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, this.virgilAppPass.card.identity.value);
             response.write(indexData);
             response.end();
         });

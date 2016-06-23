@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-export declare var VirgilSDK: any;
+declare var VirgilSDK: any;
 
 @Injectable()
 export class VirgilService {   
@@ -11,6 +11,10 @@ export class VirgilService {
     initialize(accessToken: string) {
         this.sdk = new VirgilSDK(accessToken);
         this.crypto = this.sdk.crypto;
+    }
+
+    public static get VirgilSDK(): any {
+        return VirgilSDK;
     }
     
     public static get Crypto(): any {

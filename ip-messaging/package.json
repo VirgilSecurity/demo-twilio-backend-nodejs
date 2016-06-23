@@ -2,7 +2,7 @@
   "name": "virgil-twilio-ip-messaging",
   "version": "1.0.0",
   "scripts": {
-    "start": "concurrently \"tsc -p ./client\" \"tsc -p ./server\"",
+    "start": "tsc -p ./client && tsc -p ./server && cd ./server && node server.js && echo 'Hello There'",
     "postinstall": "typings install",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
@@ -31,7 +31,7 @@
     "rxjs": "5.0.0-beta.6",
     "systemjs": "0.19.27",
     "twilio": "^2.9.1",
-    "virgil-sdk":"^1.4.6",
+    "virgil-sdk":"^1.5.0",
     "zone.js": "^0.6.12",
     "body-parser": "^1.15.1"
   },

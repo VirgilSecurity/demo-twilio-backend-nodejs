@@ -2,14 +2,14 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import * as _ from 'lodash';
 
-import { VirgilService, VirgilSDK } from '../services/virgil.service'
+import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
 import { LoginComponent } from './login.component';
 import { ChatComponent } from './chat.component';
 import { Account, AccountService } from '../services/account.service'
 
-declare var APP_CARD_ID: any;
+declare var APP_BUNDLE_ID: any;
 
 @Component({
     selector: 'ipm-app',
@@ -96,9 +96,9 @@ export class AppComponent implements OnInit {
             .then(data => {
                 this.virgil.initialize(data.virgil_token);
 
-                return this.virgil.sdk.searchGlobal({
-                    value: APP_CARD_ID,
-                    type: VirgilSDK.IdentityTypes.application
+                return this.virgil.sdk.cards.searchGlobal({
+                    value: APP_BUNDLE_ID,
+                    type: VirgilService.VirgilSDK.IdentityTypes.application
                 });              
             })
             .then(cards => {
