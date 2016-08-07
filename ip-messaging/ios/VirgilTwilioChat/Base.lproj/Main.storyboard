@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Dnj-5o-njL">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="gOi-G9-qpk">
+            <objects>
+                <navigationController navigationBarHidden="YES" id="Dnj-5o-njL" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="FUm-Hx-Aor">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="fz2-LY-tec" kind="relationship" relationship="rootViewController" id="Aun-Hc-IOH"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ykK-Hf-J1M" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-149" y="336"/>
+        </scene>
+        <!--Sign In View Controller-->
+        <scene sceneID="BFP-mK-Wvk">
+            <objects>
+                <viewController id="fz2-LY-tec" customClass="SignInViewController" customModule="VirgilTwilioChat" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="JSp-WN-7vr"/>
+                        <viewControllerLayoutGuide type="bottom" id="a1X-bt-wXe"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="x0t-tz-sYQ">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1cx-wf-nrU">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dqy-yh-lod">
+                                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                                        <subviews>
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Nickname" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZiA-4O-vQ3">
+                                                <rect key="frame" x="8" y="80" width="584" height="40"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="3BT-MM-i01"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <textInputTraits key="textInputTraits"/>
+                                                <connections>
+                                                    <outlet property="delegate" destination="fz2-LY-tec" id="acI-Hm-cyk"/>
+                                                </connections>
+                                            </textField>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ik7-C1-qxe">
+                                                <rect key="frame" x="8" y="150" width="584" height="40"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="5MJ-qK-hZa"/>
+                                                </constraints>
+                                                <state key="normal" title="Connect"/>
+                                                <connections>
+                                                    <action selector="chatAction:" destination="fz2-LY-tec" eventType="touchUpInside" id="r3e-5f-lXR"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="Ik7-C1-qxe" secondAttribute="trailing" constant="8" id="E8B-4i-onP"/>
+                                            <constraint firstItem="Ik7-C1-qxe" firstAttribute="top" secondItem="ZiA-4O-vQ3" secondAttribute="bottom" constant="30" id="KQI-CA-l2q"/>
+                                            <constraint firstAttribute="trailing" secondItem="ZiA-4O-vQ3" secondAttribute="trailing" constant="8" id="PFA-VV-Yxh"/>
+                                            <constraint firstItem="Ik7-C1-qxe" firstAttribute="leading" secondItem="dqy-yh-lod" secondAttribute="leading" constant="8" id="S3o-Hp-RFR"/>
+                                            <constraint firstItem="ZiA-4O-vQ3" firstAttribute="top" secondItem="dqy-yh-lod" secondAttribute="top" constant="80" id="iqb-w7-Hm0"/>
+                                            <constraint firstItem="ZiA-4O-vQ3" firstAttribute="leading" secondItem="dqy-yh-lod" secondAttribute="leading" constant="8" id="jfg-0C-8gH"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="dqy-yh-lod" secondAttribute="bottom" id="6wp-ef-u2p"/>
+                                    <constraint firstItem="dqy-yh-lod" firstAttribute="top" secondItem="1cx-wf-nrU" secondAttribute="top" id="PM9-HY-ZbK"/>
+                                    <constraint firstItem="dqy-yh-lod" firstAttribute="leading" secondItem="1cx-wf-nrU" secondAttribute="leading" id="Pli-kk-b3H"/>
+                                    <constraint firstAttribute="trailing" secondItem="dqy-yh-lod" secondAttribute="trailing" id="Vac-ey-8YV"/>
+                                </constraints>
+                            </scrollView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="1cx-wf-nrU" firstAttribute="leading" secondItem="x0t-tz-sYQ" secondAttribute="leading" id="ESS-e0-87p"/>
+                            <constraint firstItem="1cx-wf-nrU" firstAttribute="top" secondItem="x0t-tz-sYQ" secondAttribute="top" id="MTF-je-VN9"/>
+                            <constraint firstAttribute="width" secondItem="dqy-yh-lod" secondAttribute="width" id="ZdF-HM-qkg"/>
+                            <constraint firstItem="a1X-bt-wXe" firstAttribute="top" secondItem="1cx-wf-nrU" secondAttribute="bottom" id="cgI-ln-1RL"/>
+                            <constraint firstAttribute="trailing" secondItem="1cx-wf-nrU" secondAttribute="trailing" id="fEh-K9-nEn"/>
+                            <constraint firstAttribute="height" secondItem="dqy-yh-lod" secondAttribute="height" priority="250" id="grd-nR-ZbN"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="oND-1J-sRA"/>
+                    <connections>
+                        <outlet property="bChat" destination="Ik7-C1-qxe" id="KV3-Tt-rYc"/>
+                        <outlet property="svScroll" destination="1cx-wf-nrU" id="VDf-kb-gs2"/>
+                        <outlet property="tfNickname" destination="ZiA-4O-vQ3" id="WjL-cw-UE0"/>
+                        <outlet property="vContent" destination="dqy-yh-lod" id="2M1-It-qTN"/>
+                        <segue destination="PqH-uY-gE3" kind="show" identifier="ChatViewControllerSegue" id="Z8U-IG-a1a"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jcm-Dx-g4E" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="543" y="336"/>
+        </scene>
+        <!--Chat View Controller-->
+        <scene sceneID="KJh-vB-CPo">
+            <objects>
+                <viewController id="PqH-uY-gE3" customClass="ChatViewController" customModule="VirgilTwilioChat" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="LCL-d6-Lz9"/>
+                        <viewControllerLayoutGuide type="bottom" id="Ycf-zh-2HM"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="HKY-ou-pGh">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <segue destination="bF1-Cj-RHE" kind="presentation" identifier="ChannelsViewControllerSegue" id="4ei-Rp-H0r"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vSZ-ps-60r" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1259" y="336"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="HaF-FN-3bI">
+            <objects>
+                <navigationController id="bF1-Cj-RHE" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="MgH-cK-XTd">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="4BB-On-Wbm" kind="relationship" relationship="rootViewController" id="ash-0t-aGI"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SkV-RF-qUE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1979" y="336"/>
+        </scene>
+        <!--Channels-->
+        <scene sceneID="ZpD-qI-9Hy">
+            <objects>
+                <viewController id="4BB-On-Wbm" customClass="ChannelsViewController" customModule="VirgilTwilioChat" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="pbQ-mU-vpR"/>
+                        <viewControllerLayoutGuide type="bottom" id="mbg-XW-HuE"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="LNI-nZ-Nlc">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="WbE-Mf-TZA">
+                                <rect key="frame" x="0.0" y="64" width="600" height="536"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="4BB-On-Wbm" id="f6j-8l-yzX"/>
+                                    <outlet property="delegate" destination="4BB-On-Wbm" id="N0Z-2i-OqC"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="WbE-Mf-TZA" secondAttribute="trailing" id="8pd-sP-gGI"/>
+                            <constraint firstItem="WbE-Mf-TZA" firstAttribute="leading" secondItem="LNI-nZ-Nlc" secondAttribute="leading" id="Qia-Fp-JcW"/>
+                            <constraint firstItem="WbE-Mf-TZA" firstAttribute="top" secondItem="pbQ-mU-vpR" secondAttribute="bottom" id="a49-8k-bL6"/>
+                            <constraint firstItem="mbg-XW-HuE" firstAttribute="top" secondItem="WbE-Mf-TZA" secondAttribute="bottom" id="tbH-Ov-OGb"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Channels" id="S1Q-0p-eGN">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="aF3-2n-S1c">
+                            <connections>
+                                <action selector="addChannelAction" destination="4BB-On-Wbm" id="u79-Xb-Gbg"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="tvChannels" destination="WbE-Mf-TZA" id="KiT-iT-BBb"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="GhM-4e-tnK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2654" y="336"/>
+        </scene>
+    </scenes>
+</document>

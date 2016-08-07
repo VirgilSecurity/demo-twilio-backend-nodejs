@@ -1,0 +1,401 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		36B3A8831D41D78600E29A9C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8821D41D78600E29A9C /* AppDelegate.swift */; };
+		36B3A8881D41D78600E29A9C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36B3A8861D41D78600E29A9C /* Main.storyboard */; };
+		36B3A88A1D41D78600E29A9C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36B3A8891D41D78600E29A9C /* Assets.xcassets */; };
+		36B3A88D1D41D78600E29A9C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36B3A88B1D41D78600E29A9C /* LaunchScreen.storyboard */; };
+		36B3A8991D4306EB00E29A9C /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8941D4306EB00E29A9C /* AppState.swift */; };
+		36B3A89A1D4306EB00E29A9C /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8951D4306EB00E29A9C /* ChatViewController.swift */; };
+		36B3A89B1D4306EB00E29A9C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8961D4306EB00E29A9C /* Constants.swift */; };
+		36B3A89C1D4306EB00E29A9C /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8971D4306EB00E29A9C /* SignInViewController.swift */; };
+		36B3A89D1D4306EB00E29A9C /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8981D4306EB00E29A9C /* Synchronized.swift */; };
+		36B3A8A11D48771400E29A9C /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8A01D48771400E29A9C /* Backend.swift */; };
+		36B3A8A41D492A9900E29A9C /* ChannelsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8A31D492A9900E29A9C /* ChannelsViewController.swift */; };
+		DF8A137F93AD338945BBF00D /* Pods_VirgilTwilioChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4A76172EE91B8160E5E9EEE /* Pods_VirgilTwilioChat.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		36B3A87F1D41D78600E29A9C /* VirgilTwilioChat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirgilTwilioChat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		36B3A8821D41D78600E29A9C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		36B3A8871D41D78600E29A9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		36B3A8891D41D78600E29A9C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		36B3A88C1D41D78600E29A9C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		36B3A88E1D41D78600E29A9C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		36B3A8941D4306EB00E29A9C /* AppState.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		36B3A8951D4306EB00E29A9C /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		36B3A8961D4306EB00E29A9C /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		36B3A8971D4306EB00E29A9C /* SignInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
+		36B3A8981D4306EB00E29A9C /* Synchronized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Synchronized.swift; sourceTree = "<group>"; };
+		36B3A8A01D48771400E29A9C /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
+		36B3A8A21D487A4200E29A9C /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
+		36B3A8A31D492A9900E29A9C /* ChannelsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelsViewController.swift; sourceTree = "<group>"; };
+		67211271B1D1EDE6562CF70F /* Pods-VirgilTwilioChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirgilTwilioChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VirgilTwilioChat/Pods-VirgilTwilioChat.debug.xcconfig"; sourceTree = "<group>"; };
+		9B503E069BFF10C0D1306791 /* Pods-VirgilTwilioChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirgilTwilioChat.release.xcconfig"; path = "Pods/Target Support Files/Pods-VirgilTwilioChat/Pods-VirgilTwilioChat.release.xcconfig"; sourceTree = "<group>"; };
+		E4A76172EE91B8160E5E9EEE /* Pods_VirgilTwilioChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirgilTwilioChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		36B3A87C1D41D78600E29A9C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DF8A137F93AD338945BBF00D /* Pods_VirgilTwilioChat.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1F580999AB43621603C660F2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				67211271B1D1EDE6562CF70F /* Pods-VirgilTwilioChat.debug.xcconfig */,
+				9B503E069BFF10C0D1306791 /* Pods-VirgilTwilioChat.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		36B3A8761D41D78600E29A9C = {
+			isa = PBXGroup;
+			children = (
+				36B3A8811D41D78600E29A9C /* VirgilTwilioChat */,
+				36B3A8801D41D78600E29A9C /* Products */,
+				1F580999AB43621603C660F2 /* Pods */,
+				3FBD11AA8472EFBF0758EF6F /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		36B3A8801D41D78600E29A9C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				36B3A87F1D41D78600E29A9C /* VirgilTwilioChat.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		36B3A8811D41D78600E29A9C /* VirgilTwilioChat */ = {
+			isa = PBXGroup;
+			children = (
+				36B3A8A21D487A4200E29A9C /* BridgingHeader.h */,
+				36B3A8941D4306EB00E29A9C /* AppState.swift */,
+				36B3A8A01D48771400E29A9C /* Backend.swift */,
+				36B3A8961D4306EB00E29A9C /* Constants.swift */,
+				36B3A8971D4306EB00E29A9C /* SignInViewController.swift */,
+				36B3A8951D4306EB00E29A9C /* ChatViewController.swift */,
+				36B3A8A31D492A9900E29A9C /* ChannelsViewController.swift */,
+				36B3A8981D4306EB00E29A9C /* Synchronized.swift */,
+				36B3A8821D41D78600E29A9C /* AppDelegate.swift */,
+				36B3A8861D41D78600E29A9C /* Main.storyboard */,
+				36B3A8891D41D78600E29A9C /* Assets.xcassets */,
+				36B3A88B1D41D78600E29A9C /* LaunchScreen.storyboard */,
+				36B3A88E1D41D78600E29A9C /* Info.plist */,
+			);
+			path = VirgilTwilioChat;
+			sourceTree = "<group>";
+		};
+		3FBD11AA8472EFBF0758EF6F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E4A76172EE91B8160E5E9EEE /* Pods_VirgilTwilioChat.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		36B3A87E1D41D78600E29A9C /* VirgilTwilioChat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36B3A8911D41D78600E29A9C /* Build configuration list for PBXNativeTarget "VirgilTwilioChat" */;
+			buildPhases = (
+				6C94E15E8B953735C77C6A63 /* Check Pods Manifest.lock */,
+				36B3A87B1D41D78600E29A9C /* Sources */,
+				36B3A87C1D41D78600E29A9C /* Frameworks */,
+				36B3A87D1D41D78600E29A9C /* Resources */,
+				55503EF5D8537AC1A7EC2541 /* Embed Pods Frameworks */,
+				0385CDCB8E280F8C8DE972AC /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = VirgilTwilioChat;
+			productName = VirgilTwilioChat;
+			productReference = 36B3A87F1D41D78600E29A9C /* VirgilTwilioChat.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		36B3A8771D41D78600E29A9C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Virgil Security, Inc.";
+				TargetAttributes = {
+					36B3A87E1D41D78600E29A9C = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 36B3A87A1D41D78600E29A9C /* Build configuration list for PBXProject "VirgilTwilioChat" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 36B3A8761D41D78600E29A9C;
+			productRefGroup = 36B3A8801D41D78600E29A9C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				36B3A87E1D41D78600E29A9C /* VirgilTwilioChat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		36B3A87D1D41D78600E29A9C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B3A88D1D41D78600E29A9C /* LaunchScreen.storyboard in Resources */,
+				36B3A88A1D41D78600E29A9C /* Assets.xcassets in Resources */,
+				36B3A8881D41D78600E29A9C /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0385CDCB8E280F8C8DE972AC /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-VirgilTwilioChat/Pods-VirgilTwilioChat-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		55503EF5D8537AC1A7EC2541 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-VirgilTwilioChat/Pods-VirgilTwilioChat-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6C94E15E8B953735C77C6A63 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		36B3A87B1D41D78600E29A9C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				36B3A89B1D4306EB00E29A9C /* Constants.swift in Sources */,
+				36B3A8991D4306EB00E29A9C /* AppState.swift in Sources */,
+				36B3A8A41D492A9900E29A9C /* ChannelsViewController.swift in Sources */,
+				36B3A89C1D4306EB00E29A9C /* SignInViewController.swift in Sources */,
+				36B3A89D1D4306EB00E29A9C /* Synchronized.swift in Sources */,
+				36B3A89A1D4306EB00E29A9C /* ChatViewController.swift in Sources */,
+				36B3A8A11D48771400E29A9C /* Backend.swift in Sources */,
+				36B3A8831D41D78600E29A9C /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		36B3A8861D41D78600E29A9C /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				36B3A8871D41D78600E29A9C /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		36B3A88B1D41D78600E29A9C /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				36B3A88C1D41D78600E29A9C /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		36B3A88F1D41D78600E29A9C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		36B3A8901D41D78600E29A9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		36B3A8921D41D78600E29A9C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 67211271B1D1EDE6562CF70F /* Pods-VirgilTwilioChat.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = VirgilTwilioChat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.virgilsecurity.VirgilTwilioChat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = VirgilTwilioChat/BridgingHeader.h;
+			};
+			name = Debug;
+		};
+		36B3A8931D41D78600E29A9C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9B503E069BFF10C0D1306791 /* Pods-VirgilTwilioChat.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = VirgilTwilioChat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.virgilsecurity.VirgilTwilioChat;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = VirgilTwilioChat/BridgingHeader.h;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		36B3A87A1D41D78600E29A9C /* Build configuration list for PBXProject "VirgilTwilioChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36B3A88F1D41D78600E29A9C /* Debug */,
+				36B3A8901D41D78600E29A9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		36B3A8911D41D78600E29A9C /* Build configuration list for PBXNativeTarget "VirgilTwilioChat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				36B3A8921D41D78600E29A9C /* Debug */,
+				36B3A8931D41D78600E29A9C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 36B3A8771D41D78600E29A9C /* Project object */;
+}
