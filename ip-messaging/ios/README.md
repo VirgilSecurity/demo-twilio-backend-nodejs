@@ -1,7 +1,7 @@
 # Adding End-to-End Encryption to Twilio IP Messaging based iOS application.
 
 - [Introduction](#introduction)
-- [How It Works - Basics](#how-it-works-basics)
+- [How It Works Basics](#how-it-works-basics)
 - [Install](#install)
 - [Getting Started](#getting-started)
     - [Setup Vigil Infrastructure](#setup-virgil-infrastructure)
@@ -14,9 +14,9 @@
 
 ## Introduction
 
-This application is an example how to create secure iP-messaging iOS applications using Twilio SDK as a transport layer and Virgil Services as a security layer on top of it.
+This application is an example of how to create a secure IP-messaging iOS application using Twilio SDK as a transport layer and Virgil Services as a security layer on top of it.
 
-## How It Works - Basics
+## How It Works Basics
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
 
 ## Install
@@ -31,7 +31,7 @@ pod install
 
 ## Getting Started
 
-In a Twilio IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, the Channel is where Messages are sent, received, and archived for later viewing by offline clients.
+In a Twilio IP Messaging application, *a Channel* is where all the action happens. Whether it's between two users or two hundred, *the Channel* is where *Messages* are sent, received, and archived for later viewing by offline clients.
 
 ### Setup Virgil Infrastructure
 
@@ -46,9 +46,9 @@ self.virgil = VSSClient(applicationToken: token)
 ///...
 ```
 
-Here the application requests the token from the backend server and the backend server takes it from the [Virgil Dashboard](https://developer.virgilsecurity.com/dashboard/). The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate the app’s requests with a particulat Virgil Security developer's account.
+Here the application requests the token from the backend server and the backend server takes it from the [Virgil Dashboard](https://developer.virgilsecurity.com/dashboard/). The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate the app’s requests with a particular Virgil Security developer's account.
 
-The backend server also sends all requests signed using its own private key. The example application will check the signatures of every single response to make sure that a particular response comes from this exact server. For [verification the signature](#verification-of-the-backend-server-signature) the application needs correspondent public key:
+The backend server also sends all requests signed using its own private key. The example application will check the signatures of every single response to make sure that a particular response comes from this exact server. For [verification of the signature](#verification-of-the-backend-server-signature) the application needs correspondent public key:
 
 ###### Swift
 ```
@@ -72,7 +72,7 @@ self.virgil.searchAppCardWithIdentityValue(Constants.Backend.AppBundleId, comple
 
 ### Managing User Keys
 
-To use ip-messaging securely each user needs to have his/her own private key (which might and in general have to be stored locally on a particular iOS device) and a Virgil Card created on the Virgil Keys Service.
+To use IP-messaging securely each user needs to have his/her own private key (which might and in general have to be stored locally on a particular iOS device) and a Virgil Card created in Virgil Keys Service.
 
 When a user tries to connect to the chat using the example application, it searches for the Virgil Card of this particular user: 
 
@@ -97,7 +97,7 @@ AppState.sharedInstance.virgil.searchCardWithIdentityValue(self.tfNickname.text!
             ///...
         }
         else {
-            /// There is no Virgil Cards found for the user.
+            /// There are no Virgil Cards found for the user.
             /// The application will create one automatically for free and will use it.
             ///...
         }
@@ -106,7 +106,7 @@ AppState.sharedInstance.virgil.searchCardWithIdentityValue(self.tfNickname.text!
 ///...
 ```
 
-When there is no user cards found on the Virgil Keys Service, the application creates a new one for the user automatically.
+When there are no user cards found in Virgil Keys Service, the application creates a new one for the user automatically.
 
 ###### Swift
 
@@ -138,12 +138,12 @@ AppState.sharedInstance.virgil.createCardWithPublicKey(keyPair.publicKey(), iden
 ///...
 ```
 
-One of the most important parts in the snippet above is obtaining a validation token. The validation token in general is not required for creating a Card on the Virgil Keys Service. However if validation token has not been provided the Card is considered *unconfirmed*. Unconfirmed cards have usage limitations so it is strictly not recommended to use unconfirmed Cards in a real life applications. The validation token lets Virgil Service know that this user has completed his/her identity verification by the third party verification system and so it might be trusted in terms of using his/her public key. In the example applicaiton the backend service provides correct validation tokens for the chat users. 
+One of the most important parts in the snippet above is obtaining a validation token. The validation token in general is not required for creating a Card in Virgil Keys Service. However if validation token has not been provided the Card is considered *unconfirmed*. Unconfirmed cards have usage limitations so it is strictly not recommended to use unconfirmed Cards in real life applications. The validation token lets Virgil Service know that this user has completed his/her identity verification by the third party verification system and so it might be trusted in terms of using his/her public key. In the example application the backend service provides correct validation tokens for the chat users. 
 
 
 ### Chat Channels
 
-When user's setup is completed that user can create a chat channel or join existing one. But first the application have to initialize Twilio SDK: 
+When user's setup is completed, that user can create a chat channel or join existing one. But first the application has to initialize Twilio SDK: 
 
 ###### Swift
 
@@ -161,7 +161,7 @@ self.twilio = TwilioIPMessagingClient.ipMessagingClientWithAccessManager(accessM
 
 You can find more information about the Twilio setup for iOS [here](https://www.twilio.com/docs/api/ip-messaging/guides/quickstart-ios).
 
-When Twilio IP Messaging Client is initialized it notifies its delegate with a call to `-ipMessagingClient(:, synchronizationStatusChanged:)`. The example app uses this call to get a list of existing chat channels and present them to the user:
+When Twilio IP Messaging Client is initialized, it notifies its delegate with a call to `-ipMessagingClient(:, synchronizationStatusChanged:)`. The example app uses this call to get a list of existing chat channels and present them to the user:
 
 ###### Swift
 
@@ -248,7 +248,7 @@ if let data = try? cryptor.encryptData(msg, embedContentInfo: true, error: ()) {
 ///...
 ```
 
-For the sake of simplicity the actual message is just a string of text. But it may be easily expanded to include other data types such as images and binary data.
+For the sake of simplicity, the actual message is just a string of text. But it may be easily expanded to include other data types such as images and binary data.
 
 Now send the encrypted message via Twilio SDK:
 
@@ -268,7 +268,7 @@ self.channel.messages.sendMessage(message, completion: { (result) in
 
 ### Receiving and Decrypting a Message
 
-When a new message arrives to the channel Twilio IP Messaging Client informs its delegate by a call to `-ipMessagingClient(:, channel:, messageAdded:)`. In this callback function the application can convert TWLMessage into any kind of the object it wants to use further locally. The example app uses a Dictionary object, so it just saves a few fields enough for this simple example:
+When a new message arrives to the channel, Twilio IP Messaging Client informs its delegate by a call to `-ipMessagingClient(:, channel:, messageAdded:)`. In this callback function the application can convert `TWLMessage` into any kind of the object it wants to use further locally. The example app uses a Dictionary object, so it just saves a few fields enough for this simple example:
 
 ###### Swift
 
@@ -324,7 +324,7 @@ for mCandidate in messages {
 
 ### Verification of the Backend Server Signature
 
-When any response received from the backend server, the response contains a signature in the response headers. The example application verifies this signature before taking any actions on the response data.
+When any response is received from the backend server, the response contains a signature in the response headers. The example application verifies this signature before taking any actions on the response data.
 
 ###### Swift
 
@@ -352,7 +352,7 @@ return ok
 ///...
 ```
 
-In case when `ok` is `false` the response should not be touched because it should not be trusted.
+In case when `ok` is `false` the response should not be used because it should not be trusted.
 
 ## See also
 
