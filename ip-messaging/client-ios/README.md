@@ -1,7 +1,6 @@
 # Adding End-to-End Encryption to Twilio IP Messaging based iOS application.
 
 - [Introduction](#introduction)
-- [How It Works Basics](#how-it-works-basics)
 - [Install](#install)
 - [Getting Started](#getting-started)
     - [Setup Vigil Infrastructure](#setup-virgil-infrastructure)
