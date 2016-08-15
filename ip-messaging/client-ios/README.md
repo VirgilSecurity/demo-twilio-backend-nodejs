@@ -16,9 +16,6 @@
 
 This application is an example of how to create a secure IP-messaging iOS application using Twilio SDK as a transport layer and Virgil Services as a security layer on top of it.
 
-## How It Works Basics
-![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
-
 ## Install
  
 To be able to run the application code you need to install all required dependencies via [cocoapods](https://guides.cocoapods.org/using/getting-started.html):
