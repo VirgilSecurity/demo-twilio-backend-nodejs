@@ -4,7 +4,7 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 
 
 - [Quickstart Guide](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging)
-  - [iOS Quickstart](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging/client-ios)
+- [iOS Client](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging/client-ios)
 - [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
 
 ## Publish
