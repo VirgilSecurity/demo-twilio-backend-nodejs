@@ -17,6 +17,7 @@ struct Constants {
         static let IdentityTypeAdmin = "member"
         static let ChannelAttributeCardId = "virgil_card_id"
         static let ChannelAttributKey = "virgil_public_key"
+        static let VirgilPublicKeySignature = "public_key_signature"
     }
     
     struct Backend {
@@ -29,6 +30,7 @@ struct Constants {
         static let VirgilTokenKey = "virgil_token"
         static let TwilioTokenKey = "twilio_token"
         static let ValidationTokenKey = "validation_token"
+        static let ApplicationSignKey = "application_sign"
         static let AppBundleId = "com.denzil.twilio-ip-messaging-demo"
         
         static let IdentityParam = "identity"

@@ -155,7 +155,7 @@ class Backend: NSObject {
         return Array<Dictionary<String, AnyObject>>()
     }
 
-    func getValidationToken(identity: String, publicKey: NSData) -> String {
+    func getValidationToken(identity: String, publicKey: NSData) -> (String, String) {
         let async = XAsyncTask { (weakTask) in
             let url = NSURL(string: Constants.Backend.BaseURL + Constants.Backend.VirgilValidationTokenEndpoint)
             let request = NSMutableURLRequest(URL: url!)
@@ -184,8 +184,8 @@ class Backend: NSObject {
                 
                 if let r = response as? NSHTTPURLResponse, signature = r.allHeaderFields[Constants.Backend.SignResponseHeader] as? String, body = data {
                     if self.verifySignature(signature, data: body) {
-                        if let parsed = try? NSJSONSerialization.JSONObjectWithData(body, options: .AllowFragments), tokenObject = parsed as? NSDictionary, token = tokenObject[Constants.Backend.ValidationTokenKey] as? String {
-                            weakTask?.result = token
+                        if let parsed = try? NSJSONSerialization.JSONObjectWithData(body, options: .AllowFragments), tokenObject = parsed as? NSDictionary, token = tokenObject[Constants.Backend.ValidationTokenKey] as? String, sign = tokenObject[Constants.Backend.ApplicationSignKey] as? String {
+                            weakTask?.result = [token, sign]
                             weakTask?.fireSignal()
                             return
                         }
@@ -202,11 +202,11 @@ class Backend: NSObject {
             task.resume()
         }
         async.awaitSignal()
-        if let token = async.result as? String {
-            return token
+        if let tuple = async.result as? Array<String> where tuple.count == 2 {
+            return (tuple[0], tuple[1])
         }
         
-        return ""
+        return ("", "")
     }
     
     private func verifySignature(signature: String, data: NSData) -> Bool {

@@ -19,7 +19,7 @@ class AppState: NSObject {
     var appCard: VSSCard! = nil
     
     var virgil: VSSClient! = nil
-    var twilio: TwilioIPMessagingClient! = nil
+    var twilio: TwilioManager! = nil
     var backend: Backend! = nil
     
     func kill() {
@@ -43,13 +43,8 @@ class AppState: NSObject {
         
     }
     
-    func initTwilio(delegate: TwilioIPMessagingClientDelegate) {
-        if self.twilio != nil {
-            return
-        }
-        let token = self.backend.getTwilioToken(self.identity, device: UIDevice.currentDevice().identifierForVendor!.UUIDString)
-        let accessManager = TwilioAccessManager.init(token: token, delegate: nil)
-        self.twilio = TwilioIPMessagingClient.ipMessagingClientWithAccessManager(accessManager, properties: nil, delegate: delegate)
+    func initTwilio(listeners: [TwilioListener]) {
+        self.twilio = TwilioManager(listeners: listeners)
     }
     
     func cardForIdentity(identity: String, type: String = Constants.Virgil.IdentityType) -> VSSCard? {

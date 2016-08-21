@@ -18,6 +18,8 @@
 		36B3A89D1D4306EB00E29A9C /* Synchronized.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8981D4306EB00E29A9C /* Synchronized.swift */; };
 		36B3A8A11D48771400E29A9C /* Backend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8A01D48771400E29A9C /* Backend.swift */; };
 		36B3A8A41D492A9900E29A9C /* ChannelsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36B3A8A31D492A9900E29A9C /* ChannelsViewController.swift */; };
+		36E447AB1D6A432E002A512C /* TwilioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E447AA1D6A432E002A512C /* TwilioManager.swift */; };
+		36E447AD1D6A54D5002A512C /* NewChannelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E447AC1D6A54D5002A512C /* NewChannelViewController.swift */; };
 		DF8A137F93AD338945BBF00D /* Pods_VirgilTwilioChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E4A76172EE91B8160E5E9EEE /* Pods_VirgilTwilioChat.framework */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +38,8 @@
 		36B3A8A01D48771400E29A9C /* Backend.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Backend.swift; sourceTree = "<group>"; };
 		36B3A8A21D487A4200E29A9C /* BridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BridgingHeader.h; sourceTree = "<group>"; };
 		36B3A8A31D492A9900E29A9C /* ChannelsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChannelsViewController.swift; sourceTree = "<group>"; };
+		36E447AA1D6A432E002A512C /* TwilioManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TwilioManager.swift; sourceTree = "<group>"; };
+		36E447AC1D6A54D5002A512C /* NewChannelViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewChannelViewController.swift; sourceTree = "<group>"; };
 		67211271B1D1EDE6562CF70F /* Pods-VirgilTwilioChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirgilTwilioChat.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VirgilTwilioChat/Pods-VirgilTwilioChat.debug.xcconfig"; sourceTree = "<group>"; };
 		9B503E069BFF10C0D1306791 /* Pods-VirgilTwilioChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VirgilTwilioChat.release.xcconfig"; path = "Pods/Target Support Files/Pods-VirgilTwilioChat/Pods-VirgilTwilioChat.release.xcconfig"; sourceTree = "<group>"; };
 		E4A76172EE91B8160E5E9EEE /* Pods_VirgilTwilioChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VirgilTwilioChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,10 +90,12 @@
 				36B3A8A21D487A4200E29A9C /* BridgingHeader.h */,
 				36B3A8941D4306EB00E29A9C /* AppState.swift */,
 				36B3A8A01D48771400E29A9C /* Backend.swift */,
+				36E447AA1D6A432E002A512C /* TwilioManager.swift */,
 				36B3A8961D4306EB00E29A9C /* Constants.swift */,
 				36B3A8971D4306EB00E29A9C /* SignInViewController.swift */,
 				36B3A8951D4306EB00E29A9C /* ChatViewController.swift */,
 				36B3A8A31D492A9900E29A9C /* ChannelsViewController.swift */,
+				36E447AC1D6A54D5002A512C /* NewChannelViewController.swift */,
 				36B3A8981D4306EB00E29A9C /* Synchronized.swift */,
 				36B3A8821D41D78600E29A9C /* AppDelegate.swift */,
 				36B3A8861D41D78600E29A9C /* Main.storyboard */,
@@ -231,11 +237,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				36B3A89B1D4306EB00E29A9C /* Constants.swift in Sources */,
+				36E447AD1D6A54D5002A512C /* NewChannelViewController.swift in Sources */,
 				36B3A8991D4306EB00E29A9C /* AppState.swift in Sources */,
 				36B3A8A41D492A9900E29A9C /* ChannelsViewController.swift in Sources */,
 				36B3A89C1D4306EB00E29A9C /* SignInViewController.swift in Sources */,
 				36B3A89D1D4306EB00E29A9C /* Synchronized.swift in Sources */,
 				36B3A89A1D4306EB00E29A9C /* ChatViewController.swift in Sources */,
+				36E447AB1D6A432E002A512C /* TwilioManager.swift in Sources */,
 				36B3A8A11D48771400E29A9C /* Backend.swift in Sources */,
 				36B3A8831D41D78600E29A9C /* AppDelegate.swift in Sources */,
 			);
