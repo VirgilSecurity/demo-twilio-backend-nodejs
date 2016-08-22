@@ -1,21 +1,41 @@
 package com.virgilsecurity.virgiltwilioipmessaging;
 
-public class ApplicationConstants {
+public interface ApplicationConstants {
 
     public interface Prefs {
-        static final String IDENTITY = "login";
+        String IDENTITY = "login";
+        String CARD_ID = "card_id";
+        String PUBLIC_KEY = "public_key";
+        String PRIVATE_KEY = "private_key";
+        String VIRGIL_TOKEN = "virgil_token";
+
+        String LOGGED_IN = "logged_in";
     }
 
-    public interface Extra {
-        static final String IDENTITY = "login";
-        static final String CARD_ID = "card_id";
-        static final String PUBLIC_KEY = "public_key";
-        static final String PRIVATE_KEY = "private_key";
-        static final String VIRGIL_TOKEN = "virgil_token";
-        static final String TWILIO_TOKEN = "twilio_token";
+    public interface Messages {
+        String EVENT = "event";
+        String NEW_CHANNEL_EVENT = "new_channel";
+        String JOIN_CHANNEL_EVENT = "join_channel";
+        String REMOVE_CHANNEL_EVENT = "remove_channel";
+        String UPDATE_CHANNELS_EVENT = "update_channels";
+        String ADD_MESSAGE_EVENT = "add_message";
+
+        String CHANNEL_NAME = "channel_name";
+        String CHANNEL_NAMES = "channel_names";
+        String CHANNEL_OWNER = "channel_owner";
+        String CHANNEL_MEMBERS_COUNT = "members_count";
+        String DECRYPTED_MESSAGE = "decrypted_message";
+
     }
 
-    static final String IDENTITY_TYPE = "chat_member";
+    public interface State {
+        String MESSAGES = "messages";
+        String CHANNELS = "channels";
+    }
 
-    static final String TOKEN = "https://demo-ip-messaging.virgilsecurity.com/auth/virgil-token";
+    String DEFAULT_CHANNEL_NAME = "default";
+
+    String IDENTITY_TYPE = "chat_member";
+
+    String BASE_URL = "https://demo-ip-messaging.virgilsecurity.com/";
 }

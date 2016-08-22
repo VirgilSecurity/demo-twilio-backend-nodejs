@@ -1,9 +1,12 @@
 package com.virgilsecurity.virgiltwilioipmessaging;
 
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,132 +21,193 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.twilio.common.TwilioAccessManager;
-import com.twilio.common.TwilioAccessManagerFactory;
-import com.twilio.common.TwilioAccessManagerListener;
-import com.twilio.ipmessaging.Channel;
-import com.twilio.ipmessaging.ChannelListener;
-import com.twilio.ipmessaging.Constants;
-import com.twilio.ipmessaging.ErrorInfo;
-import com.twilio.ipmessaging.IPMessagingClientListener;
-import com.twilio.ipmessaging.Member;
-import com.twilio.ipmessaging.Message;
-import com.twilio.ipmessaging.TwilioIPMessagingClient;
-import com.twilio.ipmessaging.TwilioIPMessagingSDK;
-import com.twilio.ipmessaging.UserInfo;
-import com.virgilsecurity.sdk.client.ClientFactory;
-import com.virgilsecurity.sdk.client.model.publickey.SearchCriteria;
-import com.virgilsecurity.sdk.client.model.publickey.VirgilCard;
-import com.virgilsecurity.sdk.crypto.Base64;
-import com.virgilsecurity.sdk.crypto.CryptoHelper;
+import com.virgilsecurity.sdk.client.utils.StringUtils;
 import com.virgilsecurity.sdk.crypto.PrivateKey;
-import com.virgilsecurity.sdk.crypto.PublicKey;
 import com.virgilsecurity.virgiltwilioipmessaging.adapter.MessagesAdapter;
-import com.virgilsecurity.virgiltwilioipmessaging.model.ChatMember;
-import com.virgilsecurity.virgiltwilioipmessaging.model.ChatMessage;
-import com.virgilsecurity.virgiltwilioipmessaging.utils.CommonUtils;
+import com.virgilsecurity.virgiltwilioipmessaging.exception.ChannelNotFoundException;
+import com.virgilsecurity.virgiltwilioipmessaging.exception.IPMessagingServiceException;
+import com.virgilsecurity.virgiltwilioipmessaging.http.IPMessagingService;
+import com.virgilsecurity.virgiltwilioipmessaging.model.TwilioToken;
+import com.virgilsecurity.virgiltwilioipmessaging.model.channel.ChannelMessage;
+import com.virgilsecurity.virgiltwilioipmessaging.twilio.DummyMessageProcessor;
+import com.virgilsecurity.virgiltwilioipmessaging.twilio.TwilioFacade;
+import com.virgilsecurity.virgiltwilioipmessaging.twilio.VirgilMessageProcessor;
+import com.virgilsecurity.virgiltwilioipmessaging.utils.ChannelMessageStorage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class MainActivity extends AppCompatActivity {
 
     final static String TAG = "MainActivity";
-    final static String DEFAULT_CHANNEL_NAME = "default";
 
+    private RecyclerView mMessagesRecyclerView;
     private MessagesAdapter mMessagesAdapter;
-    private ArrayList<Message> mMessages = new ArrayList<>();
+    private ChannelMessageStorage mMessages;
 
+    private Toolbar mToolbar;
     private EditText mWriteMessageEditText;
     private ImageButton mSendChatMessageButton;
     private NavigationView mNavigationView;
 
-    private ClientFactory clientFactory;
+    private TwilioFacade twilioFacade;
+
     private String mIdentity;
-    private String mCardId;
-
-    private TwilioAccessManager mAccessManager;
-    private TwilioIPMessagingClient mMessagingClient;
-
-    private Channel mCurrentChannel;
-    private Map<String, ChatMember> mMembers;
-
     private Gson mGson = new GsonBuilder().create();
+
+    private ArrayList<String> mChannels;
+    private ArrayAdapter mChannelsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        // Load current user card preferences
-        Intent intent = getIntent();
-        mIdentity = intent.getStringExtra(ApplicationConstants.Extra.IDENTITY);
-        mCardId = intent.getStringExtra(ApplicationConstants.Extra.CARD_ID);
-
-        // Initialize Client Factory
-        String accessToken = intent.getStringExtra(ApplicationConstants.Extra.VIRGIL_TOKEN);
-        clientFactory = new ClientFactory(accessToken);
+        setTitle(R.string.loading);
 
         // Configure UI
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+
+        if (savedInstanceState != null) {
+            mChannels = savedInstanceState.getStringArrayList(ApplicationConstants.State.CHANNELS);
+            mMessages = (ChannelMessageStorage) savedInstanceState.getSerializable(ApplicationConstants.State.MESSAGES);
+            twilioFacade = (TwilioFacade) getLastCustomNonConfigurationInstance();
+
+            showActiveChannel(twilioFacade.getActiveChannelName(), 1);
+        } else {
+            mChannels = new ArrayList<>();
+            mMessages = new ChannelMessageStorage();
+        }
+
+        // Load current user card preferences
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String accessToken = prefs.getString(ApplicationConstants.Prefs.VIRGIL_TOKEN, "");
+        mIdentity = prefs.getString(ApplicationConstants.Prefs.IDENTITY, "");
+        String cardId = prefs.getString(ApplicationConstants.Prefs.CARD_ID, "");
+        PrivateKey privateKey = new PrivateKey(prefs.getString(ApplicationConstants.Prefs.PRIVATE_KEY, ""));
 
         // Configure messages view
-        PrivateKey privateKey = new PrivateKey(intent.getStringExtra(ApplicationConstants.Extra.PRIVATE_KEY));
-        mMessagesAdapter = new MessagesAdapter(mMessages, mCardId, privateKey);
+        mMessagesAdapter = new MessagesAdapter(mMessages);
 
-        RecyclerView messagesRecyclerView = (RecyclerView) findViewById(R.id.messagesRecyclerView);
+        mMessagesRecyclerView = (RecyclerView) findViewById(R.id.messagesRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
         // for a chat app, show latest at the bottom
         layoutManager.setStackFromEnd(true);
-        messagesRecyclerView.setLayoutManager(layoutManager);
-        messagesRecyclerView.setAdapter(mMessagesAdapter);
+        mMessagesRecyclerView.setLayoutManager(layoutManager);
+        mMessagesRecyclerView.setAdapter(mMessagesAdapter);
 
         mWriteMessageEditText = (EditText) findViewById(R.id.writeMessageEditText);
         mSendChatMessageButton = (ImageButton) findViewById(R.id.sendChatMessageButton);
         mSendChatMessageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mCurrentChannel != null) {
-                    String messageBody = mWriteMessageEditText.getText().toString();
+                String messageBody = mWriteMessageEditText.getText().toString();
+                mWriteMessageEditText.setText("");
 
-                    SendMessageTask sendTask = new SendMessageTask(messageBody);
-                    sendTask.execute((Void) null);
-                }
+                // Hide keyboard
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+                sendMessage(messageBody);
             }
         });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mNavigationView.setNavigationItemSelectedListener(this);
 
-        TextView nicknameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.nickname);
+        TextView nicknameTV = (TextView) mNavigationView.findViewById(R.id.nickname);
         nicknameTV.setText(mIdentity);
 
+        // channels list
+        mChannelsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mChannels);
+        ListView channelsList = (ListView) mNavigationView.findViewById(R.id.channels_list);
+        channelsList.setAdapter(mChannelsAdapter);
+        channelsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    twilioFacade.joinChannel(mChannels.get(position));
+                } catch (ChannelNotFoundException e) {
+                    Toast.makeText(MainActivity.this, R.string.error_channel_not_found, Toast.LENGTH_LONG).show();
+                }
+
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.closeDrawer(GravityCompat.START);
+            }
+        });
 
         // Initialize chat
-        mMembers = new ConcurrentHashMap<>();
+        if (twilioFacade == null) {
+            twilioFacade = new TwilioFacade(new TwilioTokenProviderImpl(this), new VirgilMessageProcessor(cardId, privateKey, accessToken));
+        }
+        twilioFacade.setHandler(handler);
+    }
 
-        String twilioToken = intent.getStringExtra(ApplicationConstants.Extra.TWILIO_TOKEN);
-        retrieveAccessTokenFromServer(twilioToken);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putStringArrayList(ApplicationConstants.State.CHANNELS, mChannels);
+        outState.putSerializable(ApplicationConstants.State.MESSAGES, mMessages);
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return twilioFacade;
+    }
+
+    private void sendMessage(String messageBody) {
+        if (!StringUtils.isBlank(messageBody)) {
+            // Build message
+            ChannelMessage message = new ChannelMessage();
+            message.setBody(messageBody);
+            message.setAuthor(mIdentity);
+            message.setDate(new Date().getTime());
+            message.setId(UUID.randomUUID().toString());
+
+            showMessageAtChat(message);
+
+            // Sent message with Twilio
+            twilioFacade.sendMessage(mGson.toJson(message));
+        }
+    }
+
+    private void showMessageAtChat(ChannelMessage message) {
+        mMessages.addOrUpdate(message);
+        mMessagesAdapter.notifyDataSetChanged();
+        mMessagesRecyclerView.scrollToPosition(mMessages.size() - 1);
+    }
+
+    private void showActiveChannel(String channelName, int membersCount) {
+        mToolbar.setTitle(channelName);
+        mToolbar.setSubtitle(membersCount + " Members");
     }
 
     @Override
@@ -171,30 +235,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_close) {
-            finish();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_add_channel) {
-            // Open create channel dialog
-            final EditText input = new EditText(this);
+        if (id == R.id.action_remove_channel) {
+            // Open remove channel dialog
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.dialog_create_channel)
-                    .setView(input)
+            builder.setTitle(R.string.dialog_remove_channel)
+                    .setMessage(R.string.dialog_remove_channel_message)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            String channelName = input.getText().toString();
-                            createChannel(channelName);
+                            twilioFacade.removeChannel(twilioFacade.getActiveChannelName());
                         }
                     })
                     .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -203,350 +251,117 @@ public class MainActivity extends AppCompatActivity
                         }
                     });
             builder.create().show();
-        } else {
-            joinChannel(item.getTitle().toString());
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-    private void createChannel(String name) {
-        Map<String, Object> channelProps = new HashMap<>();
-        channelProps.put(Constants.CHANNEL_FRIENDLY_NAME, name);
-        channelProps.put(Constants.CHANNEL_UNIQUE_NAME, name);
-        channelProps.put(Constants.CHANNEL_TYPE, Channel.ChannelType.CHANNEL_TYPE_PUBLIC);
-        mMessagingClient.getChannels().createChannel(channelProps, new Constants.CreateChannelListener() {
-            @Override
-            public void onCreated(final Channel channel) {
-                if (channel != null) {
-                    Log.d(TAG, "Created default channel");
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            joinChannel(channel);
+        } else if (id == R.id.action_create_channel) {
+            // Open create channel dialog
+            final EditText input = new EditText(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.dialog_create_channel)
+                    .setView(input)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            String channelName = input.getText().toString();
+                            twilioFacade.createChannel(channelName);
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
                         }
                     });
-                }
-            }
-
-            @Override
-            public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG, "Error creating channel: " + errorInfo.getErrorText());
-            }
-        });
-    }
-
-    private void addChannel(final Channel channel) {
-
-    }
-
-    private void removeChannel(final Channel channel) {
-
-    }
-
-    private void joinChannel(String name) {
-        for (Channel channel : mMessagingClient.getChannels().getChannels()) {
-            if (name.equals(channel.getFriendlyName())) {
-                joinChannel(channel);
-                break;
-            }
-        }
-    }
-
-    private void joinChannel(final Channel channel) {
-        Log.d(TAG, "Joining Channel: " + channel.getFriendlyName());
-        channel.join(new Constants.StatusListener() {
-            @Override
-            public void onSuccess() {
-                mCurrentChannel = channel;
-                Log.d(TAG, "Joined default channel");
-
-                mMembers.clear();
-                mMessages.clear();
-
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        setTitle(channel.getFriendlyName());
-                        mMessagesAdapter.notifyDataSetChanged();
-                    }
-                });
-
-                mCurrentChannel.setListener(mChannelListener);
-            }
-
-            @Override
-            public void onError(ErrorInfo errorInfo) {
-                Log.e(TAG, "Error joining channel: " + errorInfo.getErrorText());
-            }
-        });
-    }
-
-    private void loadChannels() {
-        mMessagingClient.getChannels().loadChannelsWithListener(
-                new Constants.StatusListener() {
-                    @Override
-                    public void onSuccess() {
-                        if (mMessagingClient.getChannels().getChannels().length < 1) {
-
-                            // Create default channel
-                            createChannel(DEFAULT_CHANNEL_NAME);
-                        } else {
-                            // Update channel list
-                            Menu menu = mNavigationView.getMenu();
-                            SubMenu topChannelMenu = menu.addSubMenu("Channels");
-                            for (Channel channel : mMessagingClient.getChannels().getChannels()) {
-                                topChannelMenu.add(channel.getFriendlyName());
-                            }
-
-                            // Join first channel from a list if current channel is not set
-                            if (mCurrentChannel == null) {
-                                joinChannel(mMessagingClient.getChannels().getChannels()[0]);
-                            }
-                        }
-                    }
-                });
-    }
-
-    public class SendMessageTask extends AsyncTask<Void, Void, Boolean> {
-
-        private String mMessageBody;
-
-        public SendMessageTask(String messageBody) {
-            this.mMessageBody = messageBody;
+            builder.create().show();
+        } else if (id == R.id.action_close) {
+            close();
+            return true;
         }
 
-        protected Boolean doInBackground(Void... params) {
-            // Find all VirgilCards for all chat members
-            for (Member member : mCurrentChannel.getMembers().getMembers()) {
+        return super.onOptionsItemSelected(item);
+    }
 
-                String sid = member.getSid();
-                if (mMembers.containsKey(sid)) {
-                    continue;
-                }
+    private void logout() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putBoolean(ApplicationConstants.Prefs.LOGGED_IN, false)
+                .commit();
+    }
 
-                String identity = member.getUserInfo().getIdentity();
+    private void close() {
+        logout();
+        finish();
+    }
 
-                // Find Virgil Card for valid emails only
-                if (CommonUtils.isNicknameValid(identity)) {
-
-                    Log.d(TAG, "Looking for: " + identity);
-
-                    SearchCriteria.Builder criteriaBuilder = new SearchCriteria.Builder();
-                    criteriaBuilder.setValue(identity).setIncludeUnauthorized(true);
-                    List<VirgilCard> cards = clientFactory.getPublicKeyClient().search(criteriaBuilder.build());
-
-                    if (!cards.isEmpty()) {
-                        VirgilCard card = cards.get(cards.size() - 1);
-
-                        String cardId = card.getId();
-                        PublicKey publicKey = new PublicKey(Base64.decode(card.getPublicKey().getKey()));
-
-                        mMembers.put(sid, new ChatMember(cardId, publicKey));
-
-                        Log.w(TAG, "Found card: " + cardId);
-                    } else {
-                        Log.w(TAG, "No cards for: " + identity);
-                    }
-                }
-            }
-
-            // Build recipients map
-            Map<String, PublicKey> recipients = new HashMap<>();
-            for (ChatMember member : mMembers.values()) {
-                recipients.put(member.getCardId(), member.getPublicKey());
-            }
-
-            // Build message
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setBody(mMessageBody);
-            chatMessage.setAuthor(mIdentity);
-            chatMessage.setDate(new Date().getTime());
-            chatMessage.setId(UUID.randomUUID().toString());
-
-
-            mMessageBody = mGson.toJson(chatMessage);
-
-            // Encode message body
-            if (!recipients.isEmpty()) {
-                try {
-                    mMessageBody = CryptoHelper.encrypt(mMessageBody, recipients);
-                } catch (Exception e) {
-                    // TODO: show error message
-                }
-            }
-
-            // If message was not encrypted, sent it as is (unencrypted)
-            Message message = mCurrentChannel.getMessages().createMessage(mMessageBody);
-            Log.d(TAG, "Message created");
-            mCurrentChannel.getMessages().sendMessage(message, new Constants.StatusListener() {
-                @Override
-                public void onSuccess() {
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // need to modify user interface elements on the UI thread
-                            mWriteMessageEditText.setText("");
-                        }
-                    });
-                }
-
-                @Override
-                public void onError(ErrorInfo errorInfo) {
-                    Log.e(TAG, "Error sending message: " + errorInfo.getErrorText());
-                }
-            });
-
-
-            return null;
-        }
+    private Handler handler = new Handler() {
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-        }
-    }
+        public void handleMessage(android.os.Message msg) {
+            String event = msg.getData().getString(ApplicationConstants.Messages.EVENT);
+            switch (event) {
+                case ApplicationConstants.Messages.NEW_CHANNEL_EVENT:
+                    String channelName = msg.getData().getString(ApplicationConstants.Messages.CHANNEL_NAME);
+                    mChannels.add(channelName);
+                    mChannelsAdapter.notifyDataSetChanged();
+                    break;
+                case ApplicationConstants.Messages.JOIN_CHANNEL_EVENT:
+                    channelName = msg.getData().getString(ApplicationConstants.Messages.CHANNEL_NAME);
+                    int membersCount = msg.getData().getInt(ApplicationConstants.Messages.CHANNEL_MEMBERS_COUNT);
 
-    private void retrieveAccessTokenFromServer(String twilioToken) {
-        mAccessManager = TwilioAccessManagerFactory.createAccessManager(twilioToken,
-                mAccessManagerListener);
-
-        TwilioIPMessagingClient.Properties props =
-                new TwilioIPMessagingClient.Properties(
-                        TwilioIPMessagingClient.SynchronizationStrategy.ALL, 500);
-
-        mMessagingClient = TwilioIPMessagingSDK.createClient(mAccessManager, props,
-                mMessagingClientCallback);
-
-        loadChannels();
-
-        mMessagingClient.setListener(new IPMessagingClientListener() {
-            @Override
-            public void onChannelAdd(Channel channel) {
-                Log.d(TAG, "Channel added: " + channel.getFriendlyName());
-                addChannel(channel);
-            }
-
-            @Override
-            public void onChannelChange(Channel channel) {
-                Log.d(TAG, "Channel changed: " + channel.getFriendlyName());
-                // TODO: update channel menu
-            }
-
-            @Override
-            public void onChannelDelete(Channel channel) {
-                Log.d(TAG, "Channel deleted: " + channel.getFriendlyName());
-                removeChannel(channel);
-            }
-
-            @Override
-            public void onChannelSynchronizationChange(Channel channel) {
-
-            }
-
-            @Override
-            public void onError(ErrorInfo errorInfo) {
-
-            }
-
-            @Override
-            public void onUserInfoChange(UserInfo userInfo) {
-
-            }
-
-            @Override
-            public void onClientSynchronization(TwilioIPMessagingClient.SynchronizationStatus synchronizationStatus) {
-
-            }
-        });
-    }
-
-    private TwilioAccessManagerListener mAccessManagerListener = new TwilioAccessManagerListener() {
-        @Override
-        public void onTokenExpired(TwilioAccessManager twilioAccessManager) {
-            Log.d(TAG, "Access token has expired");
-        }
-
-        @Override
-        public void onTokenUpdated(TwilioAccessManager twilioAccessManager) {
-            Log.d(TAG, "Access token has updated");
-        }
-
-        @Override
-        public void onError(TwilioAccessManager twilioAccessManager, String errorMessage) {
-            Log.d(TAG, "Error with Twilio Access Manager: " + errorMessage);
-        }
-    };
-
-    private Constants.CallbackListener<TwilioIPMessagingClient> mMessagingClientCallback =
-            new Constants.CallbackListener<TwilioIPMessagingClient>() {
-                @Override
-                public void onSuccess(TwilioIPMessagingClient twilioIPMessagingClient) {
-                    Log.d(TAG, "Success creating Twilio IP Messaging Client");
-                }
-            };
-
-    private ChannelListener mChannelListener = new ChannelListener() {
-        @Override
-        public void onMessageAdd(final Message message) {
-            Log.d(TAG, "Message added");
-            MainActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    // need to modify user interface elements on the UI thread
-                    mMessages.add(message);
+                    showActiveChannel(channelName, membersCount);
+                    mMessages.clear();
                     mMessagesAdapter.notifyDataSetChanged();
-                }
-            });
-
-        }
-
-        @Override
-        public void onMessageChange(Message message) {
-            Log.d(TAG, "Message changed: " + message.getMessageBody());
-        }
-
-        @Override
-        public void onMessageDelete(Message message) {
-            Log.d(TAG, "Message deleted");
-        }
-
-        @Override
-        public void onMemberJoin(Member member) {
-            Log.d(TAG, "Member joined: " + member.getUserInfo().getIdentity());
-        }
-
-        @Override
-        public void onMemberChange(Member member) {
-            Log.d(TAG, "Member changed: " + member.getUserInfo().getIdentity());
-        }
-
-        @Override
-        public void onMemberDelete(Member member) {
-            Log.d(TAG, "Member deleted: " + member.getUserInfo().getIdentity());
-        }
-
-        @Override
-        public void onAttributesChange(Map<String, String> map) {
-            Log.d(TAG, "Attributes changed: " + map.toString());
-        }
-
-        @Override
-        public void onTypingStarted(Member member) {
-            Log.d(TAG, "Started Typing: " + member.getUserInfo().getIdentity());
-        }
-
-        @Override
-        public void onTypingEnded(Member member) {
-            Log.d(TAG, "Ended Typing: " + member.getUserInfo().getIdentity());
-        }
-
-        @Override
-        public void onSynchronizationChange(Channel channel) {
-
+                    break;
+                case ApplicationConstants.Messages.UPDATE_CHANNELS_EVENT:
+                    mChannels.clear();
+                    List<String> channelNames = msg.getData().getStringArrayList(ApplicationConstants.Messages.CHANNEL_NAMES);
+                    for (String name : channelNames) {
+                        mChannels.add(name);
+                    }
+                    mChannelsAdapter.notifyDataSetChanged();
+                    break;
+                case ApplicationConstants.Messages.REMOVE_CHANNEL_EVENT:
+                    channelName = msg.getData().getString(ApplicationConstants.Messages.CHANNEL_NAME);
+                    mChannels.remove(channelName);
+                    mChannelsAdapter.notifyDataSetChanged();
+                    break;
+                case ApplicationConstants.Messages.ADD_MESSAGE_EVENT:
+                    ChannelMessage channelMessage = mGson.fromJson(msg.getData().getString(ApplicationConstants.Messages.DECRYPTED_MESSAGE), ChannelMessage.class);
+                    showMessageAtChat(channelMessage);
+                    break;
+            }
         }
     };
+
+    private class TwilioTokenProviderImpl implements TwilioFacade.TwilioTokenProvider {
+
+        private Context mContext;
+        private IPMessagingService mService;
+
+        public TwilioTokenProviderImpl(Context context) {
+            this.mContext = context;
+
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(ApplicationConstants.BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+
+            mService = retrofit.create(IPMessagingService.class);
+        }
+
+        @Override
+        public String getToken() {
+            try {
+                String deviceId = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+                Response<TwilioToken> response = mService.getTwilioToken(mIdentity, deviceId).execute();
+                if (response.isSuccessful()) {
+                    String token = response.body().getTwilioToken();
+                    Log.d(TAG, "Twilio token: " + token);
+                    return token;
+                } else {
+                    throw new IPMessagingServiceException("Can't obtain Twilio token");
+                }
+            } catch (IOException e) {
+                Log.e(TAG, "Can't obtain Twilio token", e);
+                throw new IPMessagingServiceException(e);
+            }
+        }
+    }
 
 }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="virgil_token"
+        android:title="@string/virgil_access_token"
+        android:defaultValue="AT.4c61c82b7b496951271dfa055e6c3dd9bfc7214b046266cf6776a5cf66d8b530"/>
+
+</PreferenceScreen>

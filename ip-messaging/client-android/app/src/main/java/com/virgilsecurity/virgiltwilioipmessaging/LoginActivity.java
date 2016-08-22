@@ -4,10 +4,11 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,23 +20,18 @@ import android.widget.EditText;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.virgilsecurity.sdk.client.ClientFactory;
-import com.virgilsecurity.sdk.client.model.IdentityType;
 import com.virgilsecurity.sdk.client.model.identity.ValidatedIdentity;
-import com.virgilsecurity.sdk.client.model.privatekey.PrivateKeyInfo;
 import com.virgilsecurity.sdk.client.model.publickey.SearchCriteria;
 import com.virgilsecurity.sdk.client.model.publickey.VirgilCard;
 import com.virgilsecurity.sdk.client.model.publickey.VirgilCardTemplate;
-import com.virgilsecurity.sdk.crypto.Base64;
 import com.virgilsecurity.sdk.crypto.KeyPair;
 import com.virgilsecurity.sdk.crypto.KeyPairGenerator;
 import com.virgilsecurity.sdk.crypto.PrivateKey;
 import com.virgilsecurity.sdk.crypto.PublicKey;
+import com.virgilsecurity.virgiltwilioipmessaging.exception.IPMessagingServiceException;
 import com.virgilsecurity.virgiltwilioipmessaging.http.IPMessagingService;
-import com.virgilsecurity.virgiltwilioipmessaging.http.IPMessagingServiceException;
 import com.virgilsecurity.virgiltwilioipmessaging.model.LoginRequest;
 import com.virgilsecurity.virgiltwilioipmessaging.model.LoginResponse;
-import com.virgilsecurity.virgiltwilioipmessaging.model.TwilioToken;
-import com.virgilsecurity.virgiltwilioipmessaging.model.VirgilToken;
 import com.virgilsecurity.virgiltwilioipmessaging.utils.CommonUtils;
 
 import java.io.IOException;
@@ -64,13 +60,23 @@ public class LoginActivity extends AppCompatActivity {
 
     private IPMessagingService mService;
 
+    private String mSavedIdentity = null;
+    private String mVirgilToken = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        PreferenceManager.setDefaultValues(this, R.xml.prefs, false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        mSavedIdentity = prefs.getString(ApplicationConstants.Prefs.IDENTITY, "");
+        mVirgilToken = prefs.getString(ApplicationConstants.Prefs.VIRGIL_TOKEN, "");
+
         // Set up the login form.
         mNicknameView = (EditText) findViewById(R.id.nickname);
+        mNicknameView.setText(mSavedIdentity);
 
         Button mNicknameSignInButton = (Button) findViewById(R.id.nickname_sign_in_button);
         mNicknameSignInButton.setOnClickListener(new OnClickListener() {
@@ -85,11 +91,21 @@ public class LoginActivity extends AppCompatActivity {
 
         Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://demo-ip-messaging.virgilsecurity.com/")
+                .baseUrl(ApplicationConstants.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         mService = retrofit.create(IPMessagingService.class);
+
+        if (prefs.getBoolean(ApplicationConstants.Prefs.LOGGED_IN, false)) {
+            openMainActivity();
+        }
+    }
+
+    private void openMainActivity() {
+        Intent intent = new Intent(getBaseContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     /**
@@ -177,13 +193,7 @@ public class LoginActivity extends AppCompatActivity {
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mNickname;
-        private String mCardId;
-        private PublicKey mPublicKey = null;
-        private PrivateKey mPrivateKey = null;
-
-        private String mVirgilToken = null;
-
-        private String mTwilioToken = null;
+        private String mErrorMessage = null;
 
         UserLoginTask(String email) {
             mNickname = email;
@@ -191,28 +201,24 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-
             try {
-                // Obtain Virgil token
-                mVirgilToken = obtainVirgilToken().getVirgilToken();
-                Log.d(TAG, "Virgil token: " + mVirgilToken);
+                if (mSavedIdentity.equals(mNickname)) {
 
-                // Obtain Twilio token
-                mTwilioToken = obtainTwilioToken().getTwilioToken();
-                Log.d(TAG, "Twilio token: " + mTwilioToken);
+                    // User already registered. Login with key stored at preferences
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    login(prefs.getString(ApplicationConstants.Prefs.PUBLIC_KEY, ""));
+                    prefs.edit()
+                            .putBoolean(ApplicationConstants.Prefs.LOGGED_IN, true)
+                            .commit();
 
+                    return true;
+                }
+
+                // Try to register new identity
                 ClientFactory clientFactory = new ClientFactory(mVirgilToken);
 
-                // Get Virgil Private Key service card
-                SearchCriteria.Builder searchCriteriaBuilder = new SearchCriteria.Builder();
-                searchCriteriaBuilder
-                        .setType(IdentityType.APPLICATION)
-                        .setValue("com.virgilsecurity.private-keys");
-                VirgilCard serviceCard = clientFactory.getPublicKeyClient().search(searchCriteriaBuilder.build()).get(0);
-                Log.d(TAG, "Service card: " + serviceCard.getId());
-
                 // Find Public Key at Virgil Key service
-                searchCriteriaBuilder = new SearchCriteria.Builder();
+                SearchCriteria.Builder searchCriteriaBuilder = new SearchCriteria.Builder();
                 searchCriteriaBuilder
                         .setType(ApplicationConstants.IDENTITY_TYPE)
                         .setValue(mNickname);
@@ -220,17 +226,16 @@ public class LoginActivity extends AppCompatActivity {
                 List<VirgilCard> cards = clientFactory.getPublicKeyClient().search(searchCriteriaBuilder.build());
                 Log.d(TAG, "Found " + cards.size() + " user's cards");
 
-                LoginResponse loginResponse = null;
                 if (cards.isEmpty()) {
-                    // Register new user
+                    // Register new Virgil Card
 
                     // Generate new Key Pair
                     KeyPair keyPair = KeyPairGenerator.generate();
-                    mPublicKey = keyPair.getPublic();
-                    mPrivateKey = keyPair.getPrivate();
+                    PublicKey publicKey = keyPair.getPublic();
+                    PrivateKey privateKey = keyPair.getPrivate();
 
                     // Login Virgil IP Messaging service
-                    loginResponse = login();
+                    LoginResponse loginResponse = login(publicKey.getAsString());
 
                     // Register new Virgil Card
                     ValidatedIdentity identity = new ValidatedIdentity(ApplicationConstants.IDENTITY_TYPE, mNickname);
@@ -239,37 +244,27 @@ public class LoginActivity extends AppCompatActivity {
                     VirgilCardTemplate.Builder cardTemplateBuilder = new VirgilCardTemplate.Builder();
                     cardTemplateBuilder.addData("public_key_signature", loginResponse.getApplicationSign());
                     cardTemplateBuilder.setIdentity(identity);
-                    cardTemplateBuilder.setPublicKey(mPublicKey);
+                    cardTemplateBuilder.setPublicKey(publicKey);
 
-                    VirgilCard registeredCard = clientFactory.getPublicKeyClient().createCard(cardTemplateBuilder.build(), mPrivateKey);
-                    mCardId = registeredCard.getId();
-                    Log.d(TAG, "New Virgil Card registered: " + mCardId);
+                    VirgilCard registeredCard = clientFactory.getPublicKeyClient().createCard(cardTemplateBuilder.build(), privateKey);
+                    String cardId = registeredCard.getId();
+                    Log.d(TAG, "New Virgil Card registered: " + cardId);
 
-                    // Save private key at Virgil Private Key service
-                    clientFactory.getPrivateKeyClient(serviceCard).stash(mCardId, mPrivateKey);
-                    Log.d(TAG, "Private key saved at Virgil Private Key store");
+                    // Save identity data for future usage
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    prefs.edit().putString(ApplicationConstants.Prefs.IDENTITY, mNickname)
+                            .putString(ApplicationConstants.Prefs.CARD_ID, cardId)
+                            .putString(ApplicationConstants.Prefs.PUBLIC_KEY, publicKey.getAsString())
+                            .putString(ApplicationConstants.Prefs.PRIVATE_KEY, privateKey.getAsString())
+                            .putBoolean(ApplicationConstants.Prefs.LOGGED_IN, true)
+                            .commit();
                 } else {
-                    VirgilCard card = cards.get(cards.size() - 1);
-                    mCardId = card.getId();
-                    Log.d(TAG, "User's Card: " + mCardId);
-
-                    mPublicKey = new PublicKey(Base64.decode(card.getPublicKey().getKey()));
-                    Log.d(TAG, "Public key is:" + mPublicKey.getAsString());
-
-                    // Login Virgil IP Messaging service
-                    loginResponse = login();
-                    Log.d(TAG, "Logged in as: " + loginResponse.getIdentity());
-
-                    // Load existing Private key
-                    ValidatedIdentity identity = new ValidatedIdentity(ApplicationConstants.IDENTITY_TYPE, mNickname);
-                    identity.setToken(loginResponse.getValidationToken());
-                    PrivateKeyInfo privateKeyInfo = clientFactory.getPrivateKeyClient(serviceCard).get(card.getId(), identity);
-
-                    mPrivateKey = new PrivateKey(Base64.decode(privateKeyInfo.getKey()));
-                    Log.d(TAG, "Private key: " + mPrivateKey.getAsString());
+                    // This user is already registered from other device
+                    Log.d(TAG, "User is already registered from other device");
+                    mErrorMessage = "User is already registered from other device";
+                    return false;
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Login failed", e);
                 return false;
             }
@@ -285,17 +280,9 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
-                Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.putExtra(ApplicationConstants.Extra.IDENTITY, mNickname);
-                intent.putExtra(ApplicationConstants.Extra.CARD_ID, mCardId);
-                intent.putExtra(ApplicationConstants.Extra.PUBLIC_KEY, mPublicKey.getAsString());
-                intent.putExtra(ApplicationConstants.Extra.PRIVATE_KEY, mPrivateKey.getAsString());
-                intent.putExtra(ApplicationConstants.Extra.VIRGIL_TOKEN, mVirgilToken);
-                intent.putExtra(ApplicationConstants.Extra.TWILIO_TOKEN, mTwilioToken);
-                startActivity(intent);
-                finish();
+                openMainActivity();
             } else {
-                mNicknameView.setError(getString(R.string.error_invalid_nickname));
+                mNicknameView.setError(mErrorMessage);
                 mNicknameView.requestFocus();
             }
         }
@@ -306,38 +293,8 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
         }
 
-        private VirgilToken obtainVirgilToken() {
-            try {
-                Response<VirgilToken> response = mService.getVirgilToken().execute();
-                if (response.isSuccessful()) {
-                    return response.body();
-                } else {
-                    throw new IPMessagingServiceException("Can't obtain Virgil token");
-                }
-            } catch (IOException e) {
-                Log.e(LoginActivity.TAG, "Can't obtain Virgil token", e);
-                throw new IPMessagingServiceException(e);
-            }
-        }
-
-        private TwilioToken obtainTwilioToken() {
-            try {
-                String deviceId = Settings.Secure.getString(LoginActivity.this.getContentResolver(),
-                        Settings.Secure.ANDROID_ID);
-                Response<TwilioToken> response = mService.getTwilioToken(mNickname, deviceId).execute();
-                if (response.isSuccessful()) {
-                    return response.body();
-                } else {
-                    throw new IPMessagingServiceException("Can't obtain Twilio token");
-                }
-            } catch (IOException e) {
-                Log.e(LoginActivity.TAG, "Can't obtain Twilio token", e);
-                throw new IPMessagingServiceException(e);
-            }
-        }
-
-        private LoginResponse login() {
-            LoginRequest loginRequest = new LoginRequest(mNickname, mPublicKey.getAsString());
+        private LoginResponse login(String publicKey) {
+            LoginRequest loginRequest = new LoginRequest(mNickname, publicKey);
             try {
                 Response<LoginResponse> response = mService.login(loginRequest).execute();
                 if (response.isSuccessful()) {
@@ -351,6 +308,5 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     }
-
 }
 

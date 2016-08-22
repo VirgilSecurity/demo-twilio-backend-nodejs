@@ -3,9 +3,8 @@
 
     <!-- Strings related to login -->
     <string name="prompt_nickname">Nickname</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_nickname">This nickname is invalid</string>
+    <string name="action_start">Start</string>
+    <string name="error_invalid_nickname">Nickname should be alphanumeric. No space allowed.</string>
     <string name="error_field_required">This field is required</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing nickname
         completions."
@@ -15,8 +14,17 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
+    <string name="loading">Loading...</string>
+    <string name="action_create_channel">Create channel</string>
+    <string name="action_remove_channel">Remove channel</string>
     <string name="action_close">Close</string>
     <string name="send">Send</string>
+    <string name="channels">Channels</string>
 
     <string name="dialog_create_channel">Create channel</string>
+    <string name="dialog_remove_channel">Remove channel</string>
+    <string name="dialog_remove_channel_message">Remove channel?</string>
+    <string name="virgil_access_token">Virgil access token</string>
+
+    <string name="error_channel_not_found">Channel not found</string>
 </resources>

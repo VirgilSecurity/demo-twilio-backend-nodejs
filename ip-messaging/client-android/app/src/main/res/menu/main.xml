@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_close"
-        android:orderInCategory="100"
-        android:title="@string/action_close"
-        app:showAsAction="never" />
+
+    <group>
+        <item
+            android:id="@+id/action_create_channel"
+            android:orderInCategory="100"
+            android:title="@string/action_create_channel"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/action_remove_channel"
+            android:orderInCategory="100"
+            android:title="@string/action_remove_channel"
+            app:showAsAction="never" />
+    </group>
+
+    <group>
+
+        <item
+            android:id="@+id/action_close"
+            android:orderInCategory="100"
+            android:title="@string/action_close"
+            app:showAsAction="never" />
+
+    </group>
 </menu>

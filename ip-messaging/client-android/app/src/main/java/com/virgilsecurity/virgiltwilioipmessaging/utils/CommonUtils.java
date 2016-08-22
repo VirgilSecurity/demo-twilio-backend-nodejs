@@ -1,9 +1,10 @@
 package com.virgilsecurity.virgiltwilioipmessaging.utils;
 
+import com.virgilsecurity.sdk.client.utils.StringUtils;
+
 public class CommonUtils {
 
     public static boolean isNicknameValid(String nickname) {
-        String trimmed = nickname.trim();
-        return !(trimmed.isEmpty()  || trimmed.contains(" "));
+        return !StringUtils.isBlank(nickname);
     }
 }
