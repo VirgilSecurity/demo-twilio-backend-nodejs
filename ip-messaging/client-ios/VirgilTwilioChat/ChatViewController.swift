@@ -17,7 +17,7 @@ import SlackTextViewController
 class ChatViewController: SLKTextViewController {
     
     private var messages = [Dictionary<String, AnyObject>]()
-    private var channel: TWMChannel!
+    var channel: TWMChannel!
     
     override var tableView: UITableView {
         get {
@@ -45,31 +45,31 @@ class ChatViewController: SLKTextViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if AppState.sharedInstance.twilio == nil {
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-            UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-            
-//            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-//                AppState.sharedInstance.initTwilio(self)
-//            }
-        }
-        
         self.navigationController?.setNavigationBarHidden(false, animated: true)
+        self.title = self.channel.friendlyName
+        
+        AppState.sharedInstance.twilio.addListener(self)
+        
+        dispatch_async(dispatch_get_main_queue()) { 
+            self.loadChatParticipants()
+            let attributes = self.channel.attributes()
+            guard attributes[Constants.Virgil.ChannelAttributeCardId] != nil else {
+                return
+            }
+            
+            let messages = AppState.sharedInstance.backend.getHistory(AppState.sharedInstance.identity, channelSid: self.channel.sid)
+            for message in messages {
+                if let body = message[Constants.Message.Body] as? String, encrypted = NSData(base64EncodedString: body, options: .IgnoreUnknownCharacters) {
+                    self.decryptAndCacheMessage(encrypted)
+                }
+            }
+
+            self.tableView.reloadData()
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-    }
-    
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let identifier = segue.identifier where identifier == "ChannelsViewControllerSegue", let destination = segue.destinationViewController as? UINavigationController, controller = destination.topViewController as? ChannelsViewController {
-//            controller.channels = AppState.sharedInstance.twilio.channelsList().allObjects()
-//            controller.delegate = self
-            
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
-        }
     }
     
     private func loadChatParticipants() {
@@ -94,16 +94,7 @@ class ChatViewController: SLKTextViewController {
                 if let json = try? NSJSONSerialization.JSONObjectWithData(plainData, options: .AllowFragments), wrapper = json as? Dictionary<String, AnyObject> {
                     self.messages.append(wrapper)
                 }
-//                if let plainData = try? decryptor.decryptData(message, recipientId: card.Id, privateKey: AppState.sharedInstance.privateKey.key, keyPassword: AppState.sharedInstance.privateKey.password, error: ()) {
-//                    if let wrapper = try? NSJSONSerialization.JSONObjectWithData(plainData, options: .AllowFragments) {
-//                        self.messages.append(wrapper)
-//                    }
-//                }
             }
-            
-//            if let card = AppState.sharedInstance.cardForIdentity(AppState.sharedInstance.identity), plainData = try? decryptor.decryptData(message, recipientId: card.Id, privateKey: AppState.sharedInstance.privateKey.key, keyPassword: AppState.sharedInstance.privateKey.password, error: ()), wrapper = try? NSJSONSerialization.JSONObjectWithData(plainData, options: .AllowFragments) {
-//                self.messages.append(wrapper)
-//            }
         }
         task.await()
     }
@@ -241,19 +232,10 @@ class ChatViewController: SLKTextViewController {
 }
 
 // MARK: - TwilioIPMessagingClientDelegate
-extension ChatViewController: TwilioIPMessagingClientDelegate {
+extension ChatViewController: TwilioMessageListener {
     
-    func ipMessagingClient(client: TwilioIPMessagingClient!, synchronizationStatusChanged status: TWMClientSynchronizationStatus) {
-        if status == .ChannelsListCompleted {
-            dispatch_async(dispatch_get_main_queue(), {
-                self.performSegueWithIdentifier("ChannelsViewControllerSegue", sender: self)
-            })
-        }
-    }
-    
-    // Called whenever a channel we've joined receives a new message
-    func ipMessagingClient(client: TwilioIPMessagingClient!, channel: TWMChannel!, messageAdded message: TWMMessage!) {
-        if let encrypted = NSData(base64EncodedString: message.body, options: .IgnoreUnknownCharacters) {
+    func didAddMessage(msg: TWMMessage) {
+        if let encrypted = NSData(base64EncodedString: msg.body, options: .IgnoreUnknownCharacters) {
             self.decryptAndCacheMessage(encrypted)
             dispatch_async(dispatch_get_main_queue()) {
                 self.tableView.reloadData()
@@ -262,82 +244,3 @@ extension ChatViewController: TwilioIPMessagingClientDelegate {
     }
     
 }
-
-// MARK: - ChannelsViewControllerDelegate
-//extension ChatViewController: ChannelsViewControllerDelegate {
-//    
-//    func channelsViewControllerDidCancel() {
-//        self.dismissViewControllerAnimated(true, completion: nil)
-//    }
-//    
-//    func channelsViewController(controller: ChannelsViewController, didFinishWithChannel channel: TWMChannel) {
-//        
-//        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-//        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-//        
-//        self.channel = channel
-//        self.channel.joinWithCompletion { (result) in
-//            self.loadChatParticipants()
-//            let messages = AppState.sharedInstance.backend.getHistory(AppState.sharedInstance.identity, channelSid: self.channel.sid)
-//            for message in messages {
-//                if let body = message[Constants.Message.Body] as? String, encrypted = NSData(base64EncodedString: body, options: .IgnoreUnknownCharacters) {
-//                    self.decryptAndCacheMessage(encrypted)
-//                }
-//            }
-//            
-//            dispatch_async(dispatch_get_main_queue(), {
-//                self.tableView.reloadData()
-//                self.dismissViewControllerAnimated(true, completion: nil)
-//                
-//                UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-//                UIApplication.sharedApplication().endIgnoringInteractionEvents()
-//            })
-//        }
-//    }
-//    
-//    func channelsViewController(controller: ChannelsViewController, didAddChannelWithName name: String) {
-//        
-//        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-//        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-//        
-//        var channelOptions: Dictionary<String, AnyObject> = [TWMChannelOptionUniqueName: name, TWMChannelOptionType: TWMChannelType.Public.rawValue]
-//        if let card = AppState.sharedInstance.cardForIdentity(Constants.Virgil.ChatAdmin, type: Constants.Virgil.IdentityTypeAdmin), key = NSString(data: card.publicKey.key, encoding: NSUTF8StringEncoding) {
-//            channelOptions[TWMChannelOptionAttributes] = [Constants.Virgil.ChannelAttributeCardId: card.Id, Constants.Virgil.ChannelAttributKey: key]
-//        }
-//        
-////        AppState.sharedInstance.twilio.channelsList().createChannelWithOptions(channelOptions) { (result, channel) in
-////            if !result.isSuccessful() {
-////                print("Error creating the channel: \(result.error)")
-////                dispatch_async(dispatch_get_main_queue(), { 
-////                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-////                    UIApplication.sharedApplication().endIgnoringInteractionEvents()
-////                })
-////                return
-////            }
-////            
-////            self.channel = channel
-////            self.channel.setUniqueName(name, completion: { (result) in
-////                
-////                self.channel.setFriendlyName(name, completion: { (result) in
-////                    self.channel.joinWithCompletion({ (result) in
-////                        self.loadChatParticipants()
-////                        let messages = AppState.sharedInstance.backend.getHistory(AppState.sharedInstance.identity, channelSid: self.channel.sid)
-////                        for message in messages {
-////                            if let body = message[Constants.Message.Body] as? String, encrypted = NSData(base64EncodedString: body, options: .IgnoreUnknownCharacters) {
-////                                self.decryptAndCacheMessage(encrypted)
-////                            }
-////                        }
-////                        
-////                        dispatch_async(dispatch_get_main_queue(), {
-////                            self.tableView.reloadData()
-////                            self.dismissViewControllerAnimated(true, completion: nil)
-////                            
-////                            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-////                            UIApplication.sharedApplication().endIgnoringInteractionEvents()
-////                        })
-////                    })
-////                })
-////            })
-////        }
-//    }
-//}

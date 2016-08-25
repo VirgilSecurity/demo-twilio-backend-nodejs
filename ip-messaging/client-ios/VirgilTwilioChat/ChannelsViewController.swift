@@ -39,6 +39,9 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
         if let identifier = segue.identifier where identifier == "NewChannelViewControllerSegue", let destination = segue.destinationViewController as? UINavigationController, controller = destination.topViewController as? NewChannelViewController {
             controller.delegate = self
         }
+        else if let identifier = segue.identifier where identifier == "ChatViewControllerSegue", let destination = segue.destinationViewController as? ChatViewController {
+            destination.channel = sender as! TWMChannel
+        }
     }
 
     // MARK: - Action handlers
@@ -78,8 +81,13 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
-        // TODO: Join the selected channel
-        // TODO: Navigate to Chat
+        
+        let channel = self.channels[indexPath.row]
+        AppState.sharedInstance.twilio.joinChannel(channel)
+        
+        dispatch_async(dispatch_get_main_queue(), {
+            self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel)
+        })
     }
 }
 
@@ -111,11 +119,39 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
             
             if saveHistory {
                 if let card = AppState.sharedInstance.cardForIdentity(Constants.Virgil.ChatAdmin, type: Constants.Virgil.IdentityTypeAdmin), key = NSString(data: card.publicKey.key, encoding: NSUTF8StringEncoding) {
-                    channelOptions[TWMChannelOptionAttributes] = [Constants.Virgil.ChannelAttributeCardId: card.Id, Constants.Virgil.ChannelAttributKey: key]
+                    channelOptions[TWMChannelOptionAttributes] = [Constants.Virgil.ChannelAttributeCardId: card.Id, Constants.Virgil.ChannelAttributeKey: key]
+                }
+                else {
+                    dispatch_async(dispatch_get_main_queue(), { 
+                        let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("History of the channel will NOT be saved.", comment: "History of the channel will NOT be saved."), preferredStyle: .Alert)
+                        let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
+                            self.dismissViewControllerAnimated(true, completion: nil)
+                        })
+                        alert.addAction(action)
+                        self.presentViewController(alert, animated: true, completion: nil)
+                    })
                 }
             }
+            
+            if let channel = AppState.sharedInstance.twilio.addChannelWithOptions(channelOptions) {
+                AppState.sharedInstance.twilio.setChannelName(channel, unique: name, friendly: nil)
+                AppState.sharedInstance.twilio.joinChannel(channel)
+                
+                dispatch_async(dispatch_get_main_queue(), { 
+                    self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel)
+                })
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), {
+                    let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Error creating the channel.", comment: "Error creating the channel."), preferredStyle: .Alert)
+                    let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
+                        self.dismissViewControllerAnimated(true, completion: nil)
+                    })
+                    alert.addAction(action)
+                    self.presentViewController(alert, animated: true, completion: nil)
+                })
+            }
         }
-        print("<<<< CHANNEL HAVE TO BE ADDED: '\(name)', SAVE HISTORY: '\(saveHistory)'")
     }
     
 }

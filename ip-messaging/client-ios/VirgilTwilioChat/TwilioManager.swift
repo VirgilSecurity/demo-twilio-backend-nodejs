@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import XAsync
 
 protocol TwilioListener: class {
     
@@ -79,6 +80,68 @@ class TwilioManager: NSObject {
             return []
         }
         return channels
+    }
+    
+    func addChannelWithOptions(options: Dictionary<String, AnyObject>) -> TWMChannel? {
+        let task = XAsyncTask { (weakTask) in
+            self.twilio.channelsList().createChannelWithOptions(options, completion: { (result, channel) in
+                if !result.isSuccessful() || channel == nil {
+                    print("Error creating the channel: \(result.error.localizedDescription)")
+                    weakTask?.result = nil
+                    weakTask?.fireSignal()
+                    return
+                }
+                
+                weakTask?.result = channel
+                weakTask?.fireSignal()
+            })
+        }
+        task.awaitSignal()
+        return task.result as? TWMChannel
+    }
+    
+    func setChannelName(channel: TWMChannel, unique: String, friendly: String?) {
+        let task1 = XAsyncTask { (weakTask) in
+            channel.setUniqueName(unique, completion: { (result) in
+                if !result.isSuccessful() {
+                    print("Error setting unique name for the channel: \(result.error.localizedDescription)")
+                    weakTask?.fireSignal()
+                    return
+                }
+                
+                weakTask?.fireSignal()
+            })
+        }
+        task1.awaitSignal()
+        
+        let task2 = XAsyncTask { (weakTask) in
+            channel.setFriendlyName(friendly ?? unique, completion: { (result) in
+                if !result.isSuccessful() {
+                    print("Error setting friendly name for the channel: \(result.error.localizedDescription)")
+                    weakTask?.fireSignal()
+                    return
+                }
+                
+                weakTask?.fireSignal()
+            })
+        }
+        task2.awaitSignal()
+    }
+    
+    func joinChannel(channel: TWMChannel) {
+        let task = XAsyncTask { (weakTask) in
+            channel.joinWithCompletion({ (result) in
+                if !result.isSuccessful() {
+                    print("Error joining the channel: \(result.error.localizedDescription)")
+                    weakTask?.fireSignal()
+                    return
+                }
+                
+                weakTask?.fireSignal()
+
+            })
+        }
+        task.awaitSignal()
     }
     
     func sendMessage() {

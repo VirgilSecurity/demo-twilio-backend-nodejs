@@ -136,6 +136,7 @@
                     <connections>
                         <outlet property="tvChannels" destination="HpO-qe-Fon" id="LFH-xe-jWX"/>
                         <segue destination="Jyo-or-31Z" kind="presentation" identifier="NewChannelViewControllerSegue" id="Q0P-Fc-6Uq"/>
+                        <segue destination="PqH-uY-gE3" kind="show" identifier="ChatViewControllerSegue" id="tp1-oU-pRl"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xxJ-YX-Tjz" userLabel="First Responder" sceneMemberID="firstResponder"/>

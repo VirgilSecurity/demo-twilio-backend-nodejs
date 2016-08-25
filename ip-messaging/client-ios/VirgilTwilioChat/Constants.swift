@@ -16,7 +16,7 @@ struct Constants {
         static let ChatAdmin = "twilio_chat_admin"
         static let IdentityTypeAdmin = "member"
         static let ChannelAttributeCardId = "virgil_card_id"
-        static let ChannelAttributKey = "virgil_public_key"
+        static let ChannelAttributeKey = "virgil_public_key"
         static let VirgilPublicKeySignature = "public_key_signature"
     }
     
