@@ -36,13 +36,6 @@ ClientFactory clientFactory = new ClientFactory(mVirgilToken);
 
 Here the application requests the token from the backend server and the backend server takes it from the [Virgil Dashboard](https://developer.virgilsecurity.com/dashboard/). The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate the app’s requests with a particular Virgil Security developer's account.
 
-The backend server also sends all requests signed using its own private key. The example application will check the signatures of every single response to make sure that a particular response comes from this exact server. For [verification of the signature](#verification-of-the-backend-server-signature) the application needs correspondent public key:
-
-###### Java
-```
-TDB
-```
-
 ### Managing User Keys
 
 To use IP-messaging securely each user needs to have his/her own private key (which might and in general have to be stored locally on a particular Android device) and a Virgil Card created in Virgil Keys Service.
@@ -109,23 +102,30 @@ When user's setup is completed, that user can create a chat channel or join exis
 
 ```java
 // Backend server provides a token for Twilio services
-mTwilioToken = obtainTwilioToken().getTwilioToken();
+String deviceId = Settings.Secure.getString(mContext.getContentResolver(),
+        Settings.Secure.ANDROID_ID);
+
+Response<TwilioToken> response =
+        mService.getTwilioToken(mIdentity, deviceId).execute();
+
+if (response.isSuccessful()) {
+    String twilioToken = response.body().getTwilioToken();
+    // Save token
+} else {
+    // Token couldn't be obtained
+}
 // ...
 // Create a Twilio Access Manager with provided token
 mAccessManager = TwilioAccessManagerFactory.createAccessManager(twilioToken,
         mAccessManagerListener);
 
-TwilioIPMessagingClient.Properties props = new TwilioIPMessagingClient
-        .Properties(TwilioIPMessagingClient.SynchronizationStrategy.ALL, 500);
+TwilioIPMessagingClient.Properties props =
+        new TwilioIPMessagingClient.Properties(
+            TwilioIPMessagingClient.SynchronizationStrategy.ALL, 500);
 
 // Initialize Twilio IP Messaging Client
 mMessagingClient = TwilioIPMessagingSDK.createClient(mAccessManager, props,
         mMessagingClientCallback);
-        
-// Register IP Messaging client listener
-mMessagingClient.setListener(new IPMessagingClientListener() {
-    // ...
-});
 ```
 
 You can find more information about the Twilio setup for Android [here](https://www.twilio.com/docs/api/ip-messaging/guides/quickstart-android).
@@ -138,7 +138,7 @@ When Twilio IP Messaging Client is initialized, it notifies its listener with a 
 // ...
 public void onClientSynchronization(
         TwilioIPMessagingClient.SynchronizationStatus synchronizationStatus) {
-    loadChannels();
+    updateChannels();
 }
 // ...
 ```
@@ -152,11 +152,10 @@ channel.join(new Constants.StatusListener() {
     @Override
     public void onSuccess() {
         mCurrentChannel = channel;
-        
+        mCurrentChannel.setListener(mChannelListener);
+
         // Update UI
         // ...
-
-        mCurrentChannel.setListener(mChannelListener);
     }
 
     @Override
@@ -176,8 +175,7 @@ Map<String, Object> channelProps = new HashMap<>();
 channelProps.put(Constants.CHANNEL_FRIENDLY_NAME, name);
 channelProps.put(Constants.CHANNEL_UNIQUE_NAME, name);
 channelProps.put(Constants.CHANNEL_TYPE, Channel.ChannelType.CHANNEL_TYPE_PUBLIC);
-mMessagingClient.getChannels().createChannel(channelProps,
-        new Constants.CreateChannelListener() {
+mMessagingClient.getChannels().createChannel(channelProps, new Constants.CreateChannelListener() {
     @Override
     public void onCreated(final Channel channel) {
         if (channel != null) {
@@ -188,8 +186,7 @@ mMessagingClient.getChannels().createChannel(channelProps,
 
     @Override
     public void onError(ErrorInfo errorInfo) {
-        // Show error message
-        // ...
+       // Show error message
     }
 });
 ```
@@ -203,36 +200,41 @@ Encrypt the plain user text:
 ###### Java
 
 ```java
-/// ChatViewController.swift: -encryptMessage(:) (l: 105)
-///...
-/// Convert text to binary data
-if let msg = body.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
-    /// Create the Virgil Cryptor object
-    let cryptor = VSSCryptor()
-    /// Get the channel participants 
-    /// (cause it is necessary to encrypt the message 
-    /// for all the channel participants so they could decrypt and read it)
-    let recipients = self.channel.members.allObjects()
-    for member in recipients {
-    /// Get the Virgil Card containing the public key 
-    /// either from local cache or from the Virgil Keys Service
-    if let card = AppState.sharedInstance.cardForIdentity(member.userInfo.identity) {
-        do {
-            /// Add the Card and the public key as a recipients for encryption 
-            try cryptor.addKeyRecipient(card.Id, publicKey: card.publicKey.key, error: ())
-        }
-        catch let e as NSError {
-            print("Error adding key recipient: \(e.localizedDescription)")
+// Build message
+ChannelMessage message = new ChannelMessage();
+message.setBody(messageBody);
+message.setAuthor(mIdentity);
+message.setDate(new Date().getTime());
+message.setId(UUID.randomUUID().toString());
+
+// Show message at chat immediatelly
+//...
+
+// Sent message with Twilio
+            twilioFacade.sendMessage(mGson.toJson(message));
+
+//...
+/// Encrypt data for all channel participants
+String encryptedMessage = message;
+Map<String, PublicKey> recipientsMap = new HashMap<>();
+for (String identity : recipients) {
+    try {
+        MessageRecipient recipient = getRecipient(identity);
+        recipientsMap.put(recipient.getCardId(), recipient.getPublicKey());
+    }
+    catch (RecipientNotFoundException e) {
+        Log.e(TAG, "Recipient not found: " + identity);
+    }
+    // Encode message body
+    if (!recipientsMap.isEmpty()) {
+        try {
+            encryptedMessage = CryptoHelper.encrypt(message, recipientsMap);
+        } catch (Exception e) {
+            Log.e(TAG, "Can't encrypt message");
         }
     }
 }
-///...
-/// Encrypt data for all channel participants 
-if let data = try? cryptor.encryptData(msg, embedContentInfo: true, error: ()) {
-    /// return encrypted binary data as a BASE64 string.
-    return data.base64EncodedStringWithOptions(.Encoding64CharacterLineLength)
-}
-///...
+//...
 ```
 
 For the sake of simplicity, the actual message is just a string of text. But it may be easily expanded to include other data types such as images and binary data.
@@ -242,35 +244,55 @@ Now send the encrypted message via Twilio SDK:
 ###### Java
 
 ```java
-/// ChatViewController.swift: -didPressRightButton(:) (l: 141)
-///...
-/// `body` contains the encryped text in BASE64 format composed in the previous snippet.
-let message = self.channel.messages.createMessageWithBody(body)
-/// Twilio TWLChannel's API allows to send a new message to the channel 
-self.channel.messages.sendMessage(message, completion: { (result) in
-    /// Message sent.
-})
+// Sent message with Twilio channel
+com.twilio.ipmessaging.Message message = mActiveChannel.getMessages().createMessage(encryptedMessage);
+
+mActiveChannel.getMessages().sendMessage(message, new Constants.StatusListener() {
+        @Override
+        public void onSuccess() {
+            Log.d(TAG, "Message sent succesfully");
+        }
+
+        @Override
+        public void onError(ErrorInfo errorInfo) {
+            Log.e(TAG, "Error sending message: " + errorInfo.getErrorText());
+        }
+});
+
 ///...
 ```
 
 ### Receiving and Decrypting a Message
 
-When a new message arrives to the channel, Twilio IP Messaging Client informs its delegate by a call to `-ipMessagingClient(:, channel:, messageAdded:)`. In this callback function the application can convert `TWLMessage` into any kind of the object it wants to use further locally. The example app uses a Dictionary object, so it just saves a few fields enough for this simple example:
+When a new message arrives to the channel, `ChannelListener.onMessageAdd` method called. In this callback function the application can decode Twilio `Message` and convert it into any kind of the object it wants to use further locally.
 
 ###### Java
 
 ```java
-/// ChatViewController.swift: -ipMessagingClient(:, client:, messageAdded:) (l: 241)
-///...
-/// Convert TWMMessage to Dictionary
-var mDict = Dictionary<String, AnyObject>()
-mDict[Constants.Message.Id] = message.sid
-mDict[Constants.Message.Author] = message.author
-mDict[Constants.Message.Date] = message.dateUpdated
-mDict[Constants.Message.Body] = message.body
-        
-/// Decrypt message with Virgil SDK and update the UI.
-///...
+private ChannelListener mChannelListener = new ChannelListener() {
+//...
+
+    public void onMessageAdd(final com.twilio.ipmessaging.Message message) {
+        Log.d(TAG, "Message added");
+
+        mMessageProcessor.decodeMessage(message.getMessageBody(), new MessageProcessor.MessageProcessingListener() {
+                @Override
+                public void onSuccess(String result) {
+                    Bundle b = new Bundle();
+                    b.putString(DECRYPTED_MESSAGE, result);
+                    
+                    // Notify UI about new message received
+                    //...
+                }
+
+                @Override
+                public void onFail() {
+                    Log.e(TAG, "Can't add message");
+                }
+        });
+    }
+//...
+};
 ```
 
 To decrypt the message received from Twilio Channel the application uses the private key of currently set up user:
@@ -278,68 +300,14 @@ To decrypt the message received from Twilio Channel the application uses the pri
 ###### Java
 
 ```java
-/// ChatViewController.swift: -decryptAndCacheMessages(:) (l: 85)
-///...
-/// For all messages received
-for mCandidate in messages {
-    /// Convert BASE64 text to binary data (which is actually encrypted message data)
-    /// Get current user's Virgil Card object (either from local cache or from Virgil Keys Service) 
-    if let mBody = mCandidate[Constants.Message.Body] as? String, 
-        mData = NSData(base64EncodedString: mBody, options: .IgnoreUnknownCharacters), 
-        card = AppState.sharedInstance.cardForIdentity(AppState.sharedInstance.identity) {
-        /// Create Virgil Cryptor object for data decryption
-        let decryptor = VSSCryptor()
-        /// Try to decrypt the data using current user's private key.
-        if let plainData = try? decryptor.decryptData(mData, recipientId: card.Id, privateKey: AppState.sharedInstance.privateKey.key, keyPassword: AppState.sharedInstance.privateKey.password, error: ()) {
-            /// If encryption is successful
-            /// Compose plain message object descriptor for caching it locally and showing it on the UI.
-            var dict = Dictionary<String, AnyObject>()
-            dict[Constants.Message.Id] = mCandidate[Constants.Message.Id]
-            dict[Constants.Message.Author] = mCandidate[Constants.Message.Author]
-            dict[Constants.Message.Date] = mCandidate[Constants.Message.Date]
-            /// Decrypted binary data converted to readable string
-            dict[Constants.Message.Body] = NSString(data: plainData, encoding: NSUTF8StringEncoding)
-            /// Cache the message.
-            self.messages.append(dict)
-        }
-        ///...
-    }
-    ///...
+String decodedMessage = "";
+try {
+    decodedMessage = CryptoHelper.decrypt(message, mCardId, mPrivateKey);
+} catch (Exception e) {
+    Log.e(TAG, "Can't decrypt message");
 }
-///...
+//...
 ```
-
-### Verification of the Backend Server Signature
-
-When any response is received from the backend server, the response contains a signature in the response headers. The example application verifies this signature before taking any actions on the response data.
-
-###### Java
-
-```java
-/// Backend.swift: -verifySignature(:, data:) (l: 213)
-///...
-var ok = false
-/// Convert signature from BASE64 to binary data
-if let sigData = NSData(base64EncodedString: signature, options: .IgnoreUnknownCharacters) {
-    /// Create a Virgil Signer object which allows to verify signatures.
-    let verifier = VSSSigner()
-    do {
-        /// Try to verify the signature using the server's public key 
-        /// which the application downloaded when set up Virgil infrastructure.
-        try verifier.verifySignature(sigData, data: data, publicKey: AppState.sharedInstance.appCard.publicKey.key, error: ())
-        ok = true
-    }
-    catch let e as NSError {
-        print("Error signature verification: \(e.localizedDescription)")
-        ok = false
-    }
-}
-/// Return verification result
-return ok
-///...
-```
-
-In case when `ok` is `false` the response should not be used because it should not be trusted.
 
 ## See also
 
