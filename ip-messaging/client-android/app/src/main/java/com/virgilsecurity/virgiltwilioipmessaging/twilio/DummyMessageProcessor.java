@@ -1,10 +1,10 @@
 package com.virgilsecurity.virgiltwilioipmessaging.twilio;
 
-import java.util.List;
+import java.util.Set;
 
 public class DummyMessageProcessor implements MessageProcessor {
     @Override
-    public void encodeMessage(final String message, List<String> recipients, final MessageProcessingListener listener) {
+    public void encodeMessage(final String message, Set<String> recipients, final MessageProcessingListener listener) {
         Thread background = new Thread(new Runnable() {
 
             @Override

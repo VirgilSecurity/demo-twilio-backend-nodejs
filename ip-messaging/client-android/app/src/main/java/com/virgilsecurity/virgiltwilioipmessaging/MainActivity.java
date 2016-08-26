@@ -48,6 +48,7 @@ import com.virgilsecurity.virgiltwilioipmessaging.utils.ChannelMessageStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -200,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showMessageAtChat(ChannelMessage message) {
+        Log.d(TAG, "Show message at chat");
         mMessages.addOrUpdate(message);
         mMessagesAdapter.notifyDataSetChanged();
         mMessagesRecyclerView.scrollToPosition(mMessages.size() - 1);
@@ -313,16 +315,28 @@ public class MainActivity extends AppCompatActivity {
                     for (String name : channelNames) {
                         mChannels.add(name);
                     }
+                    Collections.sort(mChannels);
                     mChannelsAdapter.notifyDataSetChanged();
                     break;
                 case ApplicationConstants.Messages.REMOVE_CHANNEL_EVENT:
                     channelName = msg.getData().getString(ApplicationConstants.Messages.CHANNEL_NAME);
                     mChannels.remove(channelName);
                     mChannelsAdapter.notifyDataSetChanged();
+
+                    if (channelName.equals(twilioFacade.getActiveChannelName())) {
+                        twilioFacade.joinChannel(null);
+
+                        Toast.makeText(MainActivity.this, R.string.message_active_channel_removed, Toast.LENGTH_LONG).show();
+                    }
                     break;
                 case ApplicationConstants.Messages.ADD_MESSAGE_EVENT:
-                    ChannelMessage channelMessage = mGson.fromJson(msg.getData().getString(ApplicationConstants.Messages.DECRYPTED_MESSAGE), ChannelMessage.class);
-                    showMessageAtChat(channelMessage);
+                    String gson = msg.getData().getString(ApplicationConstants.Messages.DECRYPTED_MESSAGE);
+                    ChannelMessage channelMessage = mGson.fromJson(gson, ChannelMessage.class);
+                    if (channelMessage != null) {
+                        showMessageAtChat(channelMessage);
+                    } else {
+                        Log.e(TAG, "Bad message received: " + gson);
+                    }
                     break;
             }
         }

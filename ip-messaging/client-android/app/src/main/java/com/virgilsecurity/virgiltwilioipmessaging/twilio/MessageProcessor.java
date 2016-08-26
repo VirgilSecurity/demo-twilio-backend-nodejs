@@ -1,16 +1,18 @@
 package com.virgilsecurity.virgiltwilioipmessaging.twilio;
 
-import java.util.List;
+import java.util.Set;
 
 public interface MessageProcessor {
 
-    void encodeMessage(String message, List<String> recipients, MessageProcessingListener listener);
+    void encodeMessage(String message, Set<String> recipients, MessageProcessingListener listener);
 
     void decodeMessage(String message, MessageProcessingListener listener);
 
     public interface MessageProcessingListener {
 
-        void onSuccess(String result);
+        void onLongRunningJobBegins();
+
+        void onSuccess(String message);
 
         void onFail();
     }

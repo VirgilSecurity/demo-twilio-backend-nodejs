@@ -14,8 +14,10 @@ import com.virgilsecurity.virgiltwilioipmessaging.model.channel.MessageRecipient
 import com.virgilsecurity.virgiltwilioipmessaging.utils.CommonUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class VirgilMessageProcessor implements MessageProcessor {
 
@@ -37,30 +39,50 @@ public class VirgilMessageProcessor implements MessageProcessor {
     }
 
     @Override
-    public void encodeMessage(final String message, final List<String> recipients, final MessageProcessingListener listener) {
+    public void encodeMessage(final String message, final Set<String> recipients, final MessageProcessingListener listener) {
+
         Thread background = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                String encryptedMessage = "";
-                Map<String, PublicKey> recipientsMap = new HashMap<>();
+                String encryptedMessage = message;
+                final Map<String, PublicKey> recipientsMap = new HashMap<>();
+                final Set<String> unknownRecipients = new HashSet<>();
+
                 for (String identity : recipients) {
-                    try {
-                        MessageRecipient recipient = getRecipient(identity);
+                    MessageRecipient recipient = mRecipients.get(identity);
+                    if (recipient != null) {
+                        // Recipient had been already cached
                         recipientsMap.put(recipient.getCardId(), recipient.getPublicKey());
+                    } else {
+                        // Recipient is unknown yet
+                        unknownRecipients.add(identity);
                     }
-                    catch (RecipientNotFoundException e) {
-                        Log.e(TAG, "Recipient not found: " + identity);
-                    }
-                    // Encode message body
-                    if (!recipientsMap.isEmpty()) {
+                }
+
+                if (!unknownRecipients.isEmpty()) {
+                    // Start long-running job
+                    listener.onLongRunningJobBegins();
+
+                    for (String identity : recipients) {
                         try {
-                            encryptedMessage = CryptoHelper.encrypt(message, recipientsMap);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Can't encrypt message");
+                            MessageRecipient recipient = getRecipient(identity);
+                            recipientsMap.put(recipient.getCardId(), recipient.getPublicKey());
+                        } catch (RecipientNotFoundException e) {
+                            Log.e(TAG, "Recipient not found: " + identity);
                         }
                     }
                 }
+
+                // Encode message body
+                if (!recipientsMap.isEmpty()) {
+                    try {
+                        encryptedMessage = CryptoHelper.encrypt(message, recipientsMap);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Can't encrypt message");
+                    }
+                }
+
                 listener.onSuccess(encryptedMessage);
             }
         });

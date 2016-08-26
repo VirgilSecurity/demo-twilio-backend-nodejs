@@ -1,7 +1,5 @@
 package com.virgilsecurity.virgiltwilioipmessaging.twilio;
 
-import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.*;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,12 +19,22 @@ import com.twilio.ipmessaging.TwilioIPMessagingSDK;
 import com.twilio.ipmessaging.UserInfo;
 import com.virgilsecurity.sdk.client.utils.StringUtils;
 import com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants;
-import com.virgilsecurity.virgiltwilioipmessaging.exception.ChannelNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.ADD_MESSAGE_EVENT;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.CHANNEL_MEMBERS_COUNT;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.CHANNEL_NAME;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.CHANNEL_NAMES;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.DECRYPTED_MESSAGE;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.EVENT;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.JOIN_CHANNEL_EVENT;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.REMOVE_CHANNEL_EVENT;
+import static com.virgilsecurity.virgiltwilioipmessaging.ApplicationConstants.Messages.UPDATE_CHANNELS_EVENT;
 
 public class TwilioFacade {
 
@@ -119,6 +127,21 @@ public class TwilioFacade {
             public void onClientSynchronization(TwilioIPMessagingClient.SynchronizationStatus synchronizationStatus) {
                 updateChannels();
             }
+
+            @Override
+            public void onToastNotification(String s, String s1) {
+
+            }
+
+            @Override
+            public void onToastSubscribed() {
+
+            }
+
+            @Override
+            public void onToastFailed(ErrorInfo errorInfo) {
+
+            }
         });
     }
 
@@ -144,27 +167,13 @@ public class TwilioFacade {
         @Override
         public void onMessageAdd(final com.twilio.ipmessaging.Message message) {
             Log.d(TAG, "Message added");
-
-            mMessageProcessor.decodeMessage(message.getMessageBody(), new MessageProcessor.MessageProcessingListener() {
-                @Override
-                public void onSuccess(String result) {
-                    Bundle b = new Bundle();
-                    b.putString(DECRYPTED_MESSAGE, result);
-                    sendMessageToHandler(ADD_MESSAGE_EVENT, b);
-                }
-
-                @Override
-                public void onFail() {
-                    Log.e(TAG, "Can't add message");
-                }
-            });
-
-
+            decodeMessageAndNotifyUI(message);
         }
 
         @Override
         public void onMessageChange(com.twilio.ipmessaging.Message message) {
             Log.d(TAG, "Message changed: " + message.getMessageBody());
+            decodeMessageAndNotifyUI(message);
         }
 
         @Override
@@ -205,6 +214,27 @@ public class TwilioFacade {
         @Override
         public void onSynchronizationChange(Channel channel) {
 
+        }
+
+        private void decodeMessageAndNotifyUI(com.twilio.ipmessaging.Message message) {
+            mMessageProcessor.decodeMessage(message.getMessageBody(), new MessageProcessor.MessageProcessingListener() {
+                @Override
+                public void onLongRunningJobBegins() {
+                    // There is nothing to do here
+                }
+
+                @Override
+                public void onSuccess(String result) {
+                    Bundle b = new Bundle();
+                    b.putString(DECRYPTED_MESSAGE, result);
+                    sendMessageToHandler(ADD_MESSAGE_EVENT, b);
+                }
+
+                @Override
+                public void onFail() {
+                    Log.e(TAG, "Can't add message");
+                }
+            });
         }
     };
 
@@ -352,12 +382,17 @@ public class TwilioFacade {
             //TODO: notify user
             return;
         }
-        List<String> recipients = new ArrayList<>();
+        Set<String> recipients = new HashSet<>();
         for (Member member : mActiveChannel.getMembers().getMembers()) {
             recipients.add(member.getUserInfo().getIdentity());
         }
 
         mMessageProcessor.encodeMessage(text, recipients, new MessageProcessor.MessageProcessingListener() {
+            @Override
+            public void onLongRunningJobBegins() {
+                // There is nothing to do here
+            }
+
             @Override
             public void onSuccess(String result) {
                 if (mActiveChannel != null) {

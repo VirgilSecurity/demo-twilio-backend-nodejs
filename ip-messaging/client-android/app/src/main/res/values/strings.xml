@@ -27,4 +27,5 @@
     <string name="virgil_access_token">Virgil access token</string>
 
     <string name="error_channel_not_found">Channel not found</string>
+    <string name="message_active_channel_removed">Active channel had been removed. Switching to random channel</string>
 </resources>
