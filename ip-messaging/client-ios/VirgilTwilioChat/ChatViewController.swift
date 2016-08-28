@@ -40,17 +40,19 @@ class ChatViewController: SLKTextViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.edgesForExtendedLayout = .None
-        self.title = "Secure chat"
+        
+        self.textInputbar.autoHideRightButton = false
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
         self.title = self.channel.friendlyName
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Leave", comment: "Leave"), style: .Plain, target: self, action: #selector(self.leaveAction(_:)))
         
         AppState.sharedInstance.twilio.addListener(self)
         
-        dispatch_async(dispatch_get_main_queue()) { 
+        dispatch_async(dispatch_get_main_queue()) {
             self.loadChatParticipants()
             let attributes = self.channel.attributes()
             guard attributes[Constants.Virgil.ChannelAttributeCardId] != nil else {
@@ -70,6 +72,21 @@ class ChatViewController: SLKTextViewController {
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        AppState.sharedInstance.twilio.removeListener(self)
+    }
+    
+    @objc private func leaveAction(sender: AnyObject?) {
+        AppState.sharedInstance.twilio.leaveChannel(self.channel) { (result) in
+            if !result.isSuccessful() {
+                print("Error leaving the channel: \(result.error.localizedDescription)")
+            }
+            
+            self.channel = nil
+            dispatch_async(dispatch_get_main_queue(), {
+                self.navigationController?.popViewControllerAnimated(true)
+            })
+        }
     }
     
     private func loadChatParticipants() {

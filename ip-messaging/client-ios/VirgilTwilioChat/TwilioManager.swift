@@ -17,7 +17,6 @@ protocol TwilioListener: class {
 protocol TwilioChannelsListener: TwilioListener {
     
     func channelListDidComplete()
-    func channelDidRemove()
 }
 
 protocol TwilioMessageListener: TwilioListener {
@@ -79,74 +78,47 @@ class TwilioManager: NSObject {
         guard let channels = self.twilio.channelsList().allObjects() where channels.count > 0 else {
             return []
         }
-        return channels
+        return channels.sort { $0.friendlyName < $1.friendlyName }
     }
     
-    func addChannelWithOptions(options: Dictionary<String, AnyObject>) -> TWMChannel? {
-        let task = XAsyncTask { (weakTask) in
-            self.twilio.channelsList().createChannelWithOptions(options, completion: { (result, channel) in
-                if !result.isSuccessful() || channel == nil {
-                    print("Error creating the channel: \(result.error.localizedDescription)")
-                    weakTask?.result = nil
-                    weakTask?.fireSignal()
-                    return
-                }
-                
-                weakTask?.result = channel
-                weakTask?.fireSignal()
-            })
-        }
-        task.awaitSignal()
-        return task.result as? TWMChannel
+    func addChannelWithOptions(options: Dictionary<String, AnyObject>, completion: (TWMResult, TWMChannel?) -> Void) {
+        self.twilio.channelsList().createChannelWithOptions(options, completion: { (result, channel) in
+            completion(result, channel)
+        })
     }
     
-    func setChannelName(channel: TWMChannel, unique: String, friendly: String?) {
-        let task1 = XAsyncTask { (weakTask) in
-            channel.setUniqueName(unique, completion: { (result) in
-                if !result.isSuccessful() {
-                    print("Error setting unique name for the channel: \(result.error.localizedDescription)")
-                    weakTask?.fireSignal()
-                    return
-                }
-                
-                weakTask?.fireSignal()
-            })
-        }
-        task1.awaitSignal()
-        
-        let task2 = XAsyncTask { (weakTask) in
+    func setChannelName(channel: TWMChannel, unique: String, friendly: String?, completion: (TWMResult) -> Void) {
+        channel.setUniqueName(unique) { (result) in
+            if (!result.isSuccessful()) {
+                completion(result)
+                return
+            }
+            
             channel.setFriendlyName(friendly ?? unique, completion: { (result) in
-                if !result.isSuccessful() {
-                    print("Error setting friendly name for the channel: \(result.error.localizedDescription)")
-                    weakTask?.fireSignal()
-                    return
-                }
-                
-                weakTask?.fireSignal()
+                completion(result)
             })
+            
         }
-        task2.awaitSignal()
     }
     
-    func joinChannel(channel: TWMChannel) {
-        let task = XAsyncTask { (weakTask) in
-            channel.joinWithCompletion({ (result) in
-                if !result.isSuccessful() {
-                    print("Error joining the channel: \(result.error.localizedDescription)")
-                    weakTask?.fireSignal()
-                    return
-                }
-                
-                weakTask?.fireSignal()
-
-            })
+    func joinChannel(channel: TWMChannel, completion: (TWMResult) -> Void) {
+        channel.joinWithCompletion({ (result) in
+            completion(result)
+        })
+    }
+    
+    func leaveChannel(channel: TWMChannel, completion: (TWMResult) -> Void) {
+        channel.leaveWithCompletion { (result) in
+            completion(result)
         }
-        task.awaitSignal()
     }
     
-    func sendMessage() {
-    
+    func destroyChannel(channel: TWMChannel, completion: (TWMResult) -> Void) {
+        channel.destroyWithCompletion { (result) in
+            completion(result)
+        }
     }
+    
 }
 
 extension TwilioManager: TwilioIPMessagingClientDelegate {
@@ -168,13 +140,6 @@ extension TwilioManager: TwilioIPMessagingClientDelegate {
                 channelListener.didAddMessage(message)
             }
         }
-        
-//        if let encrypted = NSData(base64EncodedString: message.body, options: .IgnoreUnknownCharacters) {
-//            self.decryptAndCacheMessage(encrypted)
-//            dispatch_async(dispatch_get_main_queue()) {
-//                self.tableView.reloadData()
-//            }
-//        }
     }
     
 }

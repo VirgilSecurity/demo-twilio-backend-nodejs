@@ -61,7 +61,14 @@ class Backend: NSObject {
     
     func getTwilioToken(identity: String, device: String) -> String {
         let async = XAsyncTask { (weakTask) in
-            let paramStr = "?\(Constants.Backend.IdentityParam)=\(identity)&\(Constants.Backend.DeviceIdParam)=\(device)"
+            let excIdentity = identity.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
+            guard excIdentity != nil else {
+                weakTask?.result = nil
+                weakTask?.fireSignal()
+                return
+            }
+            
+            let paramStr = "?\(Constants.Backend.IdentityParam)=\(excIdentity!)&\(Constants.Backend.DeviceIdParam)=\(device)"
             let url = NSURL(string: Constants.Backend.BaseURL + Constants.Backend.TwilioTokenEndpoint + paramStr)
             let request = NSMutableURLRequest(URL: url!)
             request.HTTPMethod = "GET"

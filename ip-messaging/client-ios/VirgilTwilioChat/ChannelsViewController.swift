@@ -46,12 +46,12 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
 
     // MARK: - Action handlers
     
-    func logoutAction(sender: AnyObject?) {
+    @objc private func logoutAction(sender: AnyObject?) {
         AppState.sharedInstance.kill()
         self.navigationController?.popToRootViewControllerAnimated(true)
     }
     
-    func addChannelAction(sender: AnyObject?) {
+    @objc private func addChannelAction(sender: AnyObject?) {
         self.performSegueWithIdentifier("NewChannelViewControllerSegue", sender: self)
     }
     
@@ -71,7 +71,7 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
         
         if indexPath.row < self.channels.count {
             let channel = self.channels[indexPath.row]
-            cell.textLabel?.text = (channel.friendlyName.isEmpty) ? channel.uniqueName : channel.friendlyName
+            cell.textLabel?.text = (channel.friendlyName.isEmpty) ? "u* \(channel.uniqueName)" : channel.friendlyName
         }
         
         return cell
@@ -83,11 +83,22 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
         
         let channel = self.channels[indexPath.row]
-        AppState.sharedInstance.twilio.joinChannel(channel)
-        
-        dispatch_async(dispatch_get_main_queue(), {
-            self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel)
-        })
+        AppState.sharedInstance.twilio.joinChannel(channel) { (result) in
+            if !result.isSuccessful() {
+                dispatch_async(dispatch_get_main_queue(), {
+                    let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Unable to join the channel.", comment: "Unable to join the channel."), preferredStyle: .Alert)
+                    let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
+                        self.dismissViewControllerAnimated(true, completion: nil)
+                    })
+                    alert.addAction(action)
+                    self.presentViewController(alert, animated: true, completion: nil)
+                })
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel)
+            })
+        }
     }
 }
 
@@ -133,24 +144,31 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
                 }
             }
             
-            if let channel = AppState.sharedInstance.twilio.addChannelWithOptions(channelOptions) {
-                AppState.sharedInstance.twilio.setChannelName(channel, unique: name, friendly: nil)
-                AppState.sharedInstance.twilio.joinChannel(channel)
-                
-                dispatch_async(dispatch_get_main_queue(), { 
-                    self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel)
-                })
-            }
-            else {
-                dispatch_async(dispatch_get_main_queue(), {
-                    let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Error creating the channel.", comment: "Error creating the channel."), preferredStyle: .Alert)
-                    let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
-                        self.dismissViewControllerAnimated(true, completion: nil)
+            AppState.sharedInstance.twilio.addChannelWithOptions(channelOptions, completion: { (result, channel) in
+                if result.isSuccessful() && channel != nil {
+                    AppState.sharedInstance.twilio.setChannelName(channel!, unique: name, friendly: nil, completion: { (result) in
+                        if result.isSuccessful() {
+                            AppState.sharedInstance.twilio.joinChannel(channel!, completion: { (result) in
+                                if result.isSuccessful() {
+                                    dispatch_async(dispatch_get_main_queue(), {
+                                        self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel!)
+                                    })
+                                    return
+                                }
+                            })
+                        }
                     })
-                    alert.addAction(action)
-                    self.presentViewController(alert, animated: true, completion: nil)
+                }
+            })
+            /// In case of error
+            dispatch_async(dispatch_get_main_queue(), {
+                let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Error creating the channel.", comment: "Error creating the channel."), preferredStyle: .Alert)
+                let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
+                    self.dismissViewControllerAnimated(true, completion: nil)
                 })
-            }
+                alert.addAction(action)
+                self.presentViewController(alert, animated: true, completion: nil)
+            })
         }
     }
     
