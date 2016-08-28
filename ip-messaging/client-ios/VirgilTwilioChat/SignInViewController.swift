@@ -19,6 +19,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private var tfNickname: UITextField!
     @IBOutlet private var bChat: UIButton!
 
+    @IBOutlet private var vLoading: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +34,8 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         if AppState.sharedInstance.privateKey != nil {
             AppState.sharedInstance.kill()
         }
+        
+        self.vLoading.hidden = true
     }
     
     private func toggleUIAvailability() {
@@ -50,6 +53,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
                 application.beginIgnoringInteractionEvents()
             
             application.networkActivityIndicatorVisible = !application.networkActivityIndicatorVisible
+            self.vLoading.hidden = !self.vLoading.hidden
         }
     }
     

@@ -12,6 +12,7 @@ import UIKit
 class ChannelsViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet private var tvChannels: UITableView!
+    @IBOutlet private var vLoading: UIView!
     
     var channels = [TWMChannel]()
     
@@ -25,14 +26,13 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Logout", comment: "Logout"), style: .Plain, target: self, action: #selector(self.logoutAction(_:)))
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(self.addChannelAction(_:)))
         
+        self.vLoading.hidden = false
         AppState.sharedInstance.initTwilio([self])
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
-        
-        
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -82,10 +82,12 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
         
+        self.vLoading.hidden = false
         let channel = self.channels[indexPath.row]
         AppState.sharedInstance.twilio.joinChannel(channel) { (result) in
             if !result.isSuccessful() {
                 dispatch_async(dispatch_get_main_queue(), {
+                    self.vLoading.hidden = true
                     let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Unable to join the channel.", comment: "Unable to join the channel."), preferredStyle: .Alert)
                     let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
                         self.dismissViewControllerAnimated(true, completion: nil)
@@ -96,6 +98,7 @@ class ChannelsViewController: UIViewController, UITableViewDelegate, UITableView
             }
             
             dispatch_async(dispatch_get_main_queue(), {
+                self.vLoading.hidden = true
                 self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel)
             })
         }
@@ -108,12 +111,8 @@ extension ChannelsViewController: TwilioChannelsListener {
         self.channels = AppState.sharedInstance.twilio.getChannelsList()
         dispatch_async(dispatch_get_main_queue()) { 
             self.tvChannels.reloadData()
+            self.vLoading.hidden = true
         }
-    }
-    
-    func channelDidRemove() {
-        // TODO: Add implementation
-        print("<<<< CHANNEL_DID_REMOVE")
     }
     
 }
@@ -126,6 +125,7 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
     
     func newChannelViewController(controller: NewChannelViewController, didAddChannelWithName name: String, saveHistory: Bool) {
         self.dismissViewControllerAnimated(true) {
+            self.vLoading.hidden = false
             var channelOptions: Dictionary<String, AnyObject> = [TWMChannelOptionUniqueName: name, TWMChannelOptionType: TWMChannelType.Public.rawValue]
             
             if saveHistory {
@@ -133,7 +133,8 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
                     channelOptions[TWMChannelOptionAttributes] = [Constants.Virgil.ChannelAttributeCardId: card.Id, Constants.Virgil.ChannelAttributeKey: key]
                 }
                 else {
-                    dispatch_async(dispatch_get_main_queue(), { 
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.vLoading.hidden = true
                         let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("History of the channel will NOT be saved.", comment: "History of the channel will NOT be saved."), preferredStyle: .Alert)
                         let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
                             self.dismissViewControllerAnimated(true, completion: nil)
@@ -151,6 +152,7 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
                             AppState.sharedInstance.twilio.joinChannel(channel!, completion: { (result) in
                                 if result.isSuccessful() {
                                     dispatch_async(dispatch_get_main_queue(), {
+                                        self.vLoading.hidden = true
                                         self.performSegueWithIdentifier("ChatViewControllerSegue", sender: channel!)
                                     })
                                     return
@@ -162,6 +164,7 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
             })
             /// In case of error
             dispatch_async(dispatch_get_main_queue(), {
+                self.vLoading.hidden = true
                 let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Error creating the channel.", comment: "Error creating the channel."), preferredStyle: .Alert)
                 let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
                     self.dismissViewControllerAnimated(true, completion: nil)

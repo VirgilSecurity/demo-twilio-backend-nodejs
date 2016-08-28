@@ -16,6 +16,7 @@ import SlackTextViewController
 
 class ChatViewController: SLKTextViewController {
     
+    @IBOutlet private var vLoading: UIView!
     private var messages = [Dictionary<String, AnyObject>]()
     var channel: TWMChannel!
     
@@ -53,9 +54,11 @@ class ChatViewController: SLKTextViewController {
         AppState.sharedInstance.twilio.addListener(self)
         
         dispatch_async(dispatch_get_main_queue()) {
+            self.vLoading.hidden = false
             self.loadChatParticipants()
             let attributes = self.channel.attributes()
             guard attributes[Constants.Virgil.ChannelAttributeCardId] != nil else {
+                self.vLoading.hidden = true
                 return
             }
             
@@ -67,16 +70,18 @@ class ChatViewController: SLKTextViewController {
             }
 
             self.tableView.reloadData()
+            self.vLoading.hidden = true
         }
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        
+        self.vLoading.hidden = true
         AppState.sharedInstance.twilio.removeListener(self)
     }
     
     @objc private func leaveAction(sender: AnyObject?) {
+        self.vLoading.hidden = false
         AppState.sharedInstance.twilio.leaveChannel(self.channel) { (result) in
             if !result.isSuccessful() {
                 print("Error leaving the channel: \(result.error.localizedDescription)")
@@ -84,6 +89,7 @@ class ChatViewController: SLKTextViewController {
             
             self.channel = nil
             dispatch_async(dispatch_get_main_queue(), {
+                self.vLoading.hidden = true
                 self.navigationController?.popViewControllerAnimated(true)
             })
         }
@@ -161,10 +167,14 @@ class ChatViewController: SLKTextViewController {
     
     // Notifies the view controller when the right button's action has been triggered, manually or by using the keyboard return key.
     override func didPressRightButton(sender: AnyObject!) {
+        self.vLoading.hidden = false
         if let body = self.encryptMessage(self.textView.text) where !body.isEmpty {
             let message = self.channel.messages.createMessageWithBody(body)
             self.channel.messages.sendMessage(message, completion: { (result) in
                 print("Message sent")
+                dispatch_async(dispatch_get_main_queue(), { 
+                    self.vLoading.hidden = true
+                })
             })
         }
         super.didPressRightButton(sender)
@@ -252,10 +262,14 @@ class ChatViewController: SLKTextViewController {
 extension ChatViewController: TwilioMessageListener {
     
     func didAddMessage(msg: TWMMessage) {
+        dispatch_async(dispatch_get_main_queue()) { 
+            self.vLoading.hidden = false
+        }
         if let encrypted = NSData(base64EncodedString: msg.body, options: .IgnoreUnknownCharacters) {
             self.decryptAndCacheMessage(encrypted)
             dispatch_async(dispatch_get_main_queue()) {
                 self.tableView.reloadData()
+                self.vLoading.hidden = true
             }
         }
     }
