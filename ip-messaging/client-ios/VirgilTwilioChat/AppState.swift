@@ -66,7 +66,24 @@ class AppState: NSObject {
                 
                 /// Get the card from the service response if possible
                 if let candidates = cards where candidates.count > 0 {
-                    weakTask?.result = candidates[0]
+                    let card = candidates[0]
+                    if let sign64 = card.data?[Constants.Virgil.VirgilPublicKeySignature] as? String, signature = NSData(base64EncodedString: sign64, options: .IgnoreUnknownCharacters) {
+                        let verifier = VSSSigner()
+                        do {
+                            try verifier.verifySignature(signature, data: card.publicKey.key, publicKey: AppState.sharedInstance.appCard.publicKey.key, error: ())
+                            weakTask?.result = card
+                        }
+                        catch let err as NSError {
+                            print("Public key signature is invalid: \(err.localizedDescription)")
+                            weakTask?.result = nil
+                        }
+                    }
+                    else {
+                        /// There is no public_key_signature in data.
+                        /// Card does not contain this information - just ignore it.
+                        weakTask?.result = candidates[0]
+                    }
+                    
                 }
                 /// And mark the task as finished.
                 weakTask?.fireSignal()

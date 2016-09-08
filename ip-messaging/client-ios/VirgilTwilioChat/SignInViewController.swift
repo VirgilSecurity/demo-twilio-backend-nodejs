@@ -120,7 +120,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         AppState.sharedInstance.privateKey = VSSPrivateKey(key: keyPair.privateKey(), password: nil)
         /// Compose the identity info object for the future Virgil Card:
         let identityInfo = VSSIdentityInfo(type: Constants.Virgil.IdentityType, value: AppState.sharedInstance.identity)
-        let (token, sign) = AppState.sharedInstance.backend.getValidationToken(AppState.sharedInstance.identity, publicKey: keyPair.publicKey())
+        let (token, sign) = AppState.sharedInstance.backend.getValidationToken(AppState.sharedInstance.identity, publicKey: keyPair.publicKey())        
         identityInfo.validationToken = token
         AppState.sharedInstance.virgil.createCardWithPublicKey(keyPair.publicKey(), identityInfo: identityInfo, data: [Constants.Virgil.VirgilPublicKeySignature: sign], privateKey: AppState.sharedInstance.privateKey) { (card, error) in
             if error != nil || card == nil {

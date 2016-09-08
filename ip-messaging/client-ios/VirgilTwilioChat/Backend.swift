@@ -169,9 +169,11 @@ class Backend: NSObject {
             request.HTTPMethod = "POST"
             request.setValue(Constants.Backend.ContentTypeJSON, forHTTPHeaderField: Constants.Backend.ContentTypeHeader)
            
-            let bodyObject = [Constants.Backend.IdentityParam: identity, Constants.Backend.PublicKeyParam: publicKey.base64EncodedStringWithOptions(.Encoding64CharacterLineLength)]
-            if let body = try? NSJSONSerialization.dataWithJSONObject(bodyObject, options: .PrettyPrinted) {
-                request.HTTPBody = body
+            if let pKeyString = NSString(data: publicKey, encoding: NSUTF8StringEncoding) {
+                let bodyObject = [Constants.Backend.IdentityParam: identity, Constants.Backend.PublicKeyParam: pKeyString]
+                if let body = try? NSJSONSerialization.dataWithJSONObject(bodyObject, options: .PrettyPrinted) {
+                    request.HTTPBody = body
+                }
             }
             
             let task = self.session.dataTaskWithRequest(request) { (data, response, error) in

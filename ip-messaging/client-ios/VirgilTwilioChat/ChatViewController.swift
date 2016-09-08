@@ -42,6 +42,7 @@ class ChatViewController: SLKTextViewController {
         super.viewDidLoad()
         self.edgesForExtendedLayout = .None
         
+        self.inverted = false
         self.textInputbar.autoHideRightButton = false
     }
     
@@ -209,8 +210,6 @@ class ChatViewController: SLKTextViewController {
         let message = self.messages[indexPath.row]
         cell.textLabel?.text = message[Constants.Message.Body] as? String
         cell.detailTextLabel?.text = message[Constants.Message.Author] as? String
-        cell.transform = self.tableView.transform
-        
         return cell
     }
     

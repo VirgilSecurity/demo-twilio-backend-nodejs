@@ -45,9 +45,9 @@ struct Constants {
     }
     
     struct Message {
-        static let Id = "index"
-        static let Date = "date_updated"
-        static let Author = "from"
+        static let Id = "id"
+        static let Date = "date"
+        static let Author = "author"
         static let Body = "body"
     }
     

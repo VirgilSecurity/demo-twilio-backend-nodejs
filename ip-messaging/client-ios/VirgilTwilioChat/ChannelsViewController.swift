@@ -145,6 +145,19 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
                 }
             }
             
+            let errorCallback = {
+                /// In case of error
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.vLoading.hidden = true
+                    let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Error creating the channel.", comment: "Error creating the channel."), preferredStyle: .Alert)
+                    let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
+                        self.dismissViewControllerAnimated(true, completion: nil)
+                    })
+                    alert.addAction(action)
+                    self.presentViewController(alert, animated: true, completion: nil)
+                })
+            }
+            
             AppState.sharedInstance.twilio.addChannelWithOptions(channelOptions, completion: { (result, channel) in
                 if result.isSuccessful() && channel != nil {
                     AppState.sharedInstance.twilio.setChannelName(channel!, unique: name, friendly: nil, completion: { (result) in
@@ -157,20 +170,18 @@ extension ChannelsViewController: NewChannelViewControllerDelegate {
                                     })
                                     return
                                 }
+                                errorCallback()
+                                return
                             })
+                            return
                         }
+                        errorCallback()
+                        return
                     })
+                    return
                 }
-            })
-            /// In case of error
-            dispatch_async(dispatch_get_main_queue(), {
-                self.vLoading.hidden = true
-                let alert = UIAlertController(title: NSLocalizedString("Error", comment: "Error"), message: NSLocalizedString("Error creating the channel.", comment: "Error creating the channel."), preferredStyle: .Alert)
-                let action = UIAlertAction(title: NSLocalizedString("Ok", comment: "Ok"), style: .Default, handler: { (action) in
-                    self.dismissViewControllerAnimated(true, completion: nil)
-                })
-                alert.addAction(action)
-                self.presentViewController(alert, animated: true, completion: nil)
+                errorCallback()
+                return
             })
         }
     }
