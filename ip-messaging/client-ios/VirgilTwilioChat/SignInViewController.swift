@@ -19,6 +19,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet private var tfNickname: UITextField!
     @IBOutlet private var bChat: UIButton!
 
+    @IBOutlet private var vLoading: UIView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +34,8 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         if AppState.sharedInstance.privateKey != nil {
             AppState.sharedInstance.kill()
         }
+        
+        self.vLoading.hidden = true
     }
     
     private func toggleUIAvailability() {
@@ -50,6 +53,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
                 application.beginIgnoringInteractionEvents()
             
             application.networkActivityIndicatorVisible = !application.networkActivityIndicatorVisible
+            self.vLoading.hidden = !self.vLoading.hidden
         }
     }
     
@@ -116,9 +120,9 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         AppState.sharedInstance.privateKey = VSSPrivateKey(key: keyPair.privateKey(), password: nil)
         /// Compose the identity info object for the future Virgil Card:
         let identityInfo = VSSIdentityInfo(type: Constants.Virgil.IdentityType, value: AppState.sharedInstance.identity)
-        let validationToken = AppState.sharedInstance.backend.getValidationToken(AppState.sharedInstance.identity, publicKey: keyPair.publicKey())
-        identityInfo.validationToken = validationToken
-        AppState.sharedInstance.virgil.createCardWithPublicKey(keyPair.publicKey(), identityInfo: identityInfo, data: nil, privateKey: AppState.sharedInstance.privateKey) { (card, error) in
+        let (token, sign) = AppState.sharedInstance.backend.getValidationToken(AppState.sharedInstance.identity, publicKey: keyPair.publicKey())        
+        identityInfo.validationToken = token
+        AppState.sharedInstance.virgil.createCardWithPublicKey(keyPair.publicKey(), identityInfo: identityInfo, data: [Constants.Virgil.VirgilPublicKeySignature: sign], privateKey: AppState.sharedInstance.privateKey) { (card, error) in
             if error != nil || card == nil {
                 print("Error publishing the Virgil Card: \(error!.localizedDescription)")
                 self.toggleNetworkOperationStatus()
@@ -140,7 +144,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     
     private func navigateToChat() {
         dispatch_async(dispatch_get_main_queue()) { 
-            self.performSegueWithIdentifier("ChatViewControllerSegue", sender: self)
+            self.performSegueWithIdentifier("ChannelsViewControllerSegue", sender: self)
         }
     }
     

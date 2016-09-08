@@ -16,9 +16,9 @@ import SlackTextViewController
 
 class ChatViewController: SLKTextViewController {
     
-    //private var messages = [Dictionary<String, String>]()
-    private var messages = [AnyObject]()
-    private var channel: TWMChannel!
+    @IBOutlet private var vLoading: UIView!
+    private var messages = [Dictionary<String, AnyObject>]()
+    var channel: TWMChannel!
     
     override var tableView: UITableView {
         get {
@@ -41,35 +41,58 @@ class ChatViewController: SLKTextViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.edgesForExtendedLayout = .None
-        self.title = "Secure chat"
+        
+        self.inverted = false
+        self.textInputbar.autoHideRightButton = false
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if AppState.sharedInstance.twilio == nil {
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-            UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-            
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                AppState.sharedInstance.initTwilio(self)
-            }
-        }
-        
         self.navigationController?.setNavigationBarHidden(false, animated: true)
+        self.title = self.channel.friendlyName
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Leave", comment: "Leave"), style: .Plain, target: self, action: #selector(self.leaveAction(_:)))
+        
+        AppState.sharedInstance.twilio.addListener(self)
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.vLoading.hidden = false
+            self.loadChatParticipants()
+            let attributes = self.channel.attributes()
+            guard attributes[Constants.Virgil.ChannelAttributeCardId] != nil else {
+                self.vLoading.hidden = true
+                return
+            }
+            
+            let messages = AppState.sharedInstance.backend.getHistory(AppState.sharedInstance.identity, channelSid: self.channel.sid)
+            for message in messages {
+                if let body = message[Constants.Message.Body] as? String, encrypted = NSData(base64EncodedString: body, options: .IgnoreUnknownCharacters) {
+                    self.decryptAndCacheMessage(encrypted)
+                }
+            }
+
+            self.tableView.reloadData()
+            self.vLoading.hidden = true
+        }
     }
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        self.vLoading.hidden = true
+        AppState.sharedInstance.twilio.removeListener(self)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if let identifier = segue.identifier where identifier == "ChannelsViewControllerSegue", let destination = segue.destinationViewController as? UINavigationController, controller = destination.topViewController as? ChannelsViewController {
-            controller.channels = AppState.sharedInstance.twilio.channelsList().allObjects()
-            controller.delegate = self
+    @objc private func leaveAction(sender: AnyObject?) {
+        self.vLoading.hidden = false
+        AppState.sharedInstance.twilio.leaveChannel(self.channel) { (result) in
+            if !result.isSuccessful() {
+                print("Error leaving the channel: \(result.error.localizedDescription)")
+            }
             
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+            self.channel = nil
+            dispatch_async(dispatch_get_main_queue(), {
+                self.vLoading.hidden = true
+                self.navigationController?.popViewControllerAnimated(true)
+            })
         }
     }
     
@@ -80,21 +103,20 @@ class ChatViewController: SLKTextViewController {
         }
     }
     
-    private func decryptAndCacheMessages(messages: Array<Dictionary<String, AnyObject>>) {
+    private func decryptAndCacheMessage(message: NSData) {
         let task = XAsyncTask { (weakTask) in
-            for mCandidate in messages {
-                if let mBody = mCandidate[Constants.Message.Body] as? String, mData = NSData(base64EncodedString: mBody, options: .IgnoreUnknownCharacters), card = AppState.sharedInstance.cardForIdentity(AppState.sharedInstance.identity) {
-                    
-                    let decryptor = VSSCryptor()
-                    if let plainData = try? decryptor.decryptData(mData, recipientId: card.Id, privateKey: AppState.sharedInstance.privateKey.key, keyPassword: AppState.sharedInstance.privateKey.password, error: ()) {
-                        var dict = Dictionary<String, AnyObject>()
-                        dict[Constants.Message.Id] = mCandidate[Constants.Message.Id]
-                        dict[Constants.Message.Author] = mCandidate[Constants.Message.Author]
-                        dict[Constants.Message.Date] = mCandidate[Constants.Message.Date]
-                        dict[Constants.Message.Body] = NSString(data: plainData, encoding: NSUTF8StringEncoding)
-                        
-                        self.messages.append(dict)
-                    }
+            let decryptor = VSSCryptor()
+            if let card = AppState.sharedInstance.cardForIdentity(AppState.sharedInstance.identity) {
+                var plainData = NSData()
+                do {
+                    plainData = try decryptor.decryptData(message, recipientId: card.Id, privateKey: AppState.sharedInstance.privateKey.key, keyPassword: AppState.sharedInstance.privateKey.password, error: ())
+                }
+                catch let e as NSError {
+                    plainData = NSData()
+                    print("Error decrypting message: \(e.localizedDescription)")
+                }
+                if let json = try? NSJSONSerialization.JSONObjectWithData(plainData, options: .AllowFragments), wrapper = json as? Dictionary<String, AnyObject> {
+                    self.messages.append(wrapper)
                 }
             }
         }
@@ -102,7 +124,16 @@ class ChatViewController: SLKTextViewController {
     }
     
     private func encryptMessage(body: String) -> String? {
-        if let msg = body.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) {
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'kk:mm:ssZ"
+        
+        let wrapper = [Constants.Message.Id: NSUUID().UUIDString,
+                       Constants.Message.Date: dateFormatter.stringFromDate(NSDate()),
+                       Constants.Message.Author: AppState.sharedInstance.identity,
+                       Constants.Message.Body: body];
+        
+        if let messageData = try? NSJSONSerialization.dataWithJSONObject(wrapper, options: .PrettyPrinted) {
+        
             let cryptor = VSSCryptor()
             let recipients = self.channel.members.allObjects()
             for member in recipients {
@@ -125,7 +156,7 @@ class ChatViewController: SLKTextViewController {
                 }
             }
             
-            if let data = try? cryptor.encryptData(msg, embedContentInfo: true, error: ()) {
+            if let data = try? cryptor.encryptData(messageData, embedContentInfo: true, error: ()) {
                 return data.base64EncodedStringWithOptions(.Encoding64CharacterLineLength)
             }
         }
@@ -137,10 +168,14 @@ class ChatViewController: SLKTextViewController {
     
     // Notifies the view controller when the right button's action has been triggered, manually or by using the keyboard return key.
     override func didPressRightButton(sender: AnyObject!) {
+        self.vLoading.hidden = false
         if let body = self.encryptMessage(self.textView.text) where !body.isEmpty {
             let message = self.channel.messages.createMessageWithBody(body)
             self.channel.messages.sendMessage(message, completion: { (result) in
                 print("Message sent")
+                dispatch_async(dispatch_get_main_queue(), { 
+                    self.vLoading.hidden = true
+                })
             })
         }
         super.didPressRightButton(sender)
@@ -175,8 +210,6 @@ class ChatViewController: SLKTextViewController {
         let message = self.messages[indexPath.row]
         cell.textLabel?.text = message[Constants.Message.Body] as? String
         cell.detailTextLabel?.text = message[Constants.Message.Author] as? String
-        cell.transform = self.tableView.transform
-        
         return cell
     }
     
@@ -225,82 +258,19 @@ class ChatViewController: SLKTextViewController {
 }
 
 // MARK: - TwilioIPMessagingClientDelegate
-extension ChatViewController: TwilioIPMessagingClientDelegate {
+extension ChatViewController: TwilioMessageListener {
     
-    func ipMessagingClient(client: TwilioIPMessagingClient!, synchronizationStatusChanged status: TWMClientSynchronizationStatus) {
-        if status == .ChannelsListCompleted {
-            dispatch_async(dispatch_get_main_queue(), {
-                self.performSegueWithIdentifier("ChannelsViewControllerSegue", sender: self)
-            })
-        }
-    }
-    
-    // Called whenever a channel we've joined receives a new message
-    func ipMessagingClient(client: TwilioIPMessagingClient!, channel: TWMChannel!, messageAdded message: TWMMessage!) {
-        /// Convert TWMMessage to Dictionary
-        var mDict = Dictionary<String, AnyObject>()
-        mDict[Constants.Message.Id] = message.sid
-        mDict[Constants.Message.Author] = message.author
-        mDict[Constants.Message.Date] = message.dateUpdated
-        mDict[Constants.Message.Body] = message.body
-        
-        self.decryptAndCacheMessages([mDict])
+    func didAddMessage(msg: TWMMessage) {
         dispatch_async(dispatch_get_main_queue()) { 
-            self.tableView.reloadData()
+            self.vLoading.hidden = false
         }
-  }
-    
-}
-
-// MARK: - ChannelsViewControllerDelegate
-extension ChatViewController: ChannelsViewControllerDelegate {
-    
-    func channelsViewControllerDidCancel() {
-        self.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    func channelsViewController(controller: ChannelsViewController, didFinishWithChannel channel: TWMChannel) {
-        
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-        
-        self.channel = channel
-        self.channel.joinWithCompletion { (result) in
-            self.loadChatParticipants()
-            let messages = AppState.sharedInstance.backend.getHistory(AppState.sharedInstance.identity, channelSid: self.channel.sid)
-            self.decryptAndCacheMessages(messages)
-            self.tableView.reloadData()
-            self.dismissViewControllerAnimated(true, completion: nil)
-            
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-            UIApplication.sharedApplication().endIgnoringInteractionEvents()
+        if let encrypted = NSData(base64EncodedString: msg.body, options: .IgnoreUnknownCharacters) {
+            self.decryptAndCacheMessage(encrypted)
+            dispatch_async(dispatch_get_main_queue()) {
+                self.tableView.reloadData()
+                self.vLoading.hidden = true
+            }
         }
     }
     
-    func channelsViewController(controller: ChannelsViewController, didAddChannelWithName name: String) {
-        
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-        UIApplication.sharedApplication().beginIgnoringInteractionEvents()
-        
-        var channelOptions: Dictionary<String, AnyObject> = [TWMChannelOptionUniqueName: name, TWMChannelOptionType: TWMChannelType.Public.rawValue]
-        if let card = AppState.sharedInstance.cardForIdentity(Constants.Virgil.ChatAdmin) {
-            channelOptions[TWMChannelOptionAttributes] = [Constants.Virgil.ChannelAttributeCardId: card.Id, Constants.Virgil.ChannelAttributKey: card.publicKey.key]
-        }
-        
-        AppState.sharedInstance.twilio.channelsList().createChannelWithOptions(channelOptions) { (result, channel) in
-            self.channel = channel
-            self.channel.setUniqueName(name, completion: { (result) in
-                self.channel.joinWithCompletion({ (result) in
-                    self.loadChatParticipants()
-                    let messages = AppState.sharedInstance.backend.getHistory(AppState.sharedInstance.identity, channelSid: self.channel.sid)
-                    self.decryptAndCacheMessages(messages)
-                    self.tableView.reloadData()
-                    self.dismissViewControllerAnimated(true, completion: nil)
-                    
-                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-                    UIApplication.sharedApplication().endIgnoringInteractionEvents()
-                })
-            })
-        }
-    }
 }

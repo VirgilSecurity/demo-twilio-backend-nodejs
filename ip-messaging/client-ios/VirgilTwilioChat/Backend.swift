@@ -61,7 +61,14 @@ class Backend: NSObject {
     
     func getTwilioToken(identity: String, device: String) -> String {
         let async = XAsyncTask { (weakTask) in
-            let paramStr = "?\(Constants.Backend.IdentityParam)=\(identity)&\(Constants.Backend.DeviceIdParam)=\(device)"
+            let excIdentity = identity.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet())
+            guard excIdentity != nil else {
+                weakTask?.result = nil
+                weakTask?.fireSignal()
+                return
+            }
+            
+            let paramStr = "?\(Constants.Backend.IdentityParam)=\(excIdentity!)&\(Constants.Backend.DeviceIdParam)=\(device)"
             let url = NSURL(string: Constants.Backend.BaseURL + Constants.Backend.TwilioTokenEndpoint + paramStr)
             let request = NSMutableURLRequest(URL: url!)
             request.HTTPMethod = "GET"
@@ -155,16 +162,18 @@ class Backend: NSObject {
         return Array<Dictionary<String, AnyObject>>()
     }
 
-    func getValidationToken(identity: String, publicKey: NSData) -> String {
+    func getValidationToken(identity: String, publicKey: NSData) -> (String, String) {
         let async = XAsyncTask { (weakTask) in
             let url = NSURL(string: Constants.Backend.BaseURL + Constants.Backend.VirgilValidationTokenEndpoint)
             let request = NSMutableURLRequest(URL: url!)
             request.HTTPMethod = "POST"
             request.setValue(Constants.Backend.ContentTypeJSON, forHTTPHeaderField: Constants.Backend.ContentTypeHeader)
            
-            let bodyObject = [Constants.Backend.IdentityParam: identity, Constants.Backend.PublicKeyParam: publicKey.base64EncodedStringWithOptions(.Encoding64CharacterLineLength)]
-            if let body = try? NSJSONSerialization.dataWithJSONObject(bodyObject, options: .PrettyPrinted) {
-                request.HTTPBody = body
+            if let pKeyString = NSString(data: publicKey, encoding: NSUTF8StringEncoding) {
+                let bodyObject = [Constants.Backend.IdentityParam: identity, Constants.Backend.PublicKeyParam: pKeyString]
+                if let body = try? NSJSONSerialization.dataWithJSONObject(bodyObject, options: .PrettyPrinted) {
+                    request.HTTPBody = body
+                }
             }
             
             let task = self.session.dataTaskWithRequest(request) { (data, response, error) in
@@ -184,8 +193,8 @@ class Backend: NSObject {
                 
                 if let r = response as? NSHTTPURLResponse, signature = r.allHeaderFields[Constants.Backend.SignResponseHeader] as? String, body = data {
                     if self.verifySignature(signature, data: body) {
-                        if let parsed = try? NSJSONSerialization.JSONObjectWithData(body, options: .AllowFragments), tokenObject = parsed as? NSDictionary, token = tokenObject[Constants.Backend.ValidationTokenKey] as? String {
-                            weakTask?.result = token
+                        if let parsed = try? NSJSONSerialization.JSONObjectWithData(body, options: .AllowFragments), tokenObject = parsed as? NSDictionary, token = tokenObject[Constants.Backend.ValidationTokenKey] as? String, sign = tokenObject[Constants.Backend.ApplicationSignKey] as? String {
+                            weakTask?.result = [token, sign]
                             weakTask?.fireSignal()
                             return
                         }
@@ -202,11 +211,11 @@ class Backend: NSObject {
             task.resume()
         }
         async.awaitSignal()
-        if let token = async.result as? String {
-            return token
+        if let tuple = async.result as? Array<String> where tuple.count == 2 {
+            return (tuple[0], tuple[1])
         }
         
-        return ""
+        return ("", "")
     }
     
     private func verifySignature(signature: String, data: NSData) -> Bool {
