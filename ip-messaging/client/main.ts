@@ -11,8 +11,6 @@ import { TwilioService } from './services/twilio.service';
 import { VirgilService } from './services/virgil.service';
 import { BackendService } from './services/backend.service';
 
-import * as moment from 'moment'
-
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/map';
 

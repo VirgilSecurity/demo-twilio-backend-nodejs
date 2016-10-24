@@ -13,6 +13,8 @@ import { SidebarDirective } from '../directives/sidebar.directive'
 
 import * as _ from 'lodash';
 
+const Buffer = VirgilService.VirgilSDK.Buffer;
+
 @Component({
     selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html',
@@ -124,7 +126,7 @@ export class ChatComponent implements OnInit {
             return channel.getMembers();
         }).then((members) => {                
             return Promise.all(members.map(m => this.addMember(m)));            
-        }).then(members => {
+        }).then(() => {
              this.cd.detectChanges();           
         })
         .catch(error => this.handleError(error));        
@@ -143,7 +145,7 @@ export class ChatComponent implements OnInit {
         this.backend.getHistory(identity, channelSid).then(messages => {
             
             let encryptedMessages = _.sortBy(messages, 'dateUpdated'); 
-             _.forEach(messages, m => this.onMessageAdded(m));  
+             _.forEach(encryptedMessages, m => this.onMessageAdded(m));  
              
             this.isChannelHistoryLoading = false;
             this.currentChannel.historyLoaded = true;
@@ -169,14 +171,16 @@ export class ChatComponent implements OnInit {
             };
             
             if (this.includeChannelHistory){                                
-                return this.virgil.sdk.cards.search({ 
-                    value: "twilio_chat_admin"                   
+                return this.virgil.client.searchCards({
+                    identities: [ "twilio_chat_admin" ]
                 }).then(result => {                    
-                    let channelCard: any = _.last(_.sortBy(result, 'created_at'));                    
-                    options.attributes = {
-                        virgil_card_id: channelCard.id,
-                        virgil_public_key: channelCard.public_key.public_key
-                    };                    
+                    let channelCard: any = _.last(_.sortBy(result, 'createdAt'));
+                    if (channelCard) {
+                        options.attributes = {
+                            virgil_card_id: channelCard.id,
+                            virgil_public_key: this.virgil.crypto.importPublicKey(channelCard.publicKey)
+                        };
+                    }
                     return options;
                 });
             }                        
@@ -184,7 +188,6 @@ export class ChatComponent implements OnInit {
         };
         
         prepareNewChannelFunc().then((options) => {
-            console.log(options);            
             return this.twilio.client.createChannel(options);
         })
         .then((channel) => {
@@ -218,67 +221,47 @@ export class ChatComponent implements OnInit {
     /**
      * Encrypts & posts the new message to current channel.
      */
-    private postMessage(): void {
+    public postMessage(): void {
         
         let messageString = this.newMessage;
         let recipients = [];
                 
-        if (this.currentChannel.attributes.virgil_card_id){
-            recipients.push({
-                recipientId: this.currentChannel.attributes.virgil_card_id,
-                publicKey: this.currentChannel.attributes.virgil_public_key
-            });
+        if (this.currentChannel.attributes.virgil_public_key){
+            recipients.push(this.currentChannel.attributes.virgil_public_key);
         }
         
         this.channelMembers.forEach(m => {
-             recipients.push({ recipientId: m.publicKey.id, publicKey: m.publicKey.data });
-        })
+             recipients.push(m.publicKey);
+        });
                 
         let message = {
-            body: this.newMessage,
+            body: messageString,
             date: Date.now(),
             author: this.account.current.identity,
-            id: this.virgil.sdk.publicKeys.generateUUID()
+            id: this.generateUUID()
         };
-        
+
+        let messageBuf = new Buffer(JSON.stringify(message));
+
         this.newMessage = '';
         this.messages.push(message);
         
-        this.virgil.crypto.encryptAsync(JSON.stringify(message), recipients).then(encryptedMessage => {
-            let encryptedMessageBase64 = encryptedMessage.toString('base64');
-            console.log('Encrypted Message Sent', encryptedMessageBase64);
-            this.currentChannel.sendMessage(encryptedMessageBase64);     
-        });     
+        let encryptedMessage = this.virgil.crypto.encrypt(messageBuf, recipients);
+
+        this.currentChannel.sendMessage(encryptedMessage.toString('base64'));
     }
     
     /**
      * Loads the member's public key and the member to the current member collection.
      */
     private addMember(member):Promise<any> {             
-        return this.virgil.sdk.cards.search({ 
-            value: member.identity,
+        return this.virgil.client.searchCards({
+            identities: [ member.identity ],
             type: 'chat_member' 
         }).then(result => {
-            
-            var latestCard: any = _.last(_.sortBy(result, 'created_at'));
+            let latestCard: any = _.last(_.sortBy(result, 'createdAt'));
             if (latestCard){
-                
-                console.log('Recipient', latestCard);
-                
-                let publicKeySign = new this.virgil.crypto.Buffer(latestCard.data.public_key_signature, 'base64');
-                let isValid = this.virgil.crypto.verify(latestCard.public_key.public_key, this.backend.AppPublicKey, publicKeySign);
-                
-                if (!isValid){
-                    throw "Member's Public Key is not valid";
-                }
-                
-                console.log("Member's Public Key is valid");
-                
-                member.publicKey = {
-                    id: latestCard.id,
-                    identity: latestCard.identity.value,
-                    data: latestCard.public_key.public_key
-                };
+                member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
             }
             
             this.channelMembers.push(member);
@@ -289,13 +272,11 @@ export class ChatComponent implements OnInit {
     /**
      * Fired when a new Message has been added to the Channel.
      */
-    private onMessageAdded(message: any): void{        
-        
-        var encryptedBuffer = new this.virgil.crypto.Buffer(message.body, "base64");
-        var decryptedMessage = this.virgil.crypto.decrypt(
-            encryptedBuffer, 
-            this.account.current.id, 
-            this.account.current.privateKey).toString('utf8');
+    private onMessageAdded(message: any): void {
+        let privateKey = this.account.current.privateKey;
+
+        let encryptedBuffer = new Buffer(message.body, "base64");
+        let decryptedMessage = this.virgil.crypto.decrypt(encryptedBuffer, privateKey).toString('utf8');
 
         var messageObject = JSON.parse(decryptedMessage);
         
@@ -313,7 +294,7 @@ export class ChatComponent implements OnInit {
      * Fired when a Member has joined the Channel. 
      */
     private onMemberJoined(member: any): void{        
-        this.addMember(member).then(m => {
+        this.addMember(member).then(() => {
             this.cd.detectChanges();
         });
     }
@@ -368,5 +349,12 @@ export class ChatComponent implements OnInit {
         this.cd.detectChanges();    
         
         console.error(error);    
-    }   
+    }
+
+    private generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+            return v.toString(16);
+        });
+    }
 }

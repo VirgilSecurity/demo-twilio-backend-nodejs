@@ -21,7 +21,7 @@ import * as path from 'path'
 import * as http from 'http'
 import * as _ from 'lodash'
 
-let VirgilSDK = require('virgil-sdk');
+let virgil = require('virgil-sdk');
 let Twilio = require('twilio');
 
 /**
@@ -31,9 +31,10 @@ let Twilio = require('twilio');
  */
 class Server {
 
-    private app: any;   
-    private virgilAppPass: any; 
-    private virgil: any;
+    private app: any;
+    private appPrivateKey: any;
+    private chatAdminPrivateKey: any;
+    private virgilClient: any;
     private ipMessaging: any;
 
     private rootDir: string;
@@ -68,13 +69,18 @@ class Server {
     private config(): void {        
         require('dotenv').load();         
 
-        let fileText = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
-        this.virgilAppPass = JSON.parse(fileText.toString());
+        this.appPrivateKey = virgil.crypto.importPrivateKey(
+            new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64'),
+            process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
+
+        this.chatAdminPrivateKey = virgil.crypto.importPrivateKey(
+            new Buffer(process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY, 'base64'));
 
         this.app.disable("x-powered-by");
         this.rootDir = path.resolve(__dirname + '/../'); 
  
-        this.virgil = new VirgilSDK(process.env.VIRGIL_ACCESS_TOKEN);
+        this.virgilClient = virgil.client(process.env.VIRGIL_ACCESS_TOKEN);
+        this.virgilClient.setCardValidator(virgil.cardValidator(virgil.crypto));
 
         var client = new Twilio.IpMessagingClient(process.env.TWILIO_API_KEY, process.env.TWILIO_API_SECRET);
         this.ipMessaging = client.services(process.env.TWILIO_IPM_SERVICE_SID);
@@ -94,6 +100,7 @@ class Server {
         this.app.get("/auth/virgil-token", (req, res, next) => this.authVirgilTokenHandler(req, res, next));
         this.app.get("/auth/twilio-token", (req, res, next) => this.authTwilioTokenHandler(req, res, next));
         this.app.get("/history", (req, res, next) => this.historyHandler(req, res, next));
+        this.app.post("/virgil-card", (req, res, next) => this.createVirgilCardHandler(req, res, next));
         this.app.get("/", (req, res, next) => this.indexHandler(req, res, next));
     }
 
@@ -103,7 +110,7 @@ class Server {
     private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){   
         fs.readFile(this.rootDir + '/server/index.html', 'utf8', (err, data) => { 
             response.writeHead(200, {'Content-Type': 'text/html'});
-            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, this.virgilAppPass.card.identity.value);
+            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, process.env.VIRGIL_APP_BUNDLE_ID);
             response.write(indexData);
             response.end();
         });
@@ -180,16 +187,17 @@ class Server {
             this.searchChannelMemberCard(identity),
             this.ipMessaging.channels(channelSid).messages.list()
         ])
-        .then(bundle => {                
-            let recipientCard: any = bundle[0];                
-            let messages: Array<any> = bundle[1].messages;                   
+        .then(results => {
+            let recipientCard: any = results[0];
+            let messages: Array<any> = results[1].messages;
                     
             _.forEach(messages, m => {           
                 let decryptedBody = this.decryptTextForChannelAdmin(m.body);                        
-                let encryptedBody = this.virgil.crypto.encryptStringToBase64(
-                    decryptedBody, recipientCard.id, recipientCard.public_key.public_key);
+                let encryptedBody = virgil.crypto.encrypt(
+                    decryptedBody,
+                    virgil.crypto.importPublicKey(recipientCard.publicKey));
                             
-                m.body = encryptedBody;
+                m.body = encryptedBody.toString('base64');
             });
                      
             this.signAndSend(response, messages);
@@ -197,28 +205,44 @@ class Server {
         })
         .catch(next);
     }
+
+    private createVirgilCardHandler(request: express.Request, response: express.Response, next: express.NextFunction) {
+        let cardCreateRequest = virgil.cardCreateRequest.fromTransferFormat(request.body);
+        let signer = virgil.requestSigner(virgil.crypto);
+
+        signer.authoritySign(cardCreateRequest, process.env.VIRGIL_APP_CARD_ID, this.appPrivateKey);
+
+        this.virgilClient.createCard(cardCreateRequest)
+            .then((card) => {
+                this.signAndSend(response, card);
+                next();
+            })
+            .catch((err) => {
+                console.log(err);
+                if (err.invalidCards) {
+                    response.status(400).json({ error: err.message });
+                }
+                next();
+            });
+    }
      
      /**
       * Decrypts a message using channel admin's Private Key.  
       */
      private decryptTextForChannelAdmin(encryptedText: string): string {
-         
-         let chatAdminPrivateKey = new Buffer(process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY, 'base64').toString();   
-         
-         return this.virgil.crypto.decryptStringFromBase64(
-             encryptedText, 
-             process.env.APP_CHANNEL_ADMIN_CARD_ID, 
-             chatAdminPrivateKey);
+         return virgil.crypto.decrypt(new Buffer(encryptedText, 'base64'), this.chatAdminPrivateKey);
      }
 
     /**
      * Loads latest member's Public Key from Virgil Services.
      */
     private searchChannelMemberCard(member: string) {
-        return this.virgil.cards.search({ value: member, type: 'chat_member' }).then(cards => {
-            let latestCard: any = _.last(_.sortBy(cards, 'created_at'));
-            return latestCard;
-        })
+        return this.virgilClient.searchCards({
+            identities: [ member ],
+            identity_type: 'chat_member'
+        }).then(cards => {
+            return _.last(_.sortBy(cards, 'created_at'));
+        });
     }
 
     /**
@@ -236,11 +260,8 @@ class Server {
     /**
      * Signs a text using application Private Key defined in .env file.
      */
-    private signTextUsingAppPrivateKey(text: string){                  
-        let signBase64 = this.virgil.crypto.sign(text, this.virgilAppPass.privateKey, 
-            process.env.VIRGIL_APP_KEY_PASSWORD).toString('base64');         
-         
-        return signBase64;
+    private signTextUsingAppPrivateKey(text: string) {
+        return virgil.crypto.sign(new Buffer(text), this.appPrivateKey).toString('base64');
     }
 
     /**
@@ -250,9 +271,10 @@ class Server {
         
         // this validation token is generated using app’s Private Key created on
         // Virgil Developer portal.
+        var privateKey = virgil.crypto.exportPrivateKey(this.appPrivateKey);
         
-        var validationToken = VirgilSDK.utils.generateValidationToken(identity, 
-            'chat_member', this.virgilAppPass.privateKey, process.env.VIRGIL_APP_KEY_PASSWORD);
+        var validationToken = virgil.utils.generateValidationToken(identity,
+            'chat_member', privateKey, new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD));
 
         return validationToken;
     }

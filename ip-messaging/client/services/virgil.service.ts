@@ -1,23 +1,24 @@
 import { Injectable } from '@angular/core'
 
-declare var VirgilSDK: any;
+declare var virgil: any;
 
 @Injectable()
 export class VirgilService {   
     
     public crypto:any;
-    public sdk:any;
+    public client:any;
 
     initialize(accessToken: string) {
-        this.sdk = new VirgilSDK(accessToken);
-        this.crypto = this.sdk.crypto;
+        this.client = virgil.client(accessToken);
+        this.crypto = virgil.crypto;
+        this.client.setCardValidator(virgil.cardValidator(virgil.crypto));
     }
 
     public static get VirgilSDK(): any {
-        return VirgilSDK;
+        return virgil;
     }
     
     public static get Crypto(): any {
-        return new VirgilSDK('NONE').crypto;
+        return virgil.crypto;
     } 
 }

@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core'
 import { Http, Response, Headers, RequestOptions } from '@angular/http'
 import { VirgilService } from './virgil.service'
-import * as _ from 'lodash'
+
+const Buffer = VirgilService.VirgilSDK.Buffer;
 
 @Injectable()
 export class BackendService {
         
-    private appPublicKey: string; 
+    private appPublicKey: Object;
         
-    constructor(
-        private http: Http) {}
+    constructor(private http: Http, private virgilService: VirgilService) {}
     
     /**
      * Gets a validation token for Virgil services.
@@ -41,7 +41,7 @@ export class BackendService {
     }
     
     /**
-     * Gets decrypted history with current accoount's private key. 
+     * Gets decrypted history with current account's private key.
      */
     public getHistory(identity:string, channelSid: string): Promise<any> {
         return this.http.get(`/history?identity=${identity}&channelSid=${channelSid}`)
@@ -49,28 +49,42 @@ export class BackendService {
     }
 
     /**
-     * Sets the Application Public Key, uses to prevent men-in-the-middle attacs.
+     * Sets the Application Public Key, uses to prevent men-in-the-middle attacks.
      */
-    public setAppPublicKey(publicKey: string) {
+    public setAppPublicKey(publicKey: Object) {
         this.appPublicKey = publicKey;
     }
 
     /**
      * Gets an application's Public Key. 
      */
-    public get AppPublicKey(): string {
+    public get AppPublicKey(): Object {
         return this.appPublicKey;
     } 
+    
+    public createVirgilCard(request: Object): Promise<any> {
+        return this.postJson('/virgil-card', request).then(this.verifyAndMapToJson.bind(this));
+    }
+
+    private postJson(url: string, data: Object): Promise<any> {
+        let body = JSON.stringify(data);
+        let headers = new Headers({ 'Content-Type': 'application/json' });
+        let options = new RequestOptions({ headers: headers });
+
+        return this.http.post(url, body, options).toPromise();
+    }
 
     /**
-     * Verifies resoponse using application's Public Key.
+     * Verifies response using application's Public Key.
      */
-    private verifyAndMapToJson(response:Response): Promise<any>{        
+    private verifyAndMapToJson(response:Response): Promise<any>{
         
-        let virgilCrypto = VirgilService.Crypto;
-        
-        let responseSign = new virgilCrypto.Buffer(response.headers.get('x-ipm-response-sign'), 'base64');
-        let isValid = virgilCrypto.verify(response.text(), this.appPublicKey, responseSign);
+        let responseSign = new Buffer(response.headers.get('x-ipm-response-sign'), 'base64');
+        let isValid = this.virgilService.crypto.verify(
+            new Buffer(response.text()),
+            responseSign,
+            this.AppPublicKey);
+
         if (!isValid){
             throw "Response signature is not valid."
         }

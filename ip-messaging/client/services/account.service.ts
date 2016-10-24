@@ -1,21 +1,36 @@
 import { Injectable } from '@angular/core'
+import { VirgilService } from './virgil.service';
+
+const Buffer = VirgilService.VirgilSDK.Buffer;
 
 export class Account {
     constructor(public id: string,
                 public identity: string,
                 public identityType: string,
-                public publicKey: string,
-                public privateKey: string) { }
+                public publicKey: Object,
+                public privateKey: Object) { }
+
+    public toJSON(): string {
+        var obj = {
+            id: this.id,
+            identity: this.identity,
+            identityType: this.identityType,
+            publicKey: VirgilService.Crypto.exportPublicKey(this.publicKey).toString('base64'),
+            privateKey: VirgilService.Crypto.exportPrivateKey(this.privateKey).toString('base64')
+        };
+
+        return JSON.stringify(obj);
+    }
                     
-    static fromJson(json: string){
+    static fromJson(json: string) {
         var accountObject = JSON.parse(json);
         
         return new Account(
             accountObject.id, 
             accountObject.identity, 
             accountObject.identityType,
-            accountObject.publicKey, 
-            accountObject.privateKey
+            VirgilService.Crypto.importPublicKey(new Buffer(accountObject.publicKey, 'base64')),
+            VirgilService.Crypto.importPrivateKey(new Buffer(accountObject.privateKey, 'base64'))
         );
     }
 }
@@ -23,7 +38,7 @@ export class Account {
 @Injectable()
 export class AccountService {   
         
-    constructor (){
+    constructor () {
         this.currentAccount = this.loadAccount();
     }
         
@@ -46,7 +61,7 @@ export class AccountService {
     }
         
     private storeAccount(storeAccount:Account){
-        localStorage.setItem('account', JSON.stringify(storeAccount))
+        localStorage.setItem('account', storeAccount.toJSON())
     }
     
     private loadAccount():Account{
