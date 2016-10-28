@@ -178,7 +178,7 @@ export class ChatComponent implements OnInit {
                     if (channelCard) {
                         options.attributes = {
                             virgil_card_id: channelCard.id,
-                            virgil_public_key: this.virgil.crypto.importPublicKey(channelCard.publicKey)
+                            virgil_public_key: channelCard.publicKey.toString('base64')
                         };
                     }
                     return options;
@@ -226,8 +226,11 @@ export class ChatComponent implements OnInit {
         let messageString = this.newMessage;
         let recipients = [];
                 
-        if (this.currentChannel.attributes.virgil_public_key){
-            recipients.push(this.currentChannel.attributes.virgil_public_key);
+        if (this.currentChannel.attributes.virgil_public_key) {
+            var adminPubkey = this.virgil.crypto.importPublicKey(
+                new Buffer(this.currentChannel.attributes.virgil_public_key, 'base64')
+            );
+            recipients.push(adminPubkey);
         }
         
         this.channelMembers.forEach(m => {
