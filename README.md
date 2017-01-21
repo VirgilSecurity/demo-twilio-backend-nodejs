@@ -37,3 +37,43 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
 | VIRGIL_APP_KEY_PATH               | The path to your application Private key (AppKey) file. This file had to be saved as (*.virgilkey) on your machine during create application wizard. |
 | VIRGIL_APP_KEY_PASSWORD   | The password you used to protect you AppKey. |
+| APP_CHANNEL_ADMIN_CARD_ID | Optional for chat history. Used to identify an admin's Card. See details [here](#setup-channel-admin). |
+| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional for chat history. Used to perform decryption for history merssages. See details [here](#setup-channel-admin). |
+
+## Setup channel admin
+
+Generate a new Public/Private key pair using virgil.crypto
+
+```js
+var keyPair = virgil.crypto.generateKeyPair();
+var channelAdminPrivateKey = new virgil.crypto.Buffer(keyPair.privateKey);
+
+console.log('APP_CHANNEL_ADMIN_PRIVATE_KEY:' + channelAdminPrivateKey.toString('Base64'));
+```
+
+Register a new channel admin Card using SDK client
+
+```js
+var appKey = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
+
+var identity = 'twilio_chat_admin';
+var identityType = 'chat_member';
+
+var validationToken = VirgilSDK.utils.generateValidationToken(identity, 
+  identityType, appKey, process.env.VIRGIL_APP_KEY_PASSWORD);
+
+var channelAdminCardDetails = {
+     public_key: keyPair.publicKey,
+     private_key: keyPair.privateKey,
+     identity: {
+         type: identityType,
+         value: identity,
+         validation_token: validationToken
+     }
+};
+
+virgil.cards.create(channelAdminCardDetails).then(function (card){
+    console.log('APP_CHANNEL_ADMIN_CARD_ID:' + card.id);
+});
+```
+
