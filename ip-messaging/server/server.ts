@@ -10,6 +10,7 @@ TWILIO_API_SECRET=
 TWILIO_IPM_SERVICE_SID=
 
 VIRGIL_ACCESS_TOKEN=
+VIRGIL_APP_ID=
 VIRGIL_APP_KEY_PATH=
 VIRGIL_APP_KEY_PASSWORD=
 */
@@ -32,7 +33,7 @@ let Twilio = require('twilio');
 class Server {
 
     private app: any;   
-    private virgilAppPass: any; 
+    private appPrivateKey: any; 
     private virgil: any;
     private ipMessaging: any;
 
@@ -68,8 +69,7 @@ class Server {
     private config(): void {        
         require('dotenv').load();         
 
-        let fileText = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
-        this.virgilAppPass = JSON.parse(fileText.toString());
+        this.appPrivateKey = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
 
         this.app.disable("x-powered-by");
         this.rootDir = path.resolve(__dirname + '/../'); 
@@ -103,7 +103,7 @@ class Server {
     private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){   
         fs.readFile(this.rootDir + '/server/index.html', 'utf8', (err, data) => { 
             response.writeHead(200, {'Content-Type': 'text/html'});
-            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, this.virgilAppPass.card.identity.value);
+            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, process.env.VIRGIL_APP_ID);
             response.write(indexData);
             response.end();
         });
@@ -237,7 +237,7 @@ class Server {
      * Signs a text using application Private Key defined in .env file.
      */
     private signTextUsingAppPrivateKey(text: string){                  
-        let signBase64 = this.virgil.crypto.sign(text, this.virgilAppPass.privateKey, 
+        let signBase64 = this.virgil.crypto.sign(text, this.appPrivateKey, 
             process.env.VIRGIL_APP_KEY_PASSWORD).toString('base64');         
          
         return signBase64;
@@ -252,7 +252,7 @@ class Server {
         // Virgil Developer portal.
         
         var validationToken = VirgilSDK.utils.generateValidationToken(identity, 
-            'chat_member', this.virgilAppPass.privateKey, process.env.VIRGIL_APP_KEY_PASSWORD);
+            'chat_member', this.appPrivateKey, process.env.VIRGIL_APP_KEY_PASSWORD);
 
         return validationToken;
     }
