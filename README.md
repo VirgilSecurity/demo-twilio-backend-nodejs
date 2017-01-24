@@ -35,7 +35,7 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | TWILIO_API_SECRET                 | Used to authenticate - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
 | TWILIO_IPM_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/user/account/ip-messaging/services) |
 | VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
-| VIRGIL_APP_ID               |  |
+| VIRGIL_APP_ID               | uniquely identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with (AppKey) |
 | VIRGIL_APP_KEY_PATH               | The path to your application Private key (AppKey) file. This file had to be saved as (*.virgilkey) on your machine during create application wizard. |
 | VIRGIL_APP_KEY_PASSWORD   | The password you used to protect you AppKey. |
 | APP_CHANNEL_ADMIN_CARD_ID | Optional for chat history. Used to identify an admin's Card. See details [here](#setup-channel-admin). |
