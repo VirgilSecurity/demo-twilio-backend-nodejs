@@ -228,8 +228,7 @@ export class ChatComponent implements OnInit {
                 
         if (this.currentChannel.attributes.virgil_public_key) {
             var adminPubkey = this.virgil.crypto.importPublicKey(
-                new Buffer(this.currentChannel.attributes.virgil_public_key, 'base64')
-            );
+                this.currentChannel.attributes.virgil_public_key);
             recipients.push(adminPubkey);
         }
         
@@ -244,12 +243,12 @@ export class ChatComponent implements OnInit {
             id: this.generateUUID()
         };
 
-        let messageBuf = new Buffer(JSON.stringify(message));
+        let messageJSON = JSON.stringify(message);
 
         this.newMessage = '';
         this.messages.push(message);
         
-        let encryptedMessage = this.virgil.crypto.encrypt(messageBuf, recipients);
+        let encryptedMessage = this.virgil.crypto.encrypt(messageJSON, recipients);
 
         this.currentChannel.sendMessage(encryptedMessage.toString('base64'));
     }
@@ -278,8 +277,7 @@ export class ChatComponent implements OnInit {
     private onMessageAdded(message: any): void {
         let privateKey = this.account.current.privateKey;
 
-        let encryptedBuffer = new Buffer(message.body, "base64");
-        let decryptedMessage = this.virgil.crypto.decrypt(encryptedBuffer, privateKey).toString('utf8');
+        let decryptedMessage = this.virgil.crypto.decrypt(message.body, privateKey).toString('utf8');
 
         var messageObject = JSON.parse(decryptedMessage);
         

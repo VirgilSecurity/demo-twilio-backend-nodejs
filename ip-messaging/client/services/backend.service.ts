@@ -79,9 +79,9 @@ export class BackendService {
      */
     private verifyAndMapToJson(response:Response): Promise<any>{
         
-        let responseSign = new Buffer(response.headers.get('x-ipm-response-sign'), 'base64');
+        let responseSign = response.headers.get('x-ipm-response-sign');
         let isValid = this.virgilService.crypto.verify(
-            new Buffer(response.text()),
+            response.text(),
             responseSign,
             this.AppPublicKey);
 

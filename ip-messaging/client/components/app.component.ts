@@ -110,17 +110,16 @@ export class AppComponent implements OnInit {
         let keyPair = this.virgil.crypto.generateKeys();
         let rawPublicKey = this.virgil.crypto.exportPublicKey(keyPair.publicKey);
         
-        let request = VirgilService.VirgilSDK.cardCreateRequest({
+        let request = VirgilService.VirgilSDK.publishCardRequest({
             identity: username,
             identity_type: 'chat_member',
-            scope: 'application',
-            public_key: rawPublicKey
+            public_key: rawPublicKey.toString('base64')
         });
         
         let signer = VirgilService.VirgilSDK.requestSigner(this.virgil.crypto);
         signer.selfSign(request, keyPair.privateKey);
         
-        return this.backend.createVirgilCard(request.toTransferFormat())
+        return this.backend.createVirgilCard(request.export())
             .then((card) => {
                 return _.assign({}, card, keyPair);
             });

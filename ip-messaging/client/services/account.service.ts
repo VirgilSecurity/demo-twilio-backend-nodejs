@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core'
 import { VirgilService } from './virgil.service';
 
-const Buffer = VirgilService.VirgilSDK.Buffer;
-
 export class Account {
     constructor(public id: string,
                 public identity: string,
@@ -29,8 +27,8 @@ export class Account {
             accountObject.id, 
             accountObject.identity, 
             accountObject.identityType,
-            VirgilService.Crypto.importPublicKey(new Buffer(accountObject.publicKey, 'base64')),
-            VirgilService.Crypto.importPrivateKey(new Buffer(accountObject.privateKey, 'base64'))
+            VirgilService.Crypto.importPublicKey(accountObject.publicKey),
+            VirgilService.Crypto.importPrivateKey(accountObject.privateKey)
         );
     }
 }

@@ -32,7 +32,7 @@
     "rxjs": "5.0.0-beta.6",
     "systemjs": "0.19.27",
     "twilio": "^2.9.1",
-    "virgil-sdk": "^4.0.0-beta.3",
+    "virgil-sdk": "^4.0.0",
     "zone.js": "^0.6.12"
   },
   "devDependencies": {

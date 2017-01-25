@@ -70,11 +70,11 @@ class Server {
         require('dotenv').load();         
 
         this.appPrivateKey = virgil.crypto.importPrivateKey(
-            new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY, 'base64'),
+            process.env.VIRGIL_APP_PRIVATE_KEY,
             process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
 
         this.chatAdminPrivateKey = virgil.crypto.importPrivateKey(
-            new Buffer(process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY, 'base64'));
+            process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY);
 
         this.app.disable("x-powered-by");
         this.rootDir = path.resolve(__dirname + '/../'); 
@@ -126,12 +126,10 @@ class Server {
         let identity = request.body.identity;
         
         let applicationSign = this.signTextUsingAppPrivateKey(request.body.public_key);
-        let validationToken = this.generateValidationToken(identity);
             
         this.signAndSend(response, {
             identity: identity,        
-            application_sign: applicationSign,
-            validation_token: validationToken
+            application_sign: applicationSign
         });
     }
 
@@ -207,12 +205,12 @@ class Server {
     }
 
     private createVirgilCardHandler(request: express.Request, response: express.Response, next: express.NextFunction) {
-        let cardCreateRequest = virgil.cardCreateRequest.fromTransferFormat(request.body);
+        let cardCreateRequest = virgil.publishCardRequest.import(request.body);
         let signer = virgil.requestSigner(virgil.crypto);
 
         signer.authoritySign(cardCreateRequest, process.env.VIRGIL_APP_CARD_ID, this.appPrivateKey);
 
-        this.virgilClient.createCard(cardCreateRequest)
+        this.virgilClient.publishCard(cardCreateRequest)
             .then((card) => {
                 this.signAndSend(response, card);
                 next();
@@ -230,7 +228,7 @@ class Server {
       * Decrypts a message using channel admin's Private Key.  
       */
      private decryptTextForChannelAdmin(encryptedText: string): string {
-         return virgil.crypto.decrypt(new Buffer(encryptedText, 'base64'), this.chatAdminPrivateKey);
+         return virgil.crypto.decrypt(encryptedText, this.chatAdminPrivateKey);
      }
 
     /**
@@ -241,7 +239,7 @@ class Server {
             identities: [ member ],
             identity_type: 'chat_member'
         }).then(cards => {
-            return _.last(_.sortBy(cards, 'created_at'));
+            return _.last(_.sortBy(cards, 'createdAt'));
         });
     }
 
@@ -261,22 +259,7 @@ class Server {
      * Signs a text using application Private Key defined in .env file.
      */
     private signTextUsingAppPrivateKey(text: string) {
-        return virgil.crypto.sign(new Buffer(text), this.appPrivateKey).toString('base64');
-    }
-
-    /**
-     * Generates a Validation Token for specified identity.
-     */
-    private generateValidationToken(identity) {
-        
-        // this validation token is generated using app’s Private Key created on
-        // Virgil Developer portal.
-        var privateKey = virgil.crypto.exportPrivateKey(this.appPrivateKey);
-        
-        var validationToken = virgil.utils.generateValidationToken(identity,
-            'chat_member', privateKey, new Buffer(process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD));
-
-        return validationToken;
+        return virgil.crypto.sign(text, this.appPrivateKey).toString('base64');
     }
 }
 
