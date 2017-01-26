@@ -78,8 +78,7 @@ export class AppComponent implements OnInit {
                 return this.virgil.client.getCard(APP_BUNDLE_ID);              
             })
             .then(appCard => {
-                var appPublicKeyBuffer = VirgilService.VirgilSDK.Buffer.from(appCard.publicKey);
-                this.backend.setAppPublicKey(this.virgil.crypto.importPublicKey(appPublicKeyBuffer));
+                this.backend.setAppPublicKey(this.virgil.crypto.importPublicKey(appCard.publicKey));
                 
                 return this.backend.getTwilioToken(identity, 'web');
             })

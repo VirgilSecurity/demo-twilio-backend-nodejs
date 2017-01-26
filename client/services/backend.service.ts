@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core'
 import { Http, Response, Headers, RequestOptions } from '@angular/http'
 import { VirgilService } from './virgil.service'
 
-const Buffer = VirgilService.VirgilSDK.Buffer;
-
 @Injectable()
 export class BackendService {
         
@@ -79,14 +77,14 @@ export class BackendService {
      */
     private verifyAndMapToJson(response:Response): Promise<any>{
         let responseSign = response.headers.get('x-ipm-response-sign');
-        // let isValid = this.virgilService.crypto.verify(
-        //     response.text(),
-        //     responseSign,
-        //     this.AppPublicKey);
+        let isValid = this.virgilService.crypto.verify(
+            response.text(),
+            responseSign,
+            this.AppPublicKey);
 
-        // if (!isValid){
-        //     throw "Response signature is not valid."
-        // }
+        if (!isValid){
+            throw "Response signature is not valid."
+        }
         
         return Promise.resolve(response.json());
     }

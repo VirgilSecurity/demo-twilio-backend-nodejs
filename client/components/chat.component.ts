@@ -271,8 +271,7 @@ export class ChatComponent implements OnInit {
         }).then(result => {
             let latestCard: any = _.last(_.sortBy(result, 'createdAt'));
             if (latestCard){
-                let memberPublicKeyBuffer = Buffer.from(latestCard.publicKey);
-                member.publicKey = this.virgil.crypto.importPublicKey(memberPublicKeyBuffer);
+                member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
             }
             
             this.channelMembers.push(member);
