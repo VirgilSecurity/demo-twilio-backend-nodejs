@@ -35,6 +35,8 @@ export class ChatComponent implements OnInit {
     public channels = [];    
     public channelMembers = [];        
     public currentChannel: any;    
+    public currentChannelHasHistory:boolean = false;
+    public currentChannelAdminPublicKey: any = null;
     
     public isChannelsLoading:boolean = false;
     public isChannelHistoryLoading: boolean = false;
@@ -120,7 +122,14 @@ export class ChatComponent implements OnInit {
             // subscribe for channel events.            
             channel.on('memberJoined', this.memberJoinedHandler);
             channel.on('memberLeft', this.memberLeftHandler);
-            channel.on('messageAdded', this.messageAddedHandler);    
+            channel.on('messageAdded', this.messageAddedHandler);   
+
+            this.currentChannelHasHistory =  this.currentChannel.attributes.hasOwnProperty("virgil_public_key");
+
+            if (this.currentChannelAdminPublicKey == null && this.currentChannelHasHistory) {
+                this.currentChannelAdminPublicKey = this.virgil.crypto.importPublicKey(
+                    Buffer.from(this.currentChannel.attributes.virgil_public_key, 'utf8'));
+            }
                     
             // load channel members.        
             return channel.getMembers();
@@ -176,9 +185,10 @@ export class ChatComponent implements OnInit {
                 }).then(result => {                    
                     let channelCard: any = _.last(_.sortBy(result, 'createdAt'));
                     if (channelCard) {
+                        let chatAdminPublicKeyBuffer = Buffer.from(channelCard.publicKey);
                         options.attributes = {
                             virgil_card_id: channelCard.id,
-                            virgil_public_key: channelCard.publicKey.toString('base64')
+                            virgil_public_key: chatAdminPublicKeyBuffer.toString('utf8')
                         };
                     }
                     return options;
@@ -226,10 +236,8 @@ export class ChatComponent implements OnInit {
         let messageString = this.newMessage;
         let recipients = [];
                 
-        if (this.currentChannel.attributes.virgil_public_key) {
-            var adminPubkey = this.virgil.crypto.importPublicKey(
-                this.currentChannel.attributes.virgil_public_key);
-            recipients.push(adminPubkey);
+        if (this.currentChannelAdminPublicKey) {
+            recipients.push(this.currentChannelAdminPublicKey);
         }
         
         this.channelMembers.forEach(m => {
@@ -263,7 +271,8 @@ export class ChatComponent implements OnInit {
         }).then(result => {
             let latestCard: any = _.last(_.sortBy(result, 'createdAt'));
             if (latestCard){
-                member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
+                let memberPublicKeyBuffer = Buffer.from(latestCard.publicKey);
+                member.publicKey = this.virgil.crypto.importPublicKey(memberPublicKeyBuffer);
             }
             
             this.channelMembers.push(member);

@@ -60,7 +60,9 @@ export class AppComponent implements OnInit {
                 'chat_member',
                 keysBundle.publicKey,
                 keysBundle.privateKey);
-                
+
+            console.log('CURRENT ACCOUNT: ');
+            console.log(userAccount);    
             return this.account.setCurrentAccount(userAccount);
         })
         .catch((error) => {
@@ -73,16 +75,12 @@ export class AppComponent implements OnInit {
         return this.backend.getVirgilToken()
             .then(data => {
                 this.virgil.initialize(data.virgil_token);
-
-                return this.virgil.client.searchCards({
-                    identities: [ APP_BUNDLE_ID ],
-                    identity_type: 'application',
-                    scope: 'global'
-                });              
+                return this.virgil.client.getCard(APP_BUNDLE_ID);              
             })
-            .then(cards => {
-                let appCard: any = _.last(_.sortBy(cards, 'createdAt'));
-                this.backend.setAppPublicKey(this.virgil.crypto.importPublicKey(appCard.publicKey));
+            .then(appCard => {
+                var appPublicKeyBuffer = VirgilService.VirgilSDK.Buffer.from(appCard.publicKey);
+                this.backend.setAppPublicKey(this.virgil.crypto.importPublicKey(appPublicKeyBuffer));
+                
                 return this.backend.getTwilioToken(identity, 'web');
             })
             .then(data => {
@@ -107,19 +105,22 @@ export class AppComponent implements OnInit {
     }
     
     private createCard(username: string) : Promise<any> {
+        
         let keyPair = this.virgil.crypto.generateKeys();
         let rawPublicKey = this.virgil.crypto.exportPublicKey(keyPair.publicKey);
-        
+    
         let request = VirgilService.VirgilSDK.publishCardRequest({
             identity: username,
             identity_type: 'chat_member',
             public_key: rawPublicKey.toString('base64')
         });
-        
+    
         let signer = VirgilService.VirgilSDK.requestSigner(this.virgil.crypto);
         signer.selfSign(request, keyPair.privateKey);
+
+        var requestBody = { exported_card_request: request.export() };
         
-        return this.backend.createVirgilCard(request.export())
+        return this.backend.createVirgilCard(requestBody)
             .then((card) => {
                 return _.assign({}, card, keyPair);
             });

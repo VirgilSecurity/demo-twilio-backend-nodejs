@@ -1,4 +1,4 @@
-/// <reference path="../typings/index.d.ts" />
+/// <reference path="./typings/index.d.ts" />
 /*
 This application should give you a ready-made starting point for writing your own end-to-end 
 encrypted messaging apps with Virgil Security & Twilio IP Messaging. Before we begin, we need 
@@ -69,15 +69,14 @@ class Server {
     private config(): void {        
         require('dotenv').load();         
 
-        this.appPrivateKey = virgil.crypto.importPrivateKey(
-            process.env.VIRGIL_APP_PRIVATE_KEY,
-            process.env.VIRGIL_APP_PRIVATE_KEY_PASSWORD);
+        var appKeyData = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
+        this.appPrivateKey = virgil.crypto.importPrivateKey(appKeyData, process.env.VIRGIL_APP_KEY_PASSWORD);
 
-        this.chatAdminPrivateKey = virgil.crypto.importPrivateKey(
-            process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY);
+        // this.chatAdminPrivateKey = virgil.crypto.importPrivateKey(
+        //    process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY);
 
         this.app.disable("x-powered-by");
-        this.rootDir = path.resolve(__dirname + '/../'); 
+        this.rootDir = path.resolve(__dirname); 
  
         this.virgilClient = virgil.client(process.env.VIRGIL_ACCESS_TOKEN);
         this.virgilClient.setCardValidator(virgil.cardValidator(virgil.crypto));
@@ -108,9 +107,9 @@ class Server {
      * Handles requests for default HTML page.
      */
     private indexHandler(request: express.Request, response: express.Response, next: express.NextFunction){   
-        fs.readFile(this.rootDir + '/server/index.html', 'utf8', (err, data) => { 
+        fs.readFile(this.rootDir + '/index.html', 'utf8', (err, data) => { 
             response.writeHead(200, {'Content-Type': 'text/html'});
-            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, process.env.VIRGIL_APP_BUNDLE_ID);
+            var indexData = data.replace(/{{ APP_BUNDLE_ID }}/g, process.env.VIRGIL_APP_ID);
             response.write(indexData);
             response.end();
         });
@@ -205,10 +204,10 @@ class Server {
     }
 
     private createVirgilCardHandler(request: express.Request, response: express.Response, next: express.NextFunction) {
-        let cardCreateRequest = virgil.publishCardRequest.import(request.body);
+        let cardCreateRequest = virgil.publishCardRequest.import(request.body.exported_card_request);
         let signer = virgil.requestSigner(virgil.crypto);
 
-        signer.authoritySign(cardCreateRequest, process.env.VIRGIL_APP_CARD_ID, this.appPrivateKey);
+        signer.authoritySign(cardCreateRequest, process.env.VIRGIL_APP_ID, this.appPrivateKey);
 
         this.virgilClient.publishCard(cardCreateRequest)
             .then((card) => {
