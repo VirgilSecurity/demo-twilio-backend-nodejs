@@ -73,8 +73,8 @@ class Server {
         var appKeyData = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
         this.appPrivateKey = virgil.crypto.importPrivateKey(appKeyData, process.env.VIRGIL_APP_KEY_PASSWORD);
 
-        // this.chatAdminPrivateKey = virgil.crypto.importPrivateKey(
-        //    process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY);
+        this.chatAdminPrivateKey = virgil.crypto.importPrivateKey(
+            process.env.APP_CHANNEL_ADMIN_PRIVATE_KEY);
 
         this.app.disable("x-powered-by");
         this.rootDir = path.resolve(__dirname); 
