@@ -198,7 +198,7 @@ client.searchCards({ identities: [ 'bob' ], type: 'chat_member' })
     })
     .then(function(recipients) {
         var message = $('#chat-input').val();
-        var encryptedMessage = virgil.crypto.encrypt(message, recipients);
+        var encryptedMessage = virgil.crypto.encrypt(message, recipients).toString('base64');
         
         generalChannel.sendMessage(encryptedMessage);    
         console.log(encryptedMessage);
@@ -235,7 +235,7 @@ generalChannel.on('messageAdded', function(message) {
         alice.privateKey
     );
         
-    console.log(message.author + ': ' + decryptedMessage);
+    console.log(message.author + ': ' + decryptedMessage.toString());
 });
 ```
 
