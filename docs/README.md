@@ -7,43 +7,56 @@ With these instructions, you'll learn how to install and integrate the Virgil Cr
 ## How it Works - Basics
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
 
-##Prerequisites
- 
-### Obtaining an Access Token
- 
-First you must create a free Virgil Security developer's account by signing up [here](https://developer.virgilsecurity.com/account/signup). Once you have your account you can [sign in](https://developer.virgilsecurity.com/account/signin) and generate an access token for your application.
- 
-The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account.
- 
-Use this token to initialize the SDK client [here](#lets-get-started).
- 
-### Install
- 
-You can easily add SDK dependency to your project, just follow the examples below:
- 
-#### NPM
- 
+## Setting up your project
+
+### Target environments
+
+SDK targets ECMAScript5 compatible browsers and Node.js from version 0.12 
+and above. 
+
+### Installation
+
+You can install Virgil SDK from npm
+
 ```sh
-npm install virgil-sdk
+npm install virgil-sdk --save
 ```
- 
-#### Bower
-```sh
-bower install virgil-sdk
-```
-  
-#### CDN
+
+Or get it from CDN
 ```html
 <script 
-src="https://cdn.virgilsecurity.com/packages/javascript/sdk/1.4.6/virgil-sdk.min.js" 
-integrity="sha256-6gsCF73jFoEAcdAmVE8n+LCtUgzQ7j6svoCQxVxvmZ8="
+src="https://cdn.virgilsecurity.com/packages/javascript/sdk/4.0.0/virgil-sdk.min.js"
 crossorigin="anonymous"></script>
 ```
 
-Use the code below to initialize global variable of VirgilSDK.
+## User and App Credentials
 
-```js
-var virgil = new VirgilSDK("%ACCESS_TOKEN%");
+To start using Virgil Services you first have to create an account at [Virgil 
+Developer Portal](https://developer.virgilsecurity.com/account/signup).
+
+After you create an account, or if you already have an account, sign in and 
+create a new application. Make sure you save the *private key* that is 
+generated for your application at this point as you will need it later. 
+After your application is ready, create a *token* that your app will 
+use to make authenticated requests to Virgil Services. One more thing that 
+you're going to need is your application's *app id* which is an identifier 
+of your application's Virgil Card.
+
+## Usage
+
+Now that you have your account and application in place you can start making 
+requests to Virgil Services.
+
+### Initializing an API Client
+
+To initialize the client, you need the *access token* that you created for 
+your application on [Virgil Developer Portal](https://developer.virgilsecurity.com/)
+
+```javascript
+// var virgil = require('virgil-sdk');
+// or just use virgil if you've added virgil sdk via <script> tag
+ 
+var client = virgil.client("[YOUR_ACCESS_TOKEN_HERE]");
 ```
 
 ## Let's Get Started
