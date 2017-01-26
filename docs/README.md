@@ -1,8 +1,8 @@
-# Quickstart: Adding End-to-End Encryption to Twilio IP Messaging.
+# Quickstart: Adding End-to-End Encryption to Twilio Programmable Chat.
 
 ## Introduction
 
-With these instructions, you'll learn how to install and integrate the Virgil Crypto API and Twilio IP messaging API. Let's go!
+With these instructions, you'll learn how to install and integrate the Virgil Crypto API and Twilio Programmable Chat API. Let's go!
 
 ## How it Works - Basics
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
@@ -48,7 +48,7 @@ var virgil = new VirgilSDK("%ACCESS_TOKEN%");
 
 ## Let's Get Started
 
-In a Twilio IP Messaging application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where Messages are sent, received, and archived for later viewing by offline clients.
+In a Twilio Programmable Chat application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where Messages are sent, received, and archived for later viewing by offline clients.
 
 Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. Let's also apply end-to-end encryption using Virgil Security's infrastructure.
 
