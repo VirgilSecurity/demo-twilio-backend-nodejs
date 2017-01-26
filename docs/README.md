@@ -191,21 +191,18 @@ twilioClient.createChannel({ friendlyName: 'general' }).then(function(channel) {
 Once you're a member of a Channel, you can send a Message to it. A Message is a bit of data that is sent first to the Twilio backend, where it is stored for later access by members of the Channel, and then pushed out in real time to all currently online Channel members. Only users subscribed to your Channel will receive your Messages.
 
 ```js
-// Receive the list of Channel's recipients
-Promise.all(generalChannel.getMembers().map(function(member) {
-    // Search for the member’s cards on Virgil Cards service
-    return client.searchCards({ identities: [ member.identity ], type: 'chat_member' })
-        .then(function(cards){
-            return virgil.crypto.importPublicKey(cards[0].publicKey)
-        }
-    });
-}).then(function(recipients) {
-    var message = $('#chat-input').val();
-    var encryptedMessage = virgil.crypto.encrypt(message, recipients);
+// Search for recipient's Virgil Card
+client.searchCards({ identities: [ 'bob' ], type: 'chat_member' })
+    .then(function(bobCards){
+        return virgil.crypto.importPublicKey(bobCards[0].publicKey)
+    })
+    .then(function(recipients) {
+        var message = $('#chat-input').val();
+        var encryptedMessage = virgil.crypto.encrypt(message, recipients);
         
-    generalChannel.sendMessage(encryptedMessage);    
-    console.log(encryptedMessage);
-});
+        generalChannel.sendMessage(encryptedMessage);    
+        console.log(encryptedMessage);
+    });
 ```
 *Output:*
 
