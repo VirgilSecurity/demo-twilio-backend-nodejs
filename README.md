@@ -1,10 +1,10 @@
-# Virgil & Twilio IP Messaging
+# Virgil & Twilio Programmable Chat
 
-With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.
+With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
 
 
-- [Quickstart Guide](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging)
-- [iOS Client](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging/client-ios)
+- [Quickstart Guide](/docs)
+- [iOS Client](/client-ios)
 - [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
 
 ## Publish
@@ -13,13 +13,13 @@ There are only few steps required to setup Virgil History service :)
 
 ```
 $ git clone https://github.com/VirgilSecurity/virgil-demo-twilio.git
-$ cd ./ip-messaging
+$ cd ./virgil-demo-twilio
 
 $ npm install
 $ npm start
 ```
 
-Use url [http://localhost:8080](http://localhost:8080) to open your IP Messaging Chat
+Use url [http://localhost:8080](http://localhost:8080) to open your Demo Chat
 
 ## Configuration
 
