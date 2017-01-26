@@ -226,8 +226,15 @@ class Server {
      /**
       * Decrypts a message using channel admin's Private Key.  
       */
-     private decryptTextForChannelAdmin(encryptedText: string): string {
-         return virgil.crypto.decrypt(encryptedText, this.chatAdminPrivateKey);
+     private decryptTextForChannelAdmin(encryptedText: string): any {
+
+         try {
+             return virgil.crypto.decrypt(encryptedText, this.chatAdminPrivateKey);
+         } catch (err) {
+             console.log(err);
+             return Buffer.from(JSON.stringify({ body: 'failed to decrypt', date: Date.now(), id: '123' }));
+         }
+
      }
 
     /**

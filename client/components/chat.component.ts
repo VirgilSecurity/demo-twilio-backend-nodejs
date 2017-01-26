@@ -13,8 +13,6 @@ import { SidebarDirective } from '../directives/sidebar.directive'
 
 import * as _ from 'lodash';
 
-const Buffer = VirgilService.VirgilSDK.Buffer;
-
 @Component({
     selector: 'ipm-chat',
     templateUrl: './assets/views/chat.component.html',
@@ -128,7 +126,7 @@ export class ChatComponent implements OnInit {
 
             if (this.currentChannelAdminPublicKey == null && this.currentChannelHasHistory) {
                 this.currentChannelAdminPublicKey = this.virgil.crypto.importPublicKey(
-                    Buffer.from(this.currentChannel.attributes.virgil_public_key, 'utf8'));
+                    this.currentChannel.attributes.virgil_public_key);
             }
                     
             // load channel members.        
@@ -185,10 +183,9 @@ export class ChatComponent implements OnInit {
                 }).then(result => {                    
                     let channelCard: any = _.last(_.sortBy(result, 'createdAt'));
                     if (channelCard) {
-                        let chatAdminPublicKeyBuffer = Buffer.from(channelCard.publicKey);
                         options.attributes = {
                             virgil_card_id: channelCard.id,
-                            virgil_public_key: chatAdminPublicKeyBuffer.toString('utf8')
+                            virgil_public_key: channelCard.publicKey.toString('base64')
                         };
                     }
                     return options;
