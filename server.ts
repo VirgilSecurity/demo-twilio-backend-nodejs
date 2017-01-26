@@ -14,15 +14,16 @@ VIRGIL_APP_KEY_PATH=
 VIRGIL_APP_KEY_PASSWORD=
 */
 
-import * as fs from 'fs'
-import * as parser from 'body-parser'
-import * as express from 'express'
-import * as path from 'path'
-import * as http from 'http'
-import * as _ from 'lodash'
+import fs = require('fs');
+import bodyParser = require('body-parser');
+import express = require('express');
+import path = require('path');
+import http = require('http');
+import _ = require('lodash');
 
 let virgil = require('virgil-sdk');
 let Twilio = require('twilio');
+
 
 /**
  * The application Server.
@@ -64,7 +65,7 @@ class Server {
     }
     
     /**
-     * Configurates an application services.
+     * Configures the application services.
      */
     private config(): void {        
         require('dotenv').load();         
@@ -86,13 +87,12 @@ class Server {
     }
     
     /**
-     * Configurates an application routes.
+     * Configures the application routes.
      */
     private routes(): void {
-        //this.app.use(express.static(this.rootDir));
         this.app.use(express.static(this.rootDir + '/public/'));
         this.app.use('/assets/', express.static(this.rootDir + '/node_modules/'));
-        this.app.use(parser.json())
+        this.app.use(bodyParser.json())
         
         //register routes
         this.app.post("/auth/login", (req, res, next) => this.authLoginHandler(req, res, next));

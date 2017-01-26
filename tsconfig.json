@@ -2,7 +2,6 @@
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "sourceRoot": "./server",
         "moduleResolution": "node",
         "sourceMap": true,
         "emitDecoratorMetadata": true,
@@ -10,9 +9,5 @@
         "removeComments": false,
         "noImplicitAny": false
     },
-    "exclude": [
-        "../node_modules",
-        "../typings/browser",
-        "../typings/browser.d.ts"
-    ]
+    "files": [ "server.ts" ]
 }

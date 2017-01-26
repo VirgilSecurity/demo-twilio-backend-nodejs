@@ -4,9 +4,8 @@
   "scripts": {
     "start": "tsc -p ./client && tsc ./server.ts && node server.js",
     "postinstall": "typings install",
-    "tsc": "tsc",
-    "tsc:w": "tsc -w",
-    "typings": "typings"
+    "serve": "nodemon --ignore /client --ignore /public --exec ts-node -- ./server.ts",
+    "build:live": "tsc -w -p ./client"
   },
   "license": "ISC",
   "dependencies": {
@@ -38,6 +37,8 @@
   "devDependencies": {
     "@types/node": "^7.0.4",
     "concurrently": "^2.0.0",
+    "nodemon": "^1.11.0",
+    "ts-node": "^2.0.0",
     "typescript": "1.8.10",
     "typings": "1.0.4"
   }

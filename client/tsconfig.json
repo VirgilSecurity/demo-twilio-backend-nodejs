@@ -12,8 +12,8 @@
     "outDir": "../public/assets/js/app"
   },
   "exclude": [
-    "../node_modules",
-    "../typings/index",
-    "../typings/index.d.ts"
+    "node_modules",
+    "public",
+    "server.ts"
   ]
 }
