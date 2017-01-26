@@ -270,10 +270,10 @@ export class ChatComponent implements OnInit {
             type: 'chat_member' 
         }).then(result => {
             let latestCard: any = _.last(_.sortBy(result, 'createdAt'));
-            if (latestCard){
-                member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
+            if (!latestCard) {
+                return null;
             }
-            
+            member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
             this.channelMembers.push(member);
             return member;
         });
