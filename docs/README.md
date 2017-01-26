@@ -65,14 +65,21 @@ In a Twilio Programmable Chat application, a Channel is where all the action hap
 
 Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. Let's also apply end-to-end encryption using Virgil Security's infrastructure.
 
+First of all, you need to generate Public/Private key pair and publish a Public key to the Virgil Services where it is available in an open access for other chat members (e.g. recipient) to verify and encrypt the data for the key owner. See more about publishing Public keys [here](https://github.com/VirgilSecurity/virgil-sdk-javascript#creating-virgil-cards)
+
+Let's start with generating Public/Private keys.
+
 ### Generate a New Key Pair
-Generate a new public private key pair for end-to-end encryption
+Generate a new Public/Private key pair for end-to-end encryption
 
 ```js
-var keyPair = virgil.crypto.generateKeyPair();
+var alice = virgil.crypto.generateKeys();
 
-console.log(keyPair.publicKey);
-console.log(keyPair.privateKey);
+var exportedPublicKey = virgil.crypto.exportPublicKey(alice.publicKey);
+var exportedPrivateKey = virgil.crypto.exportPrivateKey(alice.privateKey);
+
+console.log(exportedPublicKey.toString('utf8'));
+console.log(exportedPrivateKey.toString('utf8'));
 ```
 *Output:*
 
@@ -89,54 +96,84 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 -----END EC PRIVATE KEY-----
 ```
 
-### Publish a Public Key
+### Prepare request
 
-Publish a Public Key to the Virgil Keys Service where they are available in an open access for other users (e.g. recipient) to verify and encrypt the data for the key owner. See more about publishing Public Keys [here...](https://virgilsecurity.com/api-docs/javascript/keys-sdk#cards-and-public-keys)
+Let's move on, the next step is to create `PublishCardRequest`. The `PublishCardRequest` is used to define a Virgil Card and publish it on Virgil Security services.
 
-`VALIDATION_TOKEN` - used to prevent an unauthorized cards registration. The **Validation Token** generates based on Application's Private Key and client Identity. See how you can generate it using SDK utilities [here...](https://virgilsecurity.com/api-docs/javascript/keys-sdk#obtaining-a-private-validationtoken)
+> Virgil Card is representing the main entity at Virgil Security services, it includes the user's Public key and identity information.
 
 ```js
-var options = {
-     public_key: keyPair.publicKey,
-     private_key: keyPair.privateKey,
-     data: {
-         public_key_signature: "%PUBLIC_KEY_SIGNATURE%"
-     },
-     identity: {
-         type: 'member',
-         value: 'Darth Vader',
-         validation_token: '%VALIDATION_TOKEN%'
-     }
-};
+var publishRequest = virgil.publishCardRequest({
+      identity: "alice",
+      identity_type: "chat_member",
+      public_key: exportedPublicKey.toString('base64')
+    });
+```
 
-virgil.cards.create(options).then(function (card){
-    myCard = card;
-    console.log(card);
+Once you've created the `PublishCardRequest`, you need to sign it using your Private key, we need this in order to confirm, that you are the owner of the Private key, as well as with another side, this guarantees you that the information about identity and Public key will never be modified with third parties.
+
+```js
+var requestSigner = virgil.requestSigner(virgil.crypto);
+requestSigner.selfSign(publishRequest, alice.privateKey);
+```
+
+Well done, we almost ready with the client side. Now we need to send this request to the servers side (Application Side) where this request will be signed with AppKey, and published to the Virgil Security Services.
+
+Here how it works:
+
+```js
+var exportedRequest = publishRequest.export();
+```
+
+The `exportedRequest` is a base64 string that represents a `PublishCardRequest`. You can easily transmit it to the server side using your application transport.
+
+### Publish Virgil Card
+Once you received the `exportedRequest` on server side, you need to import it and then sign it using your Application Private key (AppKey).
+
+```js
+var alicePublishRequest = virgil.publishCardRequest.import(exportedRequest);
+
+// prepare application credentials
+
+var APP_ID = "[YOUR_APP_ID_HERE]";
+var APP_KEY_PASSWORD = "[YOUR_APP_KEY_PASSWORD_HERE]";
+
+// this can either be a Buffer object or a base64-encoded string with the 
+// private key bytes
+var appPrivateKeyMaterial = "[YOUR_BASE64_ENCODED_APP_KEY_HERE]";
+var appPrivateKey = virgil.crypto.importPrivateKey(
+        appPrivateKeyMaterial, APP_KEY_PASSWORD);
+        
+// appPrivateKey is an object that is a handle to the private and 
+// does not hold the Private key value
+
+requestSigner.authoritySign(alicePublishRequest, APP_ID, appPrivateKey);
+```
+
+After you sign the request object you can send it to Virgil Services to conclude the card creation process.
+
+```js
+client.publishCard(alicePublishRequest)
+.then(function (aliceCard) {
+  console.log(aliceCard);
 });
 ```
 
 *Output:*
 
 ```json
-{  
-   "id":"3e5a5d8b-e0b9-4be6-aa6b-66e3374c05b3",
-   "authorized_by":"com.virgilsecurity.twilio-ip-messaging-demo",
-   "hash":"QiWtZjZyIQhqZK7+3nZmIEWFBU+qI64EzSuqBcY+E7ZtKPwd4ZyU6gdfU/VzbTn6dHtfahCzHasN...",
-   "data": {
-      "public_key_signature": "MFcwDQYJYIZIAWUDBAICBQAERjBEAiBc3KaIF1EYzFZ+x4FzSwS4HBBJ..."
-   },
-   "created_at":"2016-05-03T14:34:08+0000",
-   "public_key":{  
-      "id":"359abe31-3344-453a-a292-fd98a83e500a",
-      "public_key":"-----BEGIN PUBLIC KEY-----\nMFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQ...",
-      "created_at":"2016-05-03T14:34:08+0000"
-   },
-   "identity":{  
-      "id":"965ea277-ab78-442c-93fe-6bf1d70aeb4b",
-      "type":"member",
-      "value":"Darth Vader",
-      "created_at":"2016-05-03T14:34:08+0000"
-   }
+{
+    "id": "bb5db5084dab511135ec24c2fdc5ce2bca8f7bf6b0b83a7fa4c3cbdcdc740a59",
+    "content_snapshot":"eyJwdWJsaWNfa2V5IjoiTFMwdExTMUNSVWRKVGlCUVZVSk1...",
+    "meta": {
+        "created_at": "2015-12-22T07:03:42+0000",
+        "card_version": "4.0",
+        "signs": {
+            "bb5db5084dab511135ec24c2fdc5ce2bca8f7bf6b0b83a7fa4c3cbdcdc740a59":"MIGaMA0GCWCGSAFlAwQCAgUABIGIMI...",
+            "767b6b12702df1a873f42628498f32b5f31abb9ab12ac09af6799a2f263330ad":"MIGaMA0GCWCGSAFlAwQCAgUABIGIMI...",
+            "ab799a2f26333c09af6628496b12702df1a80ad767b73f42b9ab12a8f32b5f31":"MIGaMA0GCWCGSAFlAwQCAgUABf7bdC..."
+        }
+    }
 }
 ```
 
@@ -156,17 +193,15 @@ Once you're a member of a Channel, you can send a Message to it. A Message is a 
 ```js
 // Receive the list of Channel's recipients
 Promise.all(generalChannel.getMembers().map(function(member) {
-    // Search for the member’s cards on Virgil Keys service
-    return virgil.cards.search({ value: member.identity, type: 'member' })
+    // Search for the member’s cards on Virgil Cards service
+    return client.searchCards({ identities: [ member.identity ], type: 'chat_member' })
         .then(function(cards){
-            return { 
-                recipientId: cards[0].id, 
-                publicKey: cards[0].public_key.public_key
-            };
+            return virgil.crypto.importPublicKey(cards[0].publicKey)
+        }
     });
 }).then(function(recipients) {
     var message = $('#chat-input').val();
-    var encryptedMessage = virgil.crypto.encryptStringToBase64(message, recipients);
+    var encryptedMessage = virgil.crypto.encrypt(message, recipients);
         
     generalChannel.sendMessage(encryptedMessage);    
     console.log(encryptedMessage);
@@ -198,10 +233,9 @@ You can also be notified of any new incoming Messages with an event handler. Thi
 generalChannel.on('messageAdded', function(message) {
     
     // Decrypt the Message using card id and private key values.
-    var decryptedMessage = virgil.crypto.decryptStringFromBase64(
+    var decryptedMessage = virgil.crypto.decrypt(
         message.body, 
-        myCard.id, 
-        keyPair.privateKey
+        alice.privateKey
     );
         
     console.log(message.author + ': ' + decryptedMessage);
