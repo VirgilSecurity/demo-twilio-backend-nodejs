@@ -25,7 +25,7 @@ npm install virgil-sdk --save
 Or get it from CDN
 ```html
 <script 
-src="https://cdn.virgilsecurity.com/packages/javascript/sdk/4.0.0/virgil-sdk.min.js"
+src="https://cdn.virgilsecurity.com/packages/javascript/sdk/4.0.2/virgil-sdk.min.js"
 crossorigin="anonymous"></script>
 ```
 
