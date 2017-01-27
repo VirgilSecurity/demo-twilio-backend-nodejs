@@ -1,10 +1,10 @@
-# Virgil & Twilio IP Messaging
+# Virgil & Twilio Programmable Chat
 
-With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio IP messaging API.
+With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
 
 
-- [Quickstart Guide](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging)
-- [iOS Client](https://github.com/VirgilSecurity/virgil-demo-twilio/tree/master/ip-messaging/client-ios)
+- [Quickstart Guide](/docs)
+- [iOS Client](/client-ios)
 - [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
 
 ## Publish
@@ -12,19 +12,19 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 There are only few steps required to setup Virgil History service :)
 
 ```
-$ git clone https://github.com/VirgilSecurity/virgil-demo-twilio.git
-$ cd ./ip-messaging
+$ git clone git@github.com:VirgilSecurity/virgil-demo-twilio.git
+$ cd ./virgil-demo-twilio
 
 $ npm install
 $ npm start
 ```
 
-Use url [http://localhost:8080](http://localhost:8080) to open your IP Messaging Chat
+Use url [http://localhost:8080](http://localhost:8080) to open your Demo Chat
 
 ## Configuration
 
 ```
-$ cp ./server/.env.example ./server/.env
+$ cp ./.env.example ./.env
 ```
 Set Twilio & Virgil environment variables declared in `.env` file.
 
@@ -38,43 +38,4 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | VIRGIL_APP_ID               | uniquely identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with (AppKey) |
 | VIRGIL_APP_KEY_PATH               | The path to your application Private key (AppKey) file. This file had to be saved as (*.virgilkey) on your machine during create application wizard. |
 | VIRGIL_APP_KEY_PASSWORD   | The password you used to protect you AppKey. |
-| APP_CHANNEL_ADMIN_CARD_ID | Optional for chat history. Used to identify an admin's Card. See details [here](#setup-channel-admin). |
-| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional for chat history. Used to perform decryption for history merssages. See details [here](#setup-channel-admin). |
-
-## Setup channel admin
-
-Generate a new Public/Private key pair using virgil.crypto
-
-```js
-var keyPair = virgil.crypto.generateKeyPair();
-var channelAdminPrivateKey = new virgil.crypto.Buffer(keyPair.privateKey);
-
-console.log('APP_CHANNEL_ADMIN_PRIVATE_KEY:' + channelAdminPrivateKey.toString('Base64'));
-```
-
-Register a new channel admin Card using SDK client
-
-```js
-var appKey = fs.readFileSync(process.env.VIRGIL_APP_KEY_PATH);
-
-var identity = 'twilio_chat_admin';
-var identityType = 'chat_member';
-
-var validationToken = VirgilSDK.utils.generateValidationToken(identity, 
-  identityType, appKey, process.env.VIRGIL_APP_KEY_PASSWORD);
-
-var channelAdminCardDetails = {
-     public_key: keyPair.publicKey,
-     private_key: keyPair.privateKey,
-     identity: {
-         type: identityType,
-         value: identity,
-         validation_token: validationToken
-     }
-};
-
-virgil.cards.create(channelAdminCardDetails).then(function (card){
-    console.log('APP_CHANNEL_ADMIN_CARD_ID:' + card.id);
-});
-```
-
+| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This parameter is admin's Private key that is used to perform decryption for history merssages. In order to support history in your application you need to manually create a new Virgil Card with identity `twilio_chat_admin` and publish it to Virgil Security Services. The Card's related Private key encoded in base64 has to be provided in current property.  |

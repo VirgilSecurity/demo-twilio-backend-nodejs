@@ -1,0 +1,154 @@
+<div id="chat-viewport">
+    <div id="chat-menu"
+         class="ui inverted left inline vertical sidebar menu"
+         [ipmSidebar]="{context: '#chat-viewport'}"
+         [ipmSidebarToggle]="'#chat-menu-toggle'">
+        <div class="menu-header item">
+            <a class="ui logo icon image" href="/">
+                <img src="/assets/img/twilio-shield.png" width="35" alt="Virgil + Twilio">
+            </a>
+            <hgroup>
+                <h1>Virgil &amp; Twilio</h1>
+                <h2>Programmable Chat</h2>
+            </hgroup>
+            <button id="logout-btn" class="ui icon black button" (click)="logout()">
+                <i class="icon sign out"></i>
+            </button>
+        </div>
+        <div class="channels item">
+            <div class="header">Channels</div>
+            <button id="new-channel-btn"
+                    class="ui unstyled icon inverted button"
+                    aria-label="Create channel"
+                    ipmTooltip
+                    data-position="top center"
+                    data-content="Create new channel"
+                    data-variation="tiny"
+                    [ipmModalTrigger]="{selector: 'new-channel-modal'}"
+                    [onOk]="createChannel">
+                <i class="add circle icon"></i>
+            </button>
+
+            <div class="busy-indicator" *ngIf="isChannelsLoading">
+                <div class="ui active small inline loader"></div>&nbsp;&nbsp;
+                Loading channels...
+            </div>
+            <div class="channel-list menu">
+                <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
+            </div>
+
+            <div class="ui small modal new-channel-modal basic">
+                <i class="close icon"></i>
+                <div class="ui icon header">
+                    Create New Channel
+                </div>
+                <div class="content">
+                    <div class="channel-input ui fluid input" [class.disabled]="isChannelCreating">
+                        <input type="text" placeholder="Channel name" [(ngModel)]="newChannelName" maxlength="25" (keyup.enter)="okbtn.click()">
+                    </div>
+                    <div class="ui inverted checkbox">
+                        <input id="include-history-checkbox" type="checkbox" [(ngModel)]="includeChannelHistory">
+                        <label for="include-history-checkbox">Include channel history</label>
+                    </div>
+                </div>
+                <div class="actions">
+                    <div #okbtn class="ui green basic inverted ok button">Create</div>
+                    <div class="ui red basic inverted cancel button">Cancel</div>
+                </div>
+            </div>
+        </div>
+        <div class="menu-footer item">
+            <a class="github-link" href="https://github.com/VirgilSecurity/virgil-demo-twilio/">
+                <img class="github-img-small" src="./assets/img/github-mark-inverted.png" />
+            </a>
+        </div>
+    </div>
+    <div id="menu-toggle-container" class="fixed">
+        <button id="chat-menu-toggle"
+                class="ui basic icon button"
+                aria-label="Toggle Menu">
+            <i class="sidebar icon"></i>
+        </button>
+    </div>
+    <div class="pusher">
+        <div id="chat-content">
+
+        <seciton class="chat ui blurring">
+            <header>
+                <div class="header-content">
+                    <h2 class="header">#{{currentChannel?.friendlyName}}</h2>
+                    <h5>{{channelMembers.length}} Members | Owner: {{currentChannel?.createdBy}}</h5>
+                </div>
+                <div class="header-toolbar">
+                    <button id="remove-channel-btn"
+                            class="ui unstyled icon button"
+                            aria-label="Delete this channel"
+                            ipmTooltip
+                            data-position="bottom right"
+                            data-content="Delete this channel"
+                            data-variation="tiny inverted"
+                            [class.hidden]="account.current.identity != currentChannel?.createdBy"
+                            [class.disabled]="!currentChannel"
+                            (click)="deleteChannel()">
+                        <i class="trash outline icon"></i>
+                    </button>
+                </div>
+            </header>
+            <div class="ui divider"></div>
+            <main>
+                <div class="feed-wrapper">
+                    <div class="ui feed">
+                        <div class="event" *ngFor="let message of messages; let l = last" [class.outgoing]="message.author == account.current.identity" ipmScrollIntoView [ipmScrollIf]="l">
+                            <div class="content">
+                                <div class="summary">
+                                    <div class="user">
+                                        {{message.author}}
+                                    </div>
+                                    <div class="date">
+                                        {{message.date | ipmFromNow }}
+                                    </div>
+                                </div>
+                                <div class="extra text">
+                                    <div class="ui message">
+                                        {{message.body}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ui dimmer inverted active" *ngIf="currentChannel == null">
+                    <div class="content">
+                        <div class="center">
+                            <h2 class="text">Select a channel from menu<br /> to start chatting</h2>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <div class="history" *ngIf="currentChannel?.attributes?.virgil_card_id" >
+                <div *ngIf="!currentChannel?.historyLoaded" >
+                    <a href="#" (click)="loadHistory()" *ngIf="!isChannelHistoryLoading" ><i>Load History...</i></a>
+                    <span *ngIf="isChannelHistoryLoading" ><i>Loading...</i></span>
+                    <div [class.active]="isChannelHistoryLoading" class="ui small inline loader"></div>
+                </div>
+            </div>
+            <div class="ui divider"></div>
+            <footer>
+                <div class="ui fluid action input" [class.disabled]="currentChannel == null" >
+                    <input type="text" placeholder="Type a message here" [(ngModel)]="newMessage" (keydown.enter)="postMessage()" >
+                    <div class="ui button" [class.disabled]="!newMessage" (click)="postMessage()" >Send</div>
+                </div>
+            </footer>
+            <div class="ui dimmer inverted active" *ngIf="isChannelInitializing">
+                <div class="content">
+                    <div class="center">
+                        <div class="ui active inverted dimmer">
+                            <div class="ui text loader">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </seciton>
+    </div>
+    </div>
+</div>

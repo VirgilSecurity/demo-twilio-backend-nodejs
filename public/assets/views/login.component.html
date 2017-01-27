@@ -1,0 +1,24 @@
+<div class="login-container ui middle aligned center aligned grid">
+    <div class="column">
+        <div class="login-form-container">
+          <img class="ui centered image" src="/assets/img/twilio-shield.png" />
+          <h3 class="logo-header">Virgil & Twilio</h3>
+          <h5 class="logo-description">Programmable Chat</h5>
+          <br />
+          <form class="ui form" [class.loading]="isBusy" >
+            <div class="field">
+              <div class="ui pointing below label">
+                This <b>Nickname</b> used to register your public key on our service.
+              </div>      
+              <input type="text" name="first-name" [(ngModel)]="nickName" maxlength="30" placeholder="Nickname">
+            </div>
+            <button class="fluid ui button primary" type="submit" [class.disabled]="!nickName" (click)="onLogin()" >Start</button>
+          </form>
+          <div class="login-form-footer">
+              <a class="github-link" href="https://github.com/VirgilSecurity/virgil-demo-twilio/">
+                  <img class="github-img" src="./assets/img/github-mark.png" />
+              </a>
+          </div>
+        </div>
+    </div>
+</div>
