@@ -1,56 +1,60 @@
-# Quickstart: Adding End-to-End Encryption to Twilio Programmable Chat.
+# Quickstart: Adding End-to-End Encryption to Twilio Programmable Chat
 
 ## Introduction
 
-With these instructions, you'll learn how to install and integrate the Virgil Crypto API and Twilio Programmable Chat API. Let's go!
+With these instructions, you'll learn how to integrate the Virgil Services API with the 
+Twilio Programmable Chat to build an end-to-end encrypted chat application.
 
 ## How it Works - Basics
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/how-it-works.png)
 
 ## Setting up your project
 
-### Target environments
+To complete this guide you need the following:
 
-SDK targets ECMAScript5 compatible browsers and Node.js from version 0.12 
-and above. 
+- Twilio account. ([Sign up here](https://www.twilio.com/try-twilio))
+- Virgil Security developer account. ([Sign up here](https://developer.virgilsecurity.com/account/signup))
+- Node.js and npm installed. [Download here](https://nodejs.org/en/download/)
+(**Important!** The Node.js version must be less than 7, because Virgil JS SDK is not compatible 
+with version 7 currently.)
+- Be familiar with [Twilio Programmable Chat](https://www.twilio.com/docs/api/chat) API.
+- Basic chat application built using Twilio Programmable Chat JS SDK. 
+[This project would be a good starting point](https://github.com/twilio/twilio-chat-demo-js))
 
-### Installation
 
-You can install Virgil SDK from npm
+### Create an application at Virgil Developer portal
 
-```sh
+[Sign in](https://developer.virgilsecurity.com/account/signin) to your Virgil developer
+account and create a new application. Make sure you save the *private key* that is 
+generated for your application, because you will need it later. After your application is ready, 
+create a *token* that your app will use to make authenticated requests to Virgil Services. 
+One more thing that you will need is your application's *app id* which is an identifier 
+of your application's Virgil Card.
+
+
+Now when you have the application ready for use, you can start using Virgil Services.
+
+### Download and install the SDK
+
+You can install from npm:
+```shell
 npm install virgil-sdk --save
 ```
 
-Or get it from CDN
+For browser you can download the source from CDN:
+
 ```html
 <script 
 src="https://cdn.virgilsecurity.com/packages/javascript/sdk/4.0.2/virgil-sdk.min.js"
 crossorigin="anonymous"></script>
 ```
 
-## User and App Credentials
-
-To start using Virgil Services you first have to create an account at [Virgil 
-Developer Portal](https://developer.virgilsecurity.com/account/signup).
-
-After you create an account, or if you already have an account, sign in and 
-create a new application. Make sure you save the *private key* that is 
-generated for your application at this point as you will need it later. 
-After your application is ready, create a *token* that your app will 
-use to make authenticated requests to Virgil Services. One more thing that 
-you're going to need is your application's *app id* which is an identifier 
-of your application's Virgil Card.
-
 ## Usage
 
-Now that you have your account and application in place you can start making 
-requests to Virgil Services.
-
-### Initializing an API Client
+### Initialize an API Client
 
 To initialize the client, you need the *access token* that you created for 
-your application on [Virgil Developer Portal](https://developer.virgilsecurity.com/)
+your application in [Virgil Developer Portal](https://developer.virgilsecurity.com/)
 
 ```javascript
 // var virgil = require('virgil-sdk');
@@ -59,48 +63,46 @@ your application on [Virgil Developer Portal](https://developer.virgilsecurity.c
 var client = virgil.client("[YOUR_ACCESS_TOKEN_HERE]");
 ```
 
-## Let's Get Started
+### Get Started
 
-In a Twilio Programmable Chat application, a Channel is where all the action happens. Whether it's between two users or two hundred, a Channel is where Messages are sent, received, and archived for later viewing by offline clients.
+First of all, for every chat user you will need to perform the following steps:
 
-Let's dive into a few of the key techniques you'll need to employ while working with Channels and Messages in your application. Let's also apply end-to-end encryption using Virgil Security's infrastructure.
+1. Generate a Public/Private key pair.
+2. Publish the Public key (i.e. Virgil Card) in the Virgil Services where it will available for the other chat users to use to verify and encrypt data for the key owner.
+3. Store the Private key in a secure location on the client side. 
 
-First of all, you need to generate Public/Private key pair and publish a Public key to the Virgil Services where it is available in an open access for other chat members (e.g. recipient) to verify and encrypt the data for the key owner. See more about publishing Public keys [here](https://github.com/VirgilSecurity/virgil-sdk-javascript#creating-virgil-cards)
+See more about publishing Public keys [here](https://github.com/VirgilSecurity/virgil-sdk-javascript#creating-virgil-cards)
 
-Let's start with generating Public/Private keys.
+Let's start with generating the keys.
 
 ### Generate a New Key Pair
-Generate a new Public/Private key pair for end-to-end encryption
 
 ```js
-var alice = virgil.crypto.generateKeys();
+var userKeys = virgil.crypto.generateKeys();
 
-var exportedPublicKey = virgil.crypto.exportPublicKey(alice.publicKey);
-var exportedPrivateKey = virgil.crypto.exportPrivateKey(alice.privateKey);
+var exportedPublicKey = virgil.crypto.exportPublicKey(userKeys.publicKey); 
+var exportedPrivateKey = virgil.crypto.exportPrivateKey(userKeys.privateKey);
 
-console.log(exportedPublicKey.toString('utf8'));
-console.log(exportedPrivateKey.toString('utf8'));
+// exportedPublicKey and exportedPrivateKey are Node.js Buffer objects
+
+console.log(exportedPublicKey.toString('base64'));
+console.log(exportedPrivateKey.toString('base64'));
 ```
 *Output:*
 
 ```
------BEGIN PUBLIC KEY-----
-MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQO8ohmBRyclmcfQ38Lwmvv4Cau
-jyX6vWn8kJrR0RRfFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
------END PUBLIC KEY-----
+MCowBQYDK2VwAyEAW94Hddf0mVNNP8Ffb5BSPee6ajf9h44I/eX7NP1qtLc=
 
------BEGIN EC PRIVATE KEY-----
-MHkCAQEEIFB+lOUvbb4WX+e3zLkAcYpvZR3qpQI8Ru/tcnciCMkIoAwGCisGAQQB
-l1UBBQGhRANCAAQO8ohmBRyclmcfQ38Lwmvv4CaujyX6vWn8kJrR0RRfFQAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
------END EC PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIEt6ZTkZm/WjGpguk6iAQqw1u77NG37lefziAXUnXExK
 ```
 
-### Prepare request
+### Prepare request to publish the Virgil Card
 
-Let's move on, the next step is to create `PublishCardRequest`. The `PublishCardRequest` is used to define a Virgil Card and publish it on Virgil Security services.
+The next step is to create a `PublishCardRequest`. The `PublishCardRequest` is used to define 
+a Virgil Card properties and publish it in Virgil Security services.
 
-> Virgil Card is representing the main entity at Virgil Security services, it includes the user's Public key and identity information.
+> Virgil Card is representing the main entity at Virgil Security services, it includes the user's 
+Public key and identity information.
 
 ```js
 var publishRequest = virgil.publishCardRequest({
@@ -110,28 +112,36 @@ var publishRequest = virgil.publishCardRequest({
     });
 ```
 
-Once you've created the `PublishCardRequest`, you need to sign it using your Private key, we need this in order to confirm, that you are the owner of the Private key, as well as with another side, this guarantees you that the information about identity and Public key will never be modified with third parties.
+Once you've created the `PublishCardRequest`, you need to sign it using the generated Private key.
+This is needed in order to confirm the ownership of the Private key, as well as provide the card's 
+data integrity guarantee.
 
 ```js
 var requestSigner = virgil.requestSigner(virgil.crypto);
-requestSigner.selfSign(publishRequest, alice.privateKey);
+requestSigner.selfSign(publishRequest, userKeys.privateKey);
 ```
 
-Well done, we almost ready with the client side. Now we need to send this request to the servers side (Application Side) where this request will be signed with AppKey, and published to the Virgil Security Services.
+You're almost done with the client side of the process. Now you need to send this request to the 
+server side of your application where it has to be signed with your application's private key (AppKey), 
+and finally published in the Virgil Security Services.
 
-Here how it works:
+The `PublishCardRequest` object has a convenience method called `export` that will return the 
+base64-encoded string representation of the request suitable for transfer:
 
 ```js
 var exportedRequest = publishRequest.export();
 ```
 
-The `exportedRequest` is a base64 string that represents a `PublishCardRequest`. You can easily transmit it to the server side using your application transport.
+Now you just send the `exportedRequest` to your app's server side using your transport method.
 
 ### Publish Virgil Card
-Once you received the `exportedRequest` on server side, you need to import it and then sign it using your Application Private key (AppKey).
+
+Once you receive the `exportedRequest` on the server side, you need to transform it back to the 
+`PublishCardRequest` object using another convenience method called `publishCardRequest.import`, 
+and then sign it using your application's private key (AppKey).
 
 ```js
-var alicePublishRequest = virgil.publishCardRequest.import(exportedRequest);
+var publishRequest = virgil.publishCardRequest.import(exportedRequest);
 
 // prepare application credentials
 
@@ -144,18 +154,20 @@ var appPrivateKeyMaterial = "[YOUR_BASE64_ENCODED_APP_KEY_HERE]";
 var appPrivateKey = virgil.crypto.importPrivateKey(
         appPrivateKeyMaterial, APP_KEY_PASSWORD);
         
-// appPrivateKey is an object that is a handle to the private and 
+// appPrivateKey is an object that is a handle to the private key and 
 // does not hold the Private key value
 
-requestSigner.authoritySign(alicePublishRequest, APP_ID, appPrivateKey);
+requestSigner.authoritySign(publishRequest, APP_ID, appPrivateKey);
 ```
 
-After you sign the request object you can send it to Virgil Services to conclude the card creation process.
+After you sign the request object you can send it to the Virgil Services to conclude the card creation process.
 
 ```js
-client.publishCard(alicePublishRequest)
-.then(function (aliceCard) {
-  console.log(aliceCard);
+var client = virgil.client('[YOUR_VIRGIL_ACCESS_TOKEN_HERE]');
+client.publishCard(publishRequest)
+.then(function (memberCard) {
+    console.log(memberCard);
+    // the new chat user can now exchange encrypted messages with other users
 });
 ```
 
@@ -177,32 +189,50 @@ client.publishCard(alicePublishRequest)
 }
 ```
 
-### Create a Channel
-Before you can start sending Messages, you first need a Channel. Here is how you create a Channel.
+### Private key storage
 
-```js
-// Create a Channel
-twilioClient.createChannel({ friendlyName: 'general' }).then(function(channel) {
-    generalChannel = channel;
+In the current version of Virgil JS SDK, private key storage is left at the developer's discretion.
+However, we strongly suggest you store them in encrypted form. The easiest way to do that is to 
+use a password which you pass as a second argument to the `virgil.crypto.exportPrivateKey` method.
+
+### Send Encrypted Messages
+
+To encrypt the data for a chat user, you need their public key which you can get from their Virgil Card. 
+You can find a card for a user using the `client.serchCards` method and passing it a list of identities
+to search for. A good place to search for cards would be the twilio's `channel.getMembers()` method callback 
+or a `'memberJoined'` event handler:
+
+```javascript
+// Search for recipient's Virgil Card
+channel.getMembers()
+.then(function (members) {
+    return client.searchCards({ 
+        identities: members.map(function (member) { return member.identity; }), 
+        type: 'chat_member' 
+    });
+})
+.then(function (cards) {
+    // associate the public key from the card with the member
+    // don't forget to call virgil.crypto.importPublicKey() before using it
 });
 ```
 
-### Send Encrypted Messages
-Once you're a member of a Channel, you can send a Message to it. A Message is a bit of data that is sent first to the Twilio backend, where it is stored for later access by members of the Channel, and then pushed out in real time to all currently online Channel members. Only users subscribed to your Channel will receive your Messages.
+When you ready to send a message to the channel, you need to get the public keys of channel members
+and pass them to `virgil.crypto.encrypt` method along with the message body to get the encrypted
+message:
 
-```js
-// Search for recipient's Virgil Card
-client.searchCards({ identities: [ 'bob' ], type: 'chat_member' })
-    .then(function(bobCards){
-        return virgil.crypto.importPublicKey(bobCards[0].publicKey)
-    })
-    .then(function(recipients) {
-        var message = $('#chat-input').val();
-        var encryptedMessage = virgil.crypto.encrypt(message, recipients).toString('base64');
+```javascript
+var body = $('#message-body-input').val();
+
+// assuming channelMembers is an array of current channel members,
+// and a member.publicKey property references an object returned by
+// the virgil.crypto.importPublicKey method
+var recipients = channelMembers.map(function (member) { return member.publicKey });
+
+var encryptedBody = virgil.crypto.encrypt(message, recipients).toString('base64');
         
-        generalChannel.sendMessage(encryptedMessage);    
-        console.log(encryptedMessage);
-    });
+channel.sendMessage(encryptedMessage);    
+console.log(encryptedMessage);
 ```
 *Output:*
 
@@ -220,26 +250,25 @@ qBBCfKdP/gZnkVwJvv4Hdf2eWBDC3czBjV/yPGeGTqBIilHSsrqwK7lVMTBuKR+mR3eNdh+yBIAcOk4r
 ZIhvcNAQcBMBkGCWCGSAFlAwQBLgQMfjkCvK3UgXdorcYUmtCHHuSm4yfBacMsniMADAeos7qN7OmNsFU1
 ```
 
-Today, a Message is just a string of text. In the future, this may expand to include other media types such as images and binary data. For now, in addition to text Messages, you might get crafty and use JSON serialized text to send rich data over the wire in your application.
-
 ### Receive Encrypted Messages
-You can also be notified of any new incoming Messages with an event handler. This is likely where you would handle updating your user interface to display new Messages.
 
-```js
-// Listen for new Messages sent to a Channel
-generalChannel.on('messageAdded', function(message) {
-    
-    // Decrypt the Message using card id and private key values.
-    var decryptedMessage = virgil.crypto.decrypt(
-        message.body, 
-        alice.privateKey
-    );
-        
-    console.log(message.author + ': ' + decryptedMessage.toString());
-});
+Now that the messages are sent encrypted, you need to decrypt them with the user's private key
+before displaying them on the screen. In your `'messageAdded'` event handler add the following
+code:
+
+```javascript
+// assuming user is an object and its privateKeyProperty references an object
+// returned by the virgil.crypto.importPrivateKey method
+var decryptedMessage = virgil.crypto.decrypt(message.body, user.privateKey);
+// decryptedMessage is a Buffer object, so you need to convert it to string
+// using its toString method
+console.log(decryptedMessage.toString());
+// display the message
 ```
 
 *Output:*
 ```
 Darth Vader: Luke. I am your father!
 ```
+
+Congratulations! Now you have built a basic end-to-end encrypted chat application. 

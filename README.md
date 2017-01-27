@@ -34,14 +34,14 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | TWILIO_API_SECRET                 | Used to authenticate - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
 | TWILIO_IPM_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/user/account/ip-messaging/services) |
 | VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
-| VIRGIL_APP_ID               | Used to specifiy uniquely identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with (AppKey) |
-| VIRGIL_APP_KEY_PATH               | The path to your application Private key (AppKey) file. This file had to be saved as (*.virgilkey) on your machine during create application wizard. |
-| VIRGIL_APP_KEY_PASSWORD   | The password you used to protect you AppKey. |
-| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This parameter is admin's Private key that is used to perform decryption for history messages. In order to support history in your application you need to manually create a new Virgil Card with identity `twilio_chat_admin` and publish it to Virgil Security Services. The Card's related Private key encoded in base64 string has to be provided in current property. [This example](#setup-channel-admin) shows how to create admin's Virgil Card and generate Private key. |
+| VIRGIL_APP_ID               | Used to specify uniqueness and identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with AppKey |
+| VIRGIL_APP_KEY_PATH               | The path to file with Private key (AppKey) of your application. This file will be saved on your machine when you create your application. |
+| VIRGIL_APP_KEY_PASSWORD   | The password you used to protect your AppKey. |
+| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This variable is admin's Private key that is used to perform decryption of messages history. In order to support history in your application you need to manually create a new Virgil Card with `identity: 'twilio_chat_admin'`, publish it in Virgil Security Services, encode the private key of that Card in base64 string and set that string as the value of this variable. [This example](#setup-channel-admin) shows how to create admin's Virgil Card and generate Private key. |
 
 ### Setup Channel Admin
 
-This example shows, how to generate an admin's Public/Private keys and publish his Virgil Card to Virgil Security Services.
+This example shows, how to generate an admin's Public/Private keys and publish his Virgil Card in Virgil Security Services.
 
 ```js
 var virgil = require('virgil-sdk');
