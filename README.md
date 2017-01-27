@@ -4,7 +4,6 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 
 
 - [Quickstart Guide](/docs)
-- [iOS Client](/client-ios)
 - [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
 
 ## Publish
