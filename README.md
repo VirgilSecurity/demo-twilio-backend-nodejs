@@ -41,6 +41,8 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 
 ### Setup Channel Admin
 
+This example shows, how to generate an admin's Public/Private keys and publish a his Virgil Card to Virgil Security Services.
+
 ```js
 var virgil = require('virgil-sdk');
 var fs = require('fs');
@@ -50,7 +52,9 @@ var APP_KEY_PASSWORD = "[YOUR_APP_KEY_PASSWORD_HERE]";
 
 // this can either be a Buffer object or a base64-encoded string with the 
 // private key bytes
-var appPrivateKeyMaterial = "[YOUR_BASE64_ENCODED_APP_KEY_HERE]";
+var appPrivateKeyMaterial = fs.readFileSync("[YOUR_APP_KEY_PATH_HERE]");
+// var appPrivateKeyMaterial = "[YOUR_BASE64_ENCODED_APP_KEY_HERE]";
+
 var appPrivateKey = virgil.crypto.importPrivateKey(
         appPrivateKeyMaterial, APP_KEY_PASSWORD);
 
