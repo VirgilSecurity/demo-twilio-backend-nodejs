@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core'
 import { Http, Response, Headers, RequestOptions } from '@angular/http'
 import { VirgilService } from './virgil.service'
 
+import 'rxjs/add/operator/toPromise';
+
 @Injectable()
 export class BackendService {
         

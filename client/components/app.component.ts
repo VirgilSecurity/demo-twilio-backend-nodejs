@@ -4,16 +4,13 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { VirgilService } from '../services/virgil.service'
 import { TwilioService } from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
-import { LoginComponent } from './login.component';
-import { ChatComponent } from './chat.component';
 import { Account, AccountService } from '../services/account.service'
 
 declare var APP_BUNDLE_ID: any;
 
 @Component({
     selector: 'ipm-app',
-    templateUrl: './assets/views/app.component.html',   
-    directives: [LoginComponent, ChatComponent]
+    templateUrl: './assets/views/app.component.html',
 })
 export class AppComponent implements OnInit {
     
@@ -83,10 +80,11 @@ export class AppComponent implements OnInit {
                 return this.backend.getTwilioToken(identity, 'web');
             })
             .then(data => {
-                this.twilio.initialize(data.twilio_token);
-                this.twilio.client.on('tokenExpired', this.onLogout.bind(this));
-
-                console.log('Services have been successfully initialized.');
+                return this.twilio.initialize(data.twilio_token)
+                    .then(() => {
+                        this.twilio.accessManager.on('tokenExpired', this.onLogout.bind(this));
+                        console.log('Services have been successfully initialized.');
+                    });
             });
     }
     
