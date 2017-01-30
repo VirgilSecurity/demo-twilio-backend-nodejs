@@ -269,7 +269,7 @@ export class ChatComponent implements OnInit {
             let cardsByIdentity = _.groupBy(cards, 'identity');
             _.forEach(cardsByIdentity, (cards, identity) => {
                 let latestCard:any = _.last(_.sortBy(cards, 'createdAt'));
-                let member = membersByIdentity[identity];
+                let member:any = membersByIdentity[identity];
                 member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
                 this.channelMembers.push(member)
             });

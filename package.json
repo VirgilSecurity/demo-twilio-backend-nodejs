@@ -29,6 +29,7 @@
     "rxjs": "5.0.1",
     "systemjs": "0.19.40",
     "twilio": "^2.11.1",
+    "typescript": "^2.1.5",
     "virgil-sdk": "^4.0.2",
     "zone.js": "^0.7.4"
   },
@@ -42,7 +43,6 @@
     "concurrently": "^3.1.0",
     "nodemon": "^1.11.0",
     "ts-node": "^2.0.0",
-    "typescript": "~2.0.10",
     "typings": "^2.1.0"
   }
 }
