@@ -80,10 +80,11 @@ export class AppComponent implements OnInit {
                 return this.backend.getTwilioToken(identity, 'web');
             })
             .then(data => {
-                this.twilio.initialize(data.twilio_token);
-                this.twilio.client.on('tokenExpired', this.onLogout.bind(this));
-
-                console.log('Services have been successfully initialized.');
+                return this.twilio.initialize(data.twilio_token)
+                    .then(() => {
+                        this.twilio.accessManager.on('tokenExpired', this.onLogout.bind(this));
+                        console.log('Services have been successfully initialized.');
+                    });
             });
     }
     

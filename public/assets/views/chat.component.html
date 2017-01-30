@@ -34,7 +34,7 @@
                 Loading channels...
             </div>
             <div class="channel-list menu">
-                <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
+                <a class="item" *ngFor="let channel of channelDescriptors" (click)="setCurrentChannel(channel)" [class.active]="channel.sid == currentChannel?.sid" ># {{channel.friendlyName}}</a>
             </div>
 
             <div class="ui small modal new-channel-modal basic">

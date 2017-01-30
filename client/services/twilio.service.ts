@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core'
-import { BackendService } from './backend.service'
+import { Injectable } from '@angular/core';
 
 declare var Twilio: any;
 
 @Injectable()
 export class TwilioService {  
-    
-    private accessManager;
+
     public client;
+    public accessManager;
     
-    constructor(private backend: BackendService) { }
+    constructor() { }
         
-    initialize(accessToken: string) {
+    initialize(accessToken: string): Promise<any> {
+        this.client = new Twilio.Chat.Client(accessToken);
         this.accessManager = new Twilio.AccessManager(accessToken);
-        this.client = new Twilio.IPMessaging.Client(this.accessManager);
+        return this.client.initialize();
     }
 }
