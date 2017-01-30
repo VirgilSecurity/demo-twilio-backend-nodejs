@@ -131,18 +131,18 @@ a[href], button {
     display: flex;
 }
 
-#chat-menu hgroup {
+#chat-menu .hgroup {
     display: inline-block;
     vertical-align: middle;
     margin-left: 1rem;
 }
 
-#chat-menu hgroup > h1 {
+#chat-menu .hgroup > h1 {
     font-size: 1.28571429rem;
     margin: 0;
 }
 
-#chat-menu hgroup > h2 {
+#chat-menu .hgroup > h2 {
     font-size: 1rem;
     font-weight: normal;
     margin: 0;

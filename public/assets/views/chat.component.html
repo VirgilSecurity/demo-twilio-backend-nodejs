@@ -7,10 +7,10 @@
             <a class="ui logo icon image" href="/">
                 <img src="/assets/img/twilio-shield.png" width="35" alt="Virgil + Twilio">
             </a>
-            <hgroup>
+            <div class="hgroup">
                 <h1>Virgil &amp; Twilio</h1>
                 <h2>Programmable Chat</h2>
-            </hgroup>
+            </div>
             <button id="logout-btn" class="ui icon black button" (click)="logout()">
                 <i class="icon sign out"></i>
             </button>
@@ -34,7 +34,7 @@
                 Loading channels...
             </div>
             <div class="channel-list menu">
-                <a class="item" *ngFor="let channel of channels" (click)="setCurrentChannel(channel)" [class.active]="channel == currentChannel" ># {{channel.friendlyName}}</a>
+                <a class="item" *ngFor="let channel of channelDescriptors" (click)="setCurrentChannel(channel)" [class.active]="channel.sid == currentChannel?.sid" ># {{channel.friendlyName}}</a>
             </div>
 
             <div class="ui small modal new-channel-modal basic">
@@ -73,7 +73,7 @@
     <div class="pusher">
         <div id="chat-content">
 
-        <seciton class="chat ui blurring">
+        <section class="chat ui blurring">
             <header>
                 <div class="header-content">
                     <h2 class="header">#{{currentChannel?.friendlyName}}</h2>
@@ -148,7 +148,7 @@
                     </div>
                 </div>
             </div>
-        </seciton>
+        </section>
     </div>
     </div>
 </div>

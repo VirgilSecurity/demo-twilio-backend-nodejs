@@ -1,36 +1,22 @@
 import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core'
-import { NgClass } from '@angular/common'
 
 import { TwilioService }  from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
 import { AccountService } from '../services/account.service'
 import { VirgilService }  from '../services/virgil.service'
-import { FromNowPipe }  from '../pipes/from-now.pipe'
-import { TooltipDirective } from '../directives/tooltip.directive'
-import { ModalTriggerDirective } from '../directives/modal.directive'
-import { ScrollIntoViewDirective } from '../directives/scroll-into-view.directive'
-import { SidebarDirective } from '../directives/sidebar.directive'
 
 import * as _ from 'lodash';
 
 @Component({
     selector: 'ipm-chat',
-    templateUrl: './assets/views/chat.component.html',
-    directives: [
-        NgClass,
-        TooltipDirective,
-        ModalTriggerDirective, 
-        ScrollIntoViewDirective,
-        SidebarDirective
-    ],
-    pipes: [FromNowPipe]
+    templateUrl: './assets/views/chat.component.html'
 })
 export class ChatComponent implements OnInit {
     
     @Input() public logout: Function;
     
     public messages = [];
-    public channels = [];    
+    public channelDescriptors = [];
     public channelMembers = [];        
     public currentChannel: any;    
     public currentChannelHasHistory:boolean = false;
@@ -44,21 +30,17 @@ export class ChatComponent implements OnInit {
     public newMessage: string;
     public createChannel: Function;
     
-    private memberJoinedHandler: any;
-    private memberLeftHandler: any;
-    private messageAddedHandler: any;
-    
     constructor (
         public account: AccountService,
         private twilio: TwilioService,
-        private backend: BackendService,        
+        private backend: BackendService,
         private virgil: VirgilService,
         private cd: ChangeDetectorRef) {
 
         this.createChannel = this.createChannelImpl.bind(this);
     }
     
-    public ngOnInit(){
+    public ngOnInit() {
         this.twilio.client.on('channelAdded', this.onChannelAdded.bind(this));
         this.twilio.client.on('channelRemoved', this.onChannelRemoved.bind(this));
         this.loadChannels();
@@ -69,7 +51,7 @@ export class ChatComponent implements OnInit {
      */
     public deleteChannel():void {     
         
-        _.remove(this.channels, ch => ch.sid == this.currentChannel.sid);                    
+        _.remove(this.channelDescriptors, ch => ch.sid == this.currentChannel.sid);
         this.currentChannel.delete();    
         this.currentChannel = null;           
         
@@ -79,64 +61,63 @@ export class ChatComponent implements OnInit {
     /**
      * Sets the current channel for chatting.
      */
-    public setCurrentChannel(channel: any){
+    public setCurrentChannel(channelDescriptor: any){
         
-        if (channel == this.currentChannel) {
+        if (this.currentChannel != null &&
+            channelDescriptor.sid == this.currentChannel.sid) {
             return;
         }        
         
-        console.log("Channel Selected", channel);
+        console.log("Channel Selected", channelDescriptor);
         
         this.channelMembers = [];        
         this.messages = []; 
         
         if (this.currentChannel != null) {
-            
-            this.currentChannel.removeListener('memberJoined', this.memberJoinedHandler);
-            this.currentChannel.removeListener('memberLeft', this.memberLeftHandler);
-            this.currentChannel.removeListener('messageAdded', this.messageAddedHandler);
-            
+            this.currentChannel.removeAllListeners();
             this.currentChannel.leave();
         }
-        
-        this.currentChannel = channel;
-        this.currentChannel.historyLoaded = false;
-        this.cd.detectChanges();
-                
-        this.initializeChannel(channel);
+
+        // Get channel object from descriptor
+        channelDescriptor.getChannel()
+            .then(channel => {
+                this.currentChannel = channel;
+                this.currentChannel.historyLoaded = false;
+                this.cd.detectChanges();
+
+                this.initializeChannel(channel);
+            });
     }
     
     /**
      * Initializes the currently selected channel.
      */
-    public initializeChannel(channel: any){
-                        
-        this.memberJoinedHandler = this.onMemberJoined.bind(this);
-        this.memberLeftHandler = this.onMemberLeft.bind(this);
-        this.messageAddedHandler = this.onMessageAdded.bind(this);
-        
-        channel.join().then(() => {                
-             
-            // subscribe for channel events.            
-            channel.on('memberJoined', this.memberJoinedHandler);
-            channel.on('memberLeft', this.memberLeftHandler);
-            channel.on('messageAdded', this.messageAddedHandler);   
+    public initializeChannel(channel: any) {
 
-            this.currentChannelHasHistory =  this.currentChannel.attributes.hasOwnProperty("virgil_public_key");
+        // Attributes will be empty in public channels until this is called. See
+        // https://media.twiliocdn.com/sdk/js/chat/releases/0.11.1/docs/Channel.html
+        channel.join()
+            .then(() => {
+                // subscribe for channel events.
+                channel.addListener('memberJoined', member => this.onMemberJoined(member));
+                channel.addListener('memberLeft', member => this.onMemberLeft(member));
+                channel.addListener('messageAdded', message => this.onMessageAdded(message));
 
-            if (this.currentChannelAdminPublicKey == null && this.currentChannelHasHistory) {
-                this.currentChannelAdminPublicKey = this.virgil.crypto.importPublicKey(
-                    this.currentChannel.attributes.virgil_public_key);
-            }
-                    
-            // load channel members.        
-            return channel.getMembers();
-        }).then((members) => {                
-            return Promise.all(members.map(m => this.addMember(m)));            
-        }).then(() => {
-             this.cd.detectChanges();           
-        })
-        .catch(error => this.handleError(error));        
+                this.currentChannelHasHistory = channel.attributes.hasOwnProperty("virgil_public_key");
+
+                if (this.currentChannelAdminPublicKey == null && this.currentChannelHasHistory) {
+                    this.currentChannelAdminPublicKey = this.virgil.crypto.importPublicKey(
+                        channel.attributes.virgil_public_key);
+                }
+
+                // load channel members.
+                return channel.getMembers();
+            }).then(members => {
+                return this.addMembers(members);
+            }).then(() => {
+                this.cd.detectChanges();
+            })
+            .catch(error => this.handleError(error));
     }
     
     /**
@@ -198,6 +179,12 @@ export class ChatComponent implements OnInit {
             return this.twilio.client.createChannel(options);
         })
         .then((channel) => {
+            // add `getChannel` method that ChannelDescriptor objects have so
+            // that we can treat channels and descriptors the same in the
+            // setCurrentChannel method
+            channel.getChannel = function () {
+                return Promise.resolve(this);
+            };
             this.isChannelsLoading = false;
             this.newChannelName = '';
             this.onChannelAdded(channel);
@@ -209,20 +196,26 @@ export class ChatComponent implements OnInit {
     /**
      * Loads the current list of all Channels the Client knows about.
      */
-    private loadChannels(): void{
-        
+    private loadChannels(): void {
+        let that = this;
         this.isChannelsLoading = true; 
         this.cd.detectChanges();
+
+        function populateChannels (channelsPage) {
+            console.log(channelsPage);
+
+            channelsPage.items.forEach(channel => that.onChannelAdded(channel));
+            if (channelsPage.hasNextPage) {
+                channelsPage.nextPage().then(page => populateChannels(page));
+            } else {
+                that.isChannelsLoading = false;
+                that.cd.detectChanges();
+            }
+        }
         
-        this.twilio.client.getChannels().then(channels => {
-            channels.forEach(channel => {
-                this.onChannelAdded(channel);                        
-            });  
-                                    
-            this.isChannelsLoading = false;
-            this.cd.detectChanges();     
-        })
-        .catch(this.handleError);     
+        this.twilio.client.getPublicChannels()
+            .then(page => populateChannels(page))
+            .catch(err => this.handleError(err));
     }
     
     /**
@@ -261,18 +254,25 @@ export class ChatComponent implements OnInit {
     /**
      * Loads the member's public key and the member to the current member collection.
      */
-    private addMember(member):Promise<any> {             
+    private addMembers(members): Promise<any> {
+        members = Array.isArray(members) ? members : [ members ];
+        if (members.length == 0) {
+            return Promise.resolve();
+        }
+
+        let membersByIdentity = _.groupBy(members, 'identity');
+
         return this.virgil.client.searchCards({
-            identities: [ member.identity ],
+            identities: members.map(member => member.identity),
             type: 'chat_member' 
-        }).then(result => {
-            let latestCard: any = _.last(_.sortBy(result, 'createdAt'));
-            if (!latestCard) {
-                return null;
-            }
-            member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
-            this.channelMembers.push(member);
-            return member;
+        }).then(cards => {
+            let cardsByIdentity = _.groupBy(cards, 'identity');
+            _.forEach(cardsByIdentity, (cards, identity) => {
+                let latestCard:any = _.last(_.sortBy(cards, 'createdAt'));
+                let member = membersByIdentity[identity];
+                member.publicKey = this.virgil.crypto.importPublicKey(latestCard.publicKey);
+                this.channelMembers.push(member)
+            });
         });
     }
     
@@ -300,7 +300,7 @@ export class ChatComponent implements OnInit {
      * Fired when a Member has joined the Channel. 
      */
     private onMemberJoined(member: any): void{        
-        this.addMember(member).then(() => {
+        this.addMembers(member).then(() => {
             this.cd.detectChanges();
         });
     }
@@ -316,21 +316,19 @@ export class ChatComponent implements OnInit {
     /**
      * Fired when a Channel becomes visible to the Client.
      */
-    private onChannelAdded(channel:any): void{
-        
-        if (_.some(this.channels, c => c.sid == channel.sid)){
+    private onChannelAdded(channelDescriptor:any): void {
+        if (_.some(this.channelDescriptors, c => c.sid == channelDescriptor.sid)) {
             return;            
         }
         
-        this.channels.push(channel);
+        this.channelDescriptors.push(channelDescriptor);
         this.cd.detectChanges();    
     }
     
     /**
      * Fired when a Channel is no longer visible to the Client.
      */
-    private onChannelRemoved(channel:any): void{
-        
+    private onChannelRemoved(channel:any): void {
         if (this.currentChannel && this.currentChannel.sid === channel.sid) {            
             if (alert(`Unfortunately, the channel #${channel.friendlyName} has been deleted by the owner. ` + 
                       `Choose another channel, or feel free to create your own one.`)){
@@ -342,7 +340,7 @@ export class ChatComponent implements OnInit {
         
         console.log(channel);        
         
-        _.remove(this.channels, ch => ch.sid == channel.sid);    
+        _.remove(this.channelDescriptors, ch => ch.sid == channel.sid);
         this.cd.detectChanges();    
     }
     
@@ -363,4 +361,8 @@ export class ChatComponent implements OnInit {
             return v.toString(16);
         });
     }
+}
+
+function getChannel (desriptor) {
+    return desriptor.getChannel();
 }

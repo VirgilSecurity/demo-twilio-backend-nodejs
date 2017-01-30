@@ -9,7 +9,11 @@
     "removeComments": false,
     "noImplicitAny": false,
     "declaration": true,
-    "outDir": "../public/assets/js/app"
+    "outDir": "../public/assets/js/app",
+    "types" : [ "core-js" ],
+    "typeRoots": [
+      "../node_modules/@types"
+    ]
   },
   "exclude": [
     "node_modules",
