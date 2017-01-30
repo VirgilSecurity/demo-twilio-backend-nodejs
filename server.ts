@@ -1,4 +1,3 @@
-/// <reference path="./typings/index.d.ts" />
 /*
 This application should give you a ready-made starting point for writing your own end-to-end 
 encrypted messaging apps with Virgil Security & Twilio IP Messaging. Before we begin, we need 

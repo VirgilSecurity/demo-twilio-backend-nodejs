@@ -1,29 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core'
-import { NgClass } from '@angular/common'
 
 import { TwilioService }  from '../services/twilio.service'
 import { BackendService } from '../services/backend.service'
 import { AccountService } from '../services/account.service'
 import { VirgilService }  from '../services/virgil.service'
-import { FromNowPipe }  from '../pipes/from-now.pipe'
-import { TooltipDirective } from '../directives/tooltip.directive'
-import { ModalTriggerDirective } from '../directives/modal.directive'
-import { ScrollIntoViewDirective } from '../directives/scroll-into-view.directive'
-import { SidebarDirective } from '../directives/sidebar.directive'
 
 import * as _ from 'lodash';
 
 @Component({
     selector: 'ipm-chat',
-    templateUrl: './assets/views/chat.component.html',
-    directives: [
-        NgClass,
-        TooltipDirective,
-        ModalTriggerDirective, 
-        ScrollIntoViewDirective,
-        SidebarDirective
-    ],
-    pipes: [FromNowPipe]
+    templateUrl: './assets/views/chat.component.html'
 })
 export class ChatComponent implements OnInit {
     
