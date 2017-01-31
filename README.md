@@ -37,7 +37,7 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | VIRGIL_APP_ID               | Used to specify uniqueness and identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with AppKey |
 | VIRGIL_APP_KEY_PATH               | The path to file with Private key (AppKey) of your application. This file will be saved on your machine when you create your application. |
 | VIRGIL_APP_KEY_PASSWORD   | The password you used to protect your AppKey. |
-| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This variable is admin's Private key that is used to perform decryption of messages history. In order to support history in your application you need to manually create a new Virgil Card with `identity: 'twilio_chat_admin'`, publish it in Virgil Security Services, encode the private key of that Card in base64 string and set that string as the value of this variable. [This example](#setup-channel-admin) shows how to create admin's Virgil Card and generate Private key. |
+| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This variable is admin's Private key that is used to perform decryption of messages history. In order to support history in your application you need to create a new Virgil Card manually with `identity: 'twilio_chat_admin'`, publish it in Virgil Security Services, encode the private key of that Card in base64 string and set that string as the value of this variable. [This example](#setup-channel-admin) shows how to create admin's Virgil Card and generate Private key. |
 
 ### Setup Channel Admin
 

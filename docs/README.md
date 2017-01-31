@@ -15,14 +15,14 @@ To complete this guide you need the following:
 - Twilio account. ([Sign up here](https://www.twilio.com/try-twilio))
 - Virgil Security developer account. ([Sign up here](https://developer.virgilsecurity.com/account/signup))
 - Node.js and npm installed. [Download here](https://nodejs.org/en/download/)
-(**Important!** The Node.js version must be less than 7, because Virgil JS SDK is not compatible 
+(**Important!** The Node.js version must be less than 7, because the Virgil JS SDK is not compatible 
 with version 7 currently.)
 - Be familiar with [Twilio Programmable Chat](https://www.twilio.com/docs/api/chat) API.
-- Basic chat application built using Twilio Programmable Chat JS SDK. 
-[This project would be a good starting point](https://github.com/twilio/twilio-chat-demo-js))
+- Basic chat application built using the Twilio Programmable Chat JS SDK. 
+[This project](https://github.com/twilio/twilio-chat-demo-js) would be a good starting point.
 
 
-### Create an application at Virgil Developer portal
+### Create an application in Virgil Developer portal
 
 [Sign in](https://developer.virgilsecurity.com/account/signin) to your Virgil developer
 account and create a new application. Make sure you save the *private key* that is 
@@ -68,7 +68,8 @@ var client = virgil.client("[YOUR_ACCESS_TOKEN_HERE]");
 First of all, for every chat user you will need to perform the following steps:
 
 1. Generate a Public/Private key pair.
-2. Publish the Public key (i.e. Virgil Card) in the Virgil Services where it will available for the other chat users to use to verify and encrypt data for the key owner.
+2. Publish the Public key (i.e. Virgil Card) in the Virgil Services where it will be available 
+for the other chat users to use to verify and encrypt data for the key owner.
 3. Store the Private key in a secure location on the client side. 
 
 See more about publishing Public keys [here](https://github.com/VirgilSecurity/virgil-sdk-javascript#creating-virgil-cards)
@@ -113,7 +114,7 @@ var publishRequest = virgil.publishCardRequest({
 ```
 
 Once you've created the `PublishCardRequest`, you need to sign it using the generated Private key.
-This is needed in order to confirm the ownership of the Private key, as well as provide the card's 
+This is necessary in order to confirm the ownership of the Private key, as well as provide the card's 
 data integrity guarantee.
 
 ```js
@@ -191,7 +192,7 @@ client.publishCard(publishRequest)
 
 ### Private key storage
 
-In the current version of Virgil JS SDK, private key storage is left at the developer's discretion.
+In the current version of the Virgil JS SDK, private key storage is left at the developer's discretion.
 However, we strongly suggest you store them in encrypted form. The easiest way to do that is to 
 use a password which you pass as a second argument to the `virgil.crypto.exportPrivateKey` method.
 
