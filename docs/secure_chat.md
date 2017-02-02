@@ -26,7 +26,7 @@ After successful registration the client is ready to exchange messages with othe
 The exchange of encrypted Messages between users of application:
 
 1. *User1* sends message to *User2* (who works in organization):
-  `EncMsg = Enc(Msg, [User2Card-1...User2Card-N)`
+  `EncMsg = Enc(Msg, Card-12, Card-21, Card-22)`
 2. *User2* decrypts message using one of his device: `Msg = Dec(EncMsg, User2Key)`
 3. Optional: *User2* re-encrypts message for Organization to do backup: `OrgEncMsg = Enc(Msg, OrgCard)`.
 4. Optional: *User2* sends re-encrypted message to the service.
