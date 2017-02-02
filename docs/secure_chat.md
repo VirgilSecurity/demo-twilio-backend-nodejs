@@ -3,11 +3,11 @@
 
 ## Terms
 
-- **AppKey** - a Private key, generated at time of creation of Application on Virgil developer's dashboard. The *AppKey* used to authenticate a user's *ClientCard*. 
-- **ClientKey** - a Private key, generated at registration time. The *ClientKey* is creating in pair with Public key that is used as *ClientCard*. The *ClientKey* never live the device and stores in secure place which is defined by platform.
-- **ClientCard** - A Public key (and information about user/device), generated in pair with *ClientKey* that represents a user's device on Virgil service.
-- **OrgKey** - A Private key, generated at time of application server setup. The **OrgKey** uses to provide messages history backup.
-- **OrgCard** - A Public key (and information about Organization), generated in pair with *OrgKey* and represents an Organization on Virgil service;
+- **AppKey** - a Private key, is generated at the time of creation of Application on Virgil developer's dashboard. The *AppKey* is used to authenticate a user's *ClientCard*. 
+- **ClientKey** - a Private key, is generated at registration time. The *ClientKey* is created in pair with a Public key that is used as *ClientCard*. The *ClientKey* never leaves the device and is stored in secure place which is defined by platform.
+- **ClientCard** - A Public key (and information about user/device), is generated in pair with the *ClientKey*, that represents a user's device on Virgil service.
+- **OrgKey** - A Private key, is generated at the time of application server setup. The **OrgKey** is used to provide backup of messages history.
+- **OrgCard** - A Public key (and information about Organization), is generated in pair with the *OrgKey* and represents an Organization on Virgil service;
 
 ## Client Registration
 
@@ -17,27 +17,27 @@ During registration, on the client-side is generated a new pair of Public/Privat
 
 By using this mechanism, User can register several devices, where for each device generates its own pair of *ClientKey* and *ClientCard*. Thus, each user can have several registered *ClientCard*s in the application.
 
-## Exchanging Messages
+## Messages Exchanging 
 
 After successful registration the client is ready to exchange messages with other clients of the application.
 
-> Exchanging Messages within an application is carried by means of the application itself or such services as Twilio, etc.
+> Messages Exchanging within an application is carried by means of the application itself or such services as Twilio, etc.
 
 The exchange of encrypted Messages between users of application:
 
 1. *User1* sends message to *User2* (who works in organization):
   `EncMsg = Enc(Msg, Card-12, Card-21, Card-22)`
 2. *User2* decrypts message using one of his device: `Msg = Dec(EncMsg, User2Key)`
-3. Optional: *User2* re-encrypts message for Organization to do backup: `OrgEncMsg = Enc(Msg, OrgCard)`.
+3. Optional: *User2* re-encrypts message for the Organization to do backup: `OrgEncMsg = Enc(Msg, OrgCard)`.
 4. Optional: *User2* sends re-encrypted message to the service.
 
-> Setps 3 and 4 does have to be performed in case of Organization takes a part in message history synchronization.
+> Steps 3 and 4 should be performed if the Organization takes part in message history synchronization.
 
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/exchanging_messages_new.png)
 
 History sync can be done by either:
 
-1. Storing and re-sending EncMsg when needed
+1. Storing and re-sending EncMsg when it's needed
 2. Re-encrypting OrgEncMsg (if server has one) and sending to User1/User2
 
 ## Message Encryption
@@ -50,9 +50,9 @@ History sync can be done by either:
 6. The Recipient decrypts message, received from the sender, using Recipient’s *ClientKey*. 
 7. The Recipient extracts the digital signature from the decrypted message and verifies it using the sender's *ClientCard*.
 
-## Verifying Cards
+## Cards Verification 
 
-The clients on the both sides automatically verify the *VirgilCard*s of the other clients with whom they are communicating so that they are able to confirm that an unauthorized third party has not initiated a man-in-the-middle attack.
+The clients at the both sides automatically verify the *VirgilCard*s of the other clients with whom they are communicating so that they are able to confirm that an unauthorized third party has not initiated a man-in-the-middle attack.
 
 
 
