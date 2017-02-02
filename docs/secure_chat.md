@@ -33,7 +33,7 @@ The exchange of encrypted Messages between users of application:
 
 > Setps 3 and 4 does have to be performed in case of Organization takes a part in message history synchronization.
 
-![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/exchanging_messages.png)
+![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/exchanging_messages1.png)
 
 History sync can be done by either:
 
