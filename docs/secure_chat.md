@@ -35,6 +35,11 @@ The exchange of encrypted Messages between users of application:
 
 ![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/exchanging_messages.png)
 
+History sync can be done by either:
+
+1. Storing and re-sending EncMsg when needed
+2. Re-encrypting OrgEncMsg (if server has one) and sending to User1/User2
+
 ## Message Encryption
 
 1. The Sender searches for all recipients on Virgil Service and receives a list of their *ClientCard*s (considering all devices). 
