@@ -33,6 +33,8 @@ The exchange of encrypted Messages between users of application:
 
 > Setps 3 and 4 does have to be performed in case of Organization takes a part in message history synchronization.
 
+![IPMessaging](https://github.com/VirgilSecurity/virgil-demo-twilio/blob/master/Images/exchanging_messages.png)
+
 ## Message Encryption
 
 1. The Sender searches for all recipients on Virgil Service and receives a list of their *ClientCard*s (considering all devices). 
@@ -44,7 +46,8 @@ The exchange of encrypted Messages between users of application:
 7. The Recipient extracts the digital signature from the decrypted message and verifies it using the sender's *ClientCard*.
 
 ## Verifying Cards
-The clients on the both sides automatically verify the *VirgilCard*s of the other clients with whom they are communicating so that they are able to confirm that an unauthorized third party has not initiated a man-in-the-middle attack.
+
+The clients on the both sides automatically verify the *VirgilCard*s of the other clients with whom they are communicating so that they are able to confirm that an unauthorized third party has not initiated a man-in-the-middle attack.
 
 
 
