@@ -1,4 +1,4 @@
-# End-to-End Encrypted Chat with Virgil and Twilio APIs
+# End-to-End Encrypted Twilio Programmable Chat
 
 
 ## Terms
