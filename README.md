@@ -8,10 +8,10 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 
 ## Publish
 
-There are only few steps required to setup Virgil History service :)
+There are only few steps required to set up Virgil History service :)
 
 ```
-$ git clone git@github.com:VirgilSecurity/virgil-demo-twilio.git
+$ git clone https://github.com/VirgilSecurity/virgil-demo-twilio.git
 $ cd ./virgil-demo-twilio
 
 $ npm install
@@ -30,8 +30,8 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
 | TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/user/account/ip-messaging)        |
-| TWILIO_API_KEY                    | Used to authenticate - [generate one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys). |
-| TWILIO_API_SECRET                 | Used to authenticate - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
+| TWILIO_API_KEY                    | Used to authenticate to Twilio - [generate one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys). |
+| TWILIO_API_SECRET                 | Used to authenticate to Twilio - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
 | TWILIO_IPM_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/user/account/ip-messaging/services) |
 | VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
 | VIRGIL_APP_ID               | Used to specify uniqueness and identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with AppKey |
@@ -41,7 +41,7 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 
 ### Setup Channel Admin
 
-This example shows, how to generate an admin's Public/Private keys and publish his Virgil Card in Virgil Security Services.
+This example shows how to generate an admin's Public/Private keys and publish their Virgil Card in Virgil Security Services.
 
 ```js
 var virgil = require('virgil-sdk');

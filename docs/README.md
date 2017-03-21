@@ -2,7 +2,7 @@
 
 ## Introduction
 
-With these instructions, you'll learn how to integrate the Virgil Services API with the 
+With these instructions, you'll learn how to integrate the Virgil Services API with 
 Twilio Programmable Chat to build an end-to-end encrypted chat application.
 
 ## How it Works - Basics
@@ -10,24 +10,24 @@ Twilio Programmable Chat to build an end-to-end encrypted chat application.
 
 ## Setting up your project
 
-To complete this guide you need the following:
+To complete this guide you will need the following:
 
 - Twilio account. ([Sign up here](https://www.twilio.com/try-twilio))
 - Virgil Security developer account. ([Sign up here](https://developer.virgilsecurity.com/account/signup))
 - Node.js and npm installed. [Download here](https://nodejs.org/en/download/)
-(**Important!** The Node.js version must be less than 7, because the Virgil JS SDK is not compatible 
-with version 7 currently.)
-- Be familiar with [Twilio Programmable Chat](https://www.twilio.com/docs/api/chat) API.
+(**Important!** The Node.js version must be less than 7, because the Virgil JS SDK is not currently compatible 
+with version 7.)
+- Be familiar with the [Twilio Programmable Chat](https://www.twilio.com/docs/api/chat) API.
 - Basic chat application built using the Twilio Programmable Chat JS SDK. 
 [This project](https://github.com/twilio/twilio-chat-demo-js) would be a good starting point.
 
 
-### Create an application in Virgil Developer portal
+### Create an application in the Virgil Developer portal
 
-[Sign in](https://developer.virgilsecurity.com/account/signin) to your Virgil developer
+[Sign in](https://developer.virgilsecurity.com/account/signin) to your Virgil Security developer
 account and create a new application. Make sure you save the *private key* that is 
-generated for your application, because you will need it later. After your application is ready, 
-create a *token* that your app will use to make authenticated requests to Virgil Services. 
+generated for your application, you will need it later. After your application is ready, 
+create a *token* that your application will use to make authenticated requests to Virgil Services. 
 One more thing that you will need is your application's *app id* which is an identifier 
 of your application's Virgil Card.
 
@@ -54,7 +54,7 @@ crossorigin="anonymous"></script>
 ### Initialize an API Client
 
 To initialize the client, you need the *access token* that you created for 
-your application in [Virgil Developer Portal](https://developer.virgilsecurity.com/)
+your application in the [Virgil Developer Portal](https://developer.virgilsecurity.com/)
 
 ```javascript
 // var virgil = require('virgil-sdk');
@@ -69,7 +69,7 @@ First of all, for every chat user you will need to perform the following steps:
 
 1. Generate a Public/Private key pair.
 2. Publish the Public key (i.e. Virgil Card) in the Virgil Services where it will be available 
-for the other chat users to use to verify and encrypt data for the key owner.
+for other chat users to use to verify and encrypt data for the key owner.
 3. Store the Private key in a secure location on the client side. 
 
 See more about publishing Public keys [here](https://github.com/VirgilSecurity/virgil-sdk-javascript#creating-virgil-cards)
@@ -100,7 +100,7 @@ MC4CAQAwBQYDK2VwBCIEIEt6ZTkZm/WjGpguk6iAQqw1u77NG37lefziAXUnXExK
 ### Prepare request to publish the Virgil Card
 
 The next step is to create a `PublishCardRequest`. The `PublishCardRequest` is used to define 
-a Virgil Card properties and publish it in Virgil Security services.
+a Virgil Card's properties and publish it in Virgil Security services.
 
 > Virgil Card is representing the main entity at Virgil Security services, it includes the user's 
 Public key and identity information.
