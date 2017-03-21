@@ -11,7 +11,7 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 There are only few steps required to set up Virgil History service :)
 
 ```
-$ git clone git@github.com:VirgilSecurity/virgil-demo-twilio.git
+$ git clone https://github.com/VirgilSecurity/virgil-demo-twilio.git
 $ cd ./virgil-demo-twilio
 
 $ npm install
