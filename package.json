@@ -29,20 +29,20 @@
     "rxjs": "5.0.1",
     "systemjs": "0.19.40",
     "twilio": "^2.11.1",
-    "typescript": "^2.1.5",
+    "typescript": "2.1.5",
     "virgil-sdk": "^4.0.2",
     "zone.js": "^0.7.4"
   },
   "devDependencies": {
     "@types/body-parser": "0.0.33",
-    "@types/core-js": "^0.9.34",
-    "@types/express": "^4.0.35",
-    "@types/jasmine": "^2.5.36",
-    "@types/lodash": "^4.14.51",
-    "@types/node": "^6.0.46",
-    "concurrently": "^3.1.0",
-    "nodemon": "^1.11.0",
-    "ts-node": "^2.0.0",
-    "typings": "^2.1.0"
+    "@types/core-js": "0.9.34",
+    "@types/express": "4.0.35",
+    "@types/jasmine": "2.5.36",
+    "@types/lodash": "4.14.51",
+    "@types/node": "6.0.46",
+    "concurrently": "3.1.0",
+    "nodemon": "1.11.0",
+    "ts-node": "2.0.0",
+    "typings": "2.1.0"
   }
 }
