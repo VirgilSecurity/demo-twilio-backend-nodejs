@@ -6,25 +6,21 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 - [Quickstart Guide](/docs)
 - [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
 
-## Publish
+## Clone & Configurate
 
-There are only few steps required to set up Virgil History service :)
+Clone the repository from our GitHub.
 
 ```
 $ git clone git@github.com:VirgilSecurity/virgil-demo-twilio.git
+```
+
+Then, rename the configuration file ```.env``` file using next command:
+
+```
 $ cd ./virgil-demo-twilio
-
-$ npm install
-$ npm start
-```
-
-Use url [http://localhost:8080](http://localhost:8080) to open your Demo Chat
-
-## Configuration
-
-```
 $ cp ./.env.example ./.env
 ```
+
 Set Twilio & Virgil environment variables declared in `.env` file.
 
 | Variable Name                     | Description                    |
@@ -38,6 +34,17 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 | VIRGIL_APP_KEY_PATH               | The path to file with Private key (AppKey) of your application. This file will be saved on your machine when you create your application. |
 | VIRGIL_APP_KEY_PASSWORD   | The password you used to protect your AppKey. |
 | APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This variable is admin's Private key that is used to perform decryption of messages history. In order to support history in your application you need to create a new Virgil Card manually with `identity: 'twilio_chat_admin'`, publish it in Virgil Security Services, encode the private key of that Card in base64 string and set that string as the value of this variable. [This example](#setup-channel-admin) shows how to create admin's Virgil Card and generate Private key. |
+
+## Install & Start
+
+Install all the package dependencies and start the application using next commands:
+
+```
+$ npm install
+$ npm start
+```
+
+Use url [http://localhost:8080](http://localhost:8080) to open your Demo Chat
 
 ### Setup Channel Admin
 
