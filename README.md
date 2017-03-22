@@ -39,6 +39,8 @@ Set Twilio & Virgil environment variables declared in `.env` file.
 
 Install all the package dependencies and start the application using next commands:
 
+> **IMPORTANT** Make sure you set the variables in `.env` before you try to start the server. It won't work without these. 
+
 ```
 $ npm install
 $ npm start
