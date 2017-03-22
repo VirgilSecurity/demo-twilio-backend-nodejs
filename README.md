@@ -14,7 +14,7 @@ Clone the repository from our GitHub.
 $ git clone git@github.com:VirgilSecurity/virgil-demo-twilio.git
 ```
 
-Then, rename the configuration file ```.env``` file using next command:
+Then, rename a configuration file ```.env``` file using next command:
 
 ```
 $ cd ./virgil-demo-twilio
