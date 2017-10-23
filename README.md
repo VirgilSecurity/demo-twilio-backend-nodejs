@@ -1,98 +1,94 @@
-# Virgil & Twilio Programmable Chat
+# Virgil Twilio Demo Chat API v1
 
-With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
+Application API server for the Virgil Twilio Demo Chat app. Its primary purpose is to register users' Virgil Cards on 
+Virgil Cards service and generate Twilio Access Tokens. Uses ad hoc [Virgil Auth](https://github.com/VirgilSecurity/virgil-services-auth) 
+service to authenticate users without passwords.
 
 
-- [Quickstart Guide](/docs)
-- [Live Demo](https://demo-ip-messaging.virgilsecurity.com/)
-
-## Clone & Configurate
-
-Clone the repository from our GitHub.
-
-```
-$ git clone git@github.com:VirgilSecurity/virgil-demo-twilio.git
-```
-
-Then, rename a configuration file ```.env``` file using next command:
-
-```
-$ cd ./virgil-demo-twilio
-$ cp ./.env.example ./.env
-```
-
-Set Twilio & Virgil environment variables declared in `.env` file.
-
-| Variable Name                     | Description                    |
-|-----------------------------------|--------------------------------|
-| TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/user/account/ip-messaging)        |
-| TWILIO_API_KEY                    | Used to authenticate to Twilio - [generate one here](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys). |
-| TWILIO_API_SECRET                 | Used to authenticate to Twilio - just like the above, [you'll get one here.](https://www.twilio.com/user/account/ip-messaging/dev-tools/api-keys) |
-| TWILIO_IPM_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/user/account/ip-messaging/services) |
-| VIRGIL_ACCESS_TOKEN               | The access token provides authenticated secure access to Virgil Keys Services and is passed with each API call. The access token also allows the API to associate your app’s requests with your Virgil Security developer's account. |
-| VIRGIL_APP_ID               | Used to specify uniqueness and identifies your application in Virgil Security services, it is also used to identify the Public key generated in a pair with AppKey |
-| VIRGIL_APP_KEY_PATH               | The path to file with Private key (AppKey) of your application. This file will be saved on your machine when you create your application. |
-| VIRGIL_APP_KEY_PASSWORD   | The password you used to protect your AppKey. |
-| APP_CHANNEL_ADMIN_PRIVATE_KEY | Optional. This variable is admin's Private key that is used to perform decryption of messages history. In order to support history in your application you need to create a new Virgil Card manually with `identity: 'twilio_chat_admin'`, publish it in Virgil Security Services, encode the private key of that Card in base64 string and set that string as the value of this variable. [This example](#setup-channel-admin) shows how to create admin's Virgil Card and generate Private key. |
-
-## Install & Start
-
-Install all the package dependencies and start the application using next commands:
-
-> **IMPORTANT** Make sure you set the variables in `.env` before you try to start the server. It won't work without these. 
-
-```
-$ npm install
-$ npm start
+ ## Contents
+ * [Endpoints](#endpoints)
+    * [POST /v1/users](#post-v1users)
+    * [GET /v1/tokens/twilio](#get-v1tokenstwilio)
+ * [Authorization](#authorization)
+ * [Errors](#errors)
+    
+ 
+ ## Endpoints
+ 
+ ### POST /v1/users
+ 
+ An endpoint to register new user. Expects a _Card Signing Request_ as its only parameter. The CSR must satisfy 
+ the following requirements:
+ 
+ * `scope` must be `"application"`.
+ * `identity` must be unique. Attempt to register a card with duplicate identity will result in an error.
+ * Must contain `"deviceId"` attribute in the `data` field. Device id can be any string that uniquely identifies 
+ user's device.
+ 
+ **Request**
+ ```json
+{
+  "csr": "eyJjb250ZW50X3NuYXBzaG90IjoiZXlKcFpHVnVkR2...k9In19fQ=="
+}
 ```
 
-Use url [http://localhost:8080](http://localhost:8080) to open your Demo Chat
+**Response**
 
-### Setup Channel Admin
-
-This example shows how to generate an admin's Public/Private keys and publish their Virgil Card in Virgil Security Services.
-
-```js
-var virgil = require('virgil-sdk');
-var fs = require('fs');
-
-var APP_ID = "[YOUR_APP_ID_HERE]";
-var APP_KEY_PASSWORD = "[YOUR_APP_KEY_PASSWORD_HERE]";
-
-// this can either be a Buffer object or a base64-encoded string with the 
-// private key bytes
-var appPrivateKeyMaterial = fs.readFileSync("[YOUR_APP_KEY_PATH_HERE]");
-// var appPrivateKeyMaterial = "[YOUR_BASE64_ENCODED_APP_KEY_HERE]";
-
-var appPrivateKey = virgil.crypto.importPrivateKey(
-        appPrivateKeyMaterial, APP_KEY_PASSWORD);
-
-// generate a new Public/Private key pair for channel admin
-var adminKeys = virgil.crypto.generateKeys();
-
-var exportedPrivateKey = virgil.crypto.exportPublicKey(adminKeys.privateKey);
-
-console.log('APP_CHANNEL_ADMIN_PRIVATE_KEY: ' + exportedPrivateKey.toString('base64'));
-
-var exportedPublicKey = virgil.crypto.exportPublicKey(adminKeys.publicKey);
-var publishRequest = virgil.publishCardRequest({
-      identity: "twilio_chat_admin",
-      identity_type: "chat_member",
-      public_key: exportedPublicKey.toString('base64')
-    });
-
-// sign request using Admin's and Application Private keys.
-var requestSigner = virgil.requestSigner(virgil.crypto);
-
-requestSigner.selfSign(publishRequest, adminKeys.privateKey);
-requestSigner.authoritySign(publishRequest, APP_ID, appPrivateKey);
-
-// initialize client 
-var client = virgil.client("[YOUR_ACCESS_TOKEN_HERE]");
-
-client.publishCard(publishRequest)
-.then(function (adminCard) {
-  console.log(adminCard);
-});
+If request is successful, the user's Virgil Card is returned:
+ 
+```json
+{
+    "id": "bb5db5084dab51113...",
+    "content_snapshot":"eyJwdWJsaWNfa2V5IjoiT...",
+    "meta": {
+        "created_at": "2017-10-22T07:03:42+0000",
+        "card_version": "4.0",
+        "signs": {
+            "bb5db5084dab51...":"MIGaMA0GCWCGSAFl...",
+            "767b6b12702df1...":"MIGaMA0GCWCGSAFl...",
+            "ab799a2f26333c...":"MIGaMA0GCWCGSAFl..."
+        }
+    }
+}
 ```
 
+### GET /v1/tokens/twilio
+
+An endpoint to obtain an access token for the Twilio API.
+ 
+> This endpoint requires [authorization](#authorization).
+
+**Response**
+```json
+{
+  "twilioToken": "eyJvd24iOiIzYWY1ZWY3OTE...GUiOiIqIn0"
+}
+```
+
+
+## Authorization
+
+To authorize the request, the client app must [obtain an access token](https://github.com/VirgilSecurity/virgil-services-auth#post-v4authorizationactionsobtain-access-token) 
+from the Virgil Auth service and include it in the `Authorization` header of the request:
+```
+Authorization: Bearer eyJhbGciOiJ2aXJnaWwiLCJ0eXA...i8m2asGQM
+```
+
+## Errors
+
+Application uses standard HTTP response codes:
+
+```
+200 - Success
+401 - Authentication failed
+500 - Server error
+```
+
+Additional information about the error is returned in response body as JSON object:
+```json
+{
+  "status": {numeric_http_status},
+  "errorCode": {numeric_error_code},
+  "message": "Message containing error details"
+}
+```

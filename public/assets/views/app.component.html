@@ -1,7 +1,0 @@
-<div *ngIf="!isReady" class="ui active inverted dimmer">
-    <div class="ui text loader">Loading...</div>
-</div>
-<div *ngIf="isReady"  >
-    <ipm-login *ngIf="!isLoggedIn" [login]="loginCallback"></ipm-login>
-    <ipm-chat *ngIf="isLoggedIn" [logout]="logoutCallback"></ipm-chat>
-</div>
