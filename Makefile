@@ -1,5 +1,5 @@
 .PHONY: docker
-docker: build_docker clean_docker_registry
+docker: build_docker
 
 IMAGENAME=virgil-demo-twilio-server
 DOCKER_REGISTRY=virgilsecurity-docker-core.bintray.io
