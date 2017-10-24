@@ -21,7 +21,7 @@ service to authenticate users without passwords.
  the following requirements:
  
  * `scope` must be `"application"`.
- * `identity` must be unique. Attempt to register a card with duplicate identity will result in an error.
+ * `identity` must be unique. Attempt to register a card with duplicate identity will result in `400 BadRequest` error.
  * Must contain `"deviceId"` attribute in the `data` field. Device id can be any string that uniquely identifies 
  user's device.
  
@@ -81,6 +81,7 @@ Application uses standard HTTP response codes:
 ```
 200 - Success
 401 - Authentication failed
+400 - Request error
 500 - Server error
 ```
 
