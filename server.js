@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
+const helmet = require('helmet');
 const router = require('./services/router');
 const errors = require('./services/errors');
 
@@ -8,6 +9,7 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 
+app.use(helmet());
 app.use(logger('combined'));
 app.use(bodyParser.json());
 app.use(enableCORS);
