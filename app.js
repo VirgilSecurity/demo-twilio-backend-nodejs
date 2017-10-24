@@ -6,8 +6,6 @@ const router = require('./services/router');
 const errors = require('./services/errors');
 const logger = require('./services/logger');
 
-const port = process.env.PORT || 3000;
-
 const app = express();
 
 app.use(helmet());
@@ -17,12 +15,6 @@ app.use(enableCORS);
 app.use('/v1', router);
 app.use(handleNotFound);
 app.use(handleError);
-
-app.listen(port, () => {
-	if (process.env.NODE_ENV !== 'production') {
-		logger.info(`Web server listening on ${port}...`);
-	}
-});
 
 module.exports = app;
 

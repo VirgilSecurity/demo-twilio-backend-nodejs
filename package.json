@@ -4,7 +4,7 @@
   "description": "Backend for Virgil Twilio Chat Demo",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node ./bin/www",
     "test": "node tests/index.js"
   },
   "author": "VirgilSecurity Inc.",

@@ -5,6 +5,9 @@ const createUser = require('./helpers/createUser');
 const obtainAccessToken = require('./helpers/obtainAccessToken');
 const deleteUser = require('./helpers/deleteUser');
 
+const app = require('../app');
+const api = request(app);
+
 let user;
 
 test('setup', t => {
@@ -13,8 +16,7 @@ test('setup', t => {
 });
 
 test('POST /users', t => {
-	request('http://localhost:3000')
-		.post('/v1/users')
+	api.post('/v1/users')
 		.send({ csr: user.csr })
 		.expect(200)
 		.expect(res => {
@@ -36,8 +38,7 @@ test('POST /users', t => {
 			t.test('GET /tokens/twilio', st => {
 				obtainAccessToken(user)
 					.then(accessToken => {
-						request('http://localhost:3000')
-							.get('/v1/tokens/twilio')
+						api.get('/v1/tokens/twilio')
 							.set('Authorization', `Bearer ${accessToken}`)
 							.expect(200)
 							.expect(res => {
@@ -58,8 +59,7 @@ test('POST /users', t => {
 });
 
 test('POST /users with invalid CSR', t => {
-	request('http://localhost:3000')
-		.post('/v1/users')
+	api.post('/v1/users')
 		.send({ csr: 'invalid_csr' })
 		.expect(400)
 		.expect(res => {
@@ -93,8 +93,7 @@ test('POST /users without device id', t => {
 		'UNNNzJMRjJhNDcxSkR4SEVkd2pIeVhHUmpYYW5MS0lOcFpJNkF3akNJM1VVS21uQU' +
 		'k9In19fQ==';
 
-	request('http://localhost:3000')
-		.post('/v1/users')
+	api.post('/v1/users')
 		.send({ csr: csrWithoutDeviceId })
 		.expect(400)
 		.expect(res => {
@@ -115,8 +114,7 @@ test('POST /users without device id', t => {
 test('POST /users with duplicate identity', t => {
 	const duplicateUser = createUser('twilio_chat_user');
 
-	request('http://localhost:3000')
-		.post('/v1/users')
+	api.post('/v1/users')
 		.send({ csr: duplicateUser.csr })
 		.expect(400)
 		.expect(res => {
@@ -135,8 +133,7 @@ test('POST /users with duplicate identity', t => {
 });
 
 test('GET /tokens/twilio without auth header', t => {
-	request('http://localhost:3000')
-		.get('/v1/tokens/twilio')
+	api.get('/v1/tokens/twilio')
 		.expect(401)
 		.expect(res => {
 			const error = res.body;
@@ -154,8 +151,7 @@ test('GET /tokens/twilio without auth header', t => {
 });
 
 test('GET /tokens/twilio with invalid token', t => {
-	request('http://localhost:3000')
-		.get('/v1/tokens/twilio')
+	api.get('/v1/tokens/twilio')
 		.set('Authorization', 'Bearer invalid_access_token')
 		.expect(401)
 		.expect(res => {

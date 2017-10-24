@@ -1,0 +1,9 @@
+{
+  "apps": [{
+	"name": "demo-twilio-chat-server",
+	"script": "./bin/www",
+	"env": {
+	  "NODE_ENV": "production"
+	}
+  }]
+}
