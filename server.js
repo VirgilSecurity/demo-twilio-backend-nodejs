@@ -15,6 +15,7 @@ app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(enableCORS);
 app.use('/v1', router);
+app.use(handleNotFound);
 app.use(handleError);
 
 app.listen(port, () => {
@@ -32,6 +33,10 @@ function enableCORS(req, res, next) {
 	res.header('Access-Control-Max-Age', 86400);
 
 	next();
+}
+
+function handleNotFound(req, res, next) {
+	next(errors.NOT_FOUND());
 }
 
 function handleError(err, req, res, next) {

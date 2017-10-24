@@ -66,6 +66,12 @@ const INTERNAL_ERROR = () => new ApiError(
 	'InternalServerError',
 	'An unexpected error has occurred on the server.'
 );
+const NOT_FOUND = () => new ApiError(
+	404,
+	40400,
+	'NotFound',
+	'Not Found'
+);
 
 module.exports = {
 	ApiError,
@@ -76,5 +82,6 @@ module.exports = {
 	INVALID_ACCESS_TOKEN,
 	VIRGIL_AUTH_ERROR,
 	VIRGIL_CARDS_ERROR,
-	INTERNAL_ERROR
+	INTERNAL_ERROR,
+	NOT_FOUND
 };
