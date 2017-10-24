@@ -2,6 +2,7 @@ const request = require('superagent');
 const url = require('url');
 const config = require('../config');
 const errors = require('./errors');
+const logger = require('./logger');
 
 module.exports = function makeAuthenticator() {
 	return (req, res, next) => {
@@ -21,7 +22,7 @@ module.exports = function makeAuthenticator() {
 				}
 			})
 			.catch(e => {
-				console.error('Failed to verify access token.', e);
+				logger.error('Failed to verify access token.', e);
 				next(errors.VIRGIL_AUTH_ERROR());
 			});
 	};
@@ -38,7 +39,7 @@ function getCardIdForToken(token) {
 	.then(res => res.body.resource_owner_virgil_card_id)
 	.catch(err => {
 		if (err.status === 400) {
-			console.log('Token verification failed.', err.response.text);
+			logger.info('Token verification failed.', err.response.text);
 			return null;
 		}
 		throw err;

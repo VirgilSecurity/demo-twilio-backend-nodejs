@@ -1,6 +1,7 @@
 const virgil = require('virgil-sdk');
 const config = require('../config');
 const errors = require('../services/errors');
+const logger = require('../services/logger');
 
 const virgilClient = virgil.client(
 	config.virgil.accessToken,
@@ -16,7 +17,7 @@ function register(req, res, next) {
 	try {
 		cardRequest = virgil.publishCardRequest.import(csr);
 	} catch (e) {
-		console.error('Failed to import card request.', e);
+		logger.error('Failed to import card request.', e);
 		return next(errors.INVALID_CSR());
 	}
 
@@ -35,12 +36,12 @@ function register(req, res, next) {
 					res.status(200).send(card.export());
 				})
 				.catch(e => {
-					console.error('Failed to publish Virgil Card.', e);
+					logger.error('Failed to publish Virgil Card.', e);
 					next(errors.VIRGIL_CARDS_ERROR());
 				});
 		})
 		.catch(e => {
-			console.error('Failed to search Virgil Card.', e);
+			logger.error('Failed to search Virgil Card.', e);
 			next(errors.VIRGIL_CARDS_ERROR());
 		});
 }

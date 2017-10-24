@@ -1,6 +1,7 @@
 const virgil = require('virgil-sdk');
 const config = require('../config');
 const errors = require('./errors');
+const logger = require('./logger');
 
 module.exports = function makeCardLoader() {
 	const virgilClient = virgil.client(
@@ -13,7 +14,7 @@ module.exports = function makeCardLoader() {
 
 	return (req, res, next) => {
 		if (!req.userCardId) {
-			console.error(
+			logger.error(
 				'Invalid middleware config. ' +
 				'Tried to load user\'s Virgil Card before resolving its id.'
 			);
@@ -27,7 +28,7 @@ module.exports = function makeCardLoader() {
 				next();
 			})
 			.catch(e => {
-				console.error('Failed to get Virgil Card by id.', e);
+				logger.error('Failed to get Virgil Card by id.', e);
 				next(errors.VIRGIL_CARDS_ERROR());
 			});
 	};

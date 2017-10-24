@@ -1,23 +1,26 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const logger = require('morgan');
+const morgan = require('morgan');
 const helmet = require('helmet');
 const router = require('./services/router');
 const errors = require('./services/errors');
+const logger = require('./services/logger');
 
 const port = process.env.PORT || 3000;
 
 const app = express();
 
 app.use(helmet());
-app.use(logger('combined'));
+app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(enableCORS);
 app.use('/v1', router);
 app.use(handleError);
 
 app.listen(port, () => {
-	console.log(`Web server listening on ${port}...`);
+	if (process.env.NODE_ENV !== 'production') {
+		logger.info(`Web server listening on ${port}...`);
+	}
 });
 
 module.exports = app;
@@ -36,7 +39,7 @@ function handleError(err, req, res, next) {
 	if (err instanceof errors.ApiError) {
 		error = err;
 	} else {
-		console.error('Unexpected error', err);
+		logger.error('Unexpected error', err);
 		error = errors.INTERNAL_ERROR();
 	}
 
