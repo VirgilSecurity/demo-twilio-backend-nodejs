@@ -13,6 +13,11 @@ const virgilClient = virgil.client(
 
 function register(req, res, next) {
 	const csr = req.body.csr;
+
+	if (!csr) {
+		return next(errors.MISSING_CSR());
+	}
+
 	let cardRequest;
 	try {
 		cardRequest = virgil.publishCardRequest.import(csr);

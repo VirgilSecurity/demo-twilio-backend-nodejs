@@ -36,6 +36,12 @@ const INVALID_IDENTITY = () => new ApiError(
 	'InvalidIdentity',
 	'Another Virgil Card with the same identity has already been registered.'
 );
+const MISSING_CSR = () => new ApiError(
+	400,
+	40004,
+	'MissingCSR',
+	'Request body is malformed. Expected JSON with "csr" property. Did you forget Content-Type header?'
+);
 const MISSING_AUTHORIZATION = () => new ApiError(
 	401,
 	40101,
@@ -75,6 +81,7 @@ const NOT_FOUND = () => new ApiError(
 
 module.exports = {
 	ApiError,
+	MISSING_CSR,
 	INVALID_CSR,
 	MISSING_DEVICE_ID,
 	INVALID_IDENTITY,

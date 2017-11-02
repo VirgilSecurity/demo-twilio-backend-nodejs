@@ -35,6 +35,8 @@ service to authenticate users without passwords.
 **Response**
 
 If request is successful, the user's Virgil Card is returned:
+
+> Request must include `Content-Type: "application/json"` header 
  
 ```json
 {
