@@ -60,11 +60,11 @@ const VIRGIL_AUTH_ERROR = () => new ApiError(
 	'VirgilAuthError',
 	'Received unexpected error from Virgil Auth service'
 );
-const VIRGIL_CARDS_ERROR = () => new ApiError(
+const VIRGIL_CARDS_ERROR = (message) => new ApiError(
 	500,
 	50020,
 	'VirgilCardsError',
-	'Received unexpected error from Virgil Cards service'
+	message || 'Received unexpected error from Virgil Cards service'
 );
 const INTERNAL_ERROR = () => new ApiError(
 	500,
