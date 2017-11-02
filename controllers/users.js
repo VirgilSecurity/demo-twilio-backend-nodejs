@@ -53,7 +53,15 @@ function register(req, res, next) {
 
 function checkIdentityUnique(identity) {
 	return virgilClient.searchCards(identity)
-		.then(cards => cards.length === 0);
+		.then(cards => cards.length === 0)
+		.catch(e => {
+			if (e instanceof TypeError) {
+				// workaround the bug in virgil-sdk where it throws when
+				// search returns null instead of an empty array.
+				// Assume identity is unique in this case;
+				return true;
+			}
+		});
 }
 
 function signCardRequest(cardRequest) {
