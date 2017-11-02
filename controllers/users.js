@@ -42,12 +42,12 @@ function register(req, res, next) {
 				})
 				.catch(e => {
 					logger.error('Failed to publish Virgil Card.', e);
-					next(errors.VIRGIL_CARDS_ERROR(e.toString()));
+					next(errors.VIRGIL_CARDS_ERROR());
 				});
 		})
 		.catch(e => {
 			logger.error('Failed to search Virgil Card.', e);
-			next(errors.VIRGIL_CARDS_ERROR(e.toString()));
+			next(errors.VIRGIL_CARDS_ERROR());
 		});
 }
 
