@@ -27,7 +27,7 @@ module.exports = {
 	virgil: {
 		accessToken: process.env.VIRGIL_ACCESS_TOKEN,
 		authBaseUrl: process.env.VIRGIL_AUTH_URI,
-		cardsReadBaseUrl: process.env.VIRGIL_CARDS_READ_URI,
+		cardsReadBaseUrl: process.env.VIRGIL_CARDS_URI,
 		cardsBaseUrl: process.env.VIRGIL_CARDS_URI
 	},
 	twilio: {
