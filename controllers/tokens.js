@@ -8,7 +8,7 @@ function getTwilioToken(req, res) {
 	const userCard = req.userCard;
 	const endpointId = `${config.app.name}:${userCard.identity}:${userCard.data.deviceId}`;
 	const charGrant = new ChatGrant({
-		serviceSid: twilio.serviceSid,
+		serviceSid: twilio.ipmServiceSid,
 		endpointId
 	});
 
