@@ -34,25 +34,16 @@ service to authenticate users without passwords.
 
 **Response**
 
-If request is successful, the user's Virgil Card is returned:
+If request is successful, the string representation of the user's Virgil Card is returned:
 
 > Request must include `Content-Type: "application/json"` header 
  
 ```json
 {
-    "id": "bb5db5084dab51113...",
-    "content_snapshot":"eyJwdWJsaWNfa2V5IjoiT...",
-    "meta": {
-        "created_at": "2017-10-22T07:03:42+0000",
-        "card_version": "4.0",
-        "signs": {
-            "bb5db5084dab51...":"MIGaMA0GCWCGSAFl...",
-            "767b6b12702df1...":"MIGaMA0GCWCGSAFl...",
-            "ab799a2f26333c...":"MIGaMA0GCWCGSAFl..."
-        }
-    }
+    "virgil_card": "eyJjb250ZW50X3NuYXBzaG90IjoiZXlKcFpHVnVkR2...k9In19fQ=="
 }
 ```
+You can then use virgil sdk to `import` a Virgil Card object from this string. 
 
 ### GET /v1/tokens/twilio
 
