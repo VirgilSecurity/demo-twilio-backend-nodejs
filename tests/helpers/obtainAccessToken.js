@@ -18,6 +18,10 @@ module.exports = function obtainAccessToken({ virgilCardId, privateKey }) {
 			return request.post(getAbsoluteUrl(`/v4/authorization/actions/obtain-access-token`))
 				.send({ grant_type: 'access_code', code: grantCode })
 				.then(res => res.body.access_token);
+		})
+		.catch(e => {
+			console.log(`Failed to obtain access token`, e);
+			throw new Error('Failed to obtain access token');
 		});
 };
 

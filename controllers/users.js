@@ -38,7 +38,7 @@ function register(req, res, next) {
 
 			virgilClient.publishCard(signCardRequest(cardRequest))
 				.then(card => {
-					res.status(200).send(card.export());
+					res.status(200).send(serializeCard(card));
 				})
 				.catch(e => {
 					logger.error('Failed to publish Virgil Card.', e);
@@ -49,6 +49,12 @@ function register(req, res, next) {
 			logger.error('Failed to search Virgil Card.', e);
 			next(errors.VIRGIL_CARDS_ERROR());
 		});
+}
+
+function serializeCard(card) {
+	const str = JSON.stringify(card.export());
+	const buf = Buffer.from(str);
+	return { virgil_card: buf.toString('base64') };
 }
 
 function checkIdentityUnique(identity) {

@@ -8,10 +8,13 @@ const deleteUser = require('./helpers/deleteUser');
 const app = require('../app');
 const api = request(app);
 
+const USER_IDENTITY = 'twilio_chat_test_user';
 let user;
 
+const base64Decode = input => Buffer.from(input, 'base64').toString('utf8');
+
 test('setup', t => {
-	user = createUser('twilio_chat_user');
+	user = createUser(USER_IDENTITY);
 	t.end();
 });
 
@@ -20,15 +23,19 @@ test('POST /users', t => {
 		.send({ csr: user.csr })
 		.expect(200)
 		.expect(res => {
-			const virgilCard = res.body;
+			const cardDto = res.body.virgil_card;
+			const virgilCard = JSON.parse(base64Decode(cardDto));
+
 			t.ok(virgilCard.id, 'Virgil Card has id');
+			user.virgilCardId = virgilCard.id;
+
 			t.ok(virgilCard.content_snapshot, 'Virgil Card has snapshot');
 			t.ok(virgilCard.meta, 'Virgil Card has meta');
 			t.ok(virgilCard.meta.signs, 'Virgil Card has signatures');
 			const signatures = Object.keys(virgilCard.meta.signs);
 			t.equals(signatures.length, 3, 'Virgil Card is signed by the App and Cards Service');
 
-			user.virgilCardId = res.body.id;
+
 		})
 		.end((err, res) => {
 			if (err) {
@@ -51,7 +58,7 @@ test('POST /users', t => {
 
 								st.end();
 							});
-					});
+					}).catch(e => st.end(e));
 			});
 
 			t.end();
@@ -112,7 +119,7 @@ test('POST /users without device id', t => {
 });
 
 test('POST /users with duplicate identity', t => {
-	const duplicateUser = createUser('twilio_chat_user');
+	const duplicateUser = createUser(USER_IDENTITY);
 
 	api.post('/v1/users')
 		.send({ csr: duplicateUser.csr })
