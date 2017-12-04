@@ -25,7 +25,7 @@ define push_docker
 endef
 
 build_docker:
-	docker build -t $(IMAGENAME) .
+	docker build -t $(IMAGENAME) --build-arg git_commit=$(GIT_COMMIT) .
 
 docker_registry_tag:
 	$(call tag_docker)

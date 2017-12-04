@@ -1,5 +1,6 @@
 FROM node:6-alpine
 MAINTAINER Virgil <support@VirgilSecurity.com>
+ARG git_commit
 RUN apk add --no-cache --update ca-certificates
 RUN npm install -g pm2
 
@@ -19,6 +20,7 @@ COPY app.js .
 COPY pm2.json .
 
 ENV PORT 3000
+ENV GIT_COMMIT $git_commit
 
 EXPOSE 3000
 
