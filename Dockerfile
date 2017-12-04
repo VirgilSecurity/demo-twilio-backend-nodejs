@@ -20,9 +20,6 @@ COPY pm2.json .
 
 ENV PORT 3000
 
-# Show current folder structure in logs
-RUN ls -al -R
-
 EXPOSE 3000
 
 CMD [ "pm2", "start", "pm2.json", "--no-daemon" ]

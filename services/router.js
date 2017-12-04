@@ -4,7 +4,6 @@ const requireAuth = require('./auth');
 const loadVirgilCard = require('./loadVirgilCard');
 const userController = require('../controllers/users');
 const tokenController = require('../controllers/tokens');
-const healthController = require('../controllers/health');
 
 router.route('/users').post(userController.register);
 router.route('/tokens/twilio').get(
@@ -12,7 +11,5 @@ router.route('/tokens/twilio').get(
 	loadVirgilCard(),
 	tokenController.getTwilioToken
 );
-router.route('/health/status').get(healthController.status);
-
 
 module.exports = router;

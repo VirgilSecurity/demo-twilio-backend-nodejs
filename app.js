@@ -5,10 +5,14 @@ const helmet = require('helmet');
 const router = require('./services/router');
 const errors = require('./services/errors');
 const logger = require('./services/logger');
+const healthController = require('./controllers/health');
 
 const app = express();
 
 app.use(helmet());
+
+app.get('/health/status', healthController.status);
+
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(enableCORS);

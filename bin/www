@@ -2,9 +2,9 @@
 
 const app = require('../app');
 const port = process.env.PORT || 3000;
+const package = require('../package.json');
+const gitCommit = process.env.GIT_COMMIT || 'latest';
 
 app.listen(port, () => {
-	if (process.env.NODE_ENV !== 'production') {
-		console.log(`Web server listening on ${port}...`);
-	}
+	console.log(`${package.name} v${package.version} (@${gitCommit}) listening on ${port}...`);
 });
