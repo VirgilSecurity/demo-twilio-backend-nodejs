@@ -67,6 +67,7 @@ function checkIdentityUnique(identity) {
 				// Assume identity is unique in this case;
 				return true;
 			}
+			return Promise.reject(e);
 		});
 }
 
