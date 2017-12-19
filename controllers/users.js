@@ -1,4 +1,5 @@
 const virgil = require('virgil-sdk');
+const queue = require('async/queue');
 const config = require('../config');
 const errors = require('../services/errors');
 const logger = require('../services/logger');
@@ -11,6 +12,32 @@ const virgilClient = virgil.client(
 	}
 );
 
+const publishQueue = queue(publish);
+
+function publish(task, callback) {
+	const cardRequest = task.cardRequest;
+
+	checkIdentityUnique(cardRequest.identity)
+		.then(isUnique => {
+			if (!isUnique) {
+				return callback(errors.INVALID_IDENTITY());
+			}
+
+			virgilClient.publishCard(signCardRequest(cardRequest))
+				.then(card => {
+					callback(null, serializeCard(card));
+				})
+				.catch(e => {
+					logger.error('Failed to publish Virgil Card.', e);
+					callback(errors.VIRGIL_CARDS_ERROR());
+				});
+		})
+		.catch(e => {
+			logger.error('Failed to search Virgil Card.', e);
+			callback(errors.VIRGIL_CARDS_ERROR());
+		});
+}
+
 function register(req, res, next) {
 	const csr = req.body.csr;
 
@@ -22,7 +49,6 @@ function register(req, res, next) {
 	try {
 		cardRequest = virgil.publishCardRequest.import(csr);
 	} catch (e) {
-		logger.error('Failed to import card request.', e);
 		return next(errors.INVALID_CSR());
 	}
 
@@ -30,25 +56,13 @@ function register(req, res, next) {
 		return next(errors.MISSING_DEVICE_ID());
 	}
 
-	checkIdentityUnique(cardRequest.identity)
-		.then(isUnique => {
-			if (!isUnique) {
-				return next(errors.INVALID_IDENTITY());
-			}
+	publishQueue.push({ cardRequest }, (err, result) => {
+		if (err) {
+			return next(err);
+		}
 
-			virgilClient.publishCard(signCardRequest(cardRequest))
-				.then(card => {
-					res.status(200).send(serializeCard(card));
-				})
-				.catch(e => {
-					logger.error('Failed to publish Virgil Card.', e);
-					next(errors.VIRGIL_CARDS_ERROR());
-				});
-		})
-		.catch(e => {
-			logger.error('Failed to search Virgil Card.', e);
-			next(errors.VIRGIL_CARDS_ERROR());
-		});
+		res.status(200).send(result);
+	});
 }
 
 function serializeCard(card) {
