@@ -1,8 +1,8 @@
 const virgil = require('virgil-sdk');
-const queue = require('async/queue');
 const config = require('../config');
 const errors = require('../services/errors');
 const logger = require('../services/logger');
+const cache = require('../services/cache');
 
 const virgilClient = virgil.client(
 	config.virgil.accessToken,
@@ -12,31 +12,9 @@ const virgilClient = virgil.client(
 	}
 );
 
-const publishQueue = queue(publish);
-
-function publish(task, callback) {
-	const cardRequest = task.cardRequest;
-
-	checkIdentityUnique(cardRequest.identity)
-		.then(isUnique => {
-			if (!isUnique) {
-				return callback(errors.INVALID_IDENTITY());
-			}
-
-			virgilClient.publishCard(signCardRequest(cardRequest))
-				.then(card => {
-					callback(null, serializeCard(card));
-				})
-				.catch(e => {
-					logger.error('Failed to publish Virgil Card.', e);
-					callback(errors.VIRGIL_CARDS_ERROR());
-				});
-		})
-		.catch(e => {
-			logger.error('Failed to search Virgil Card.', e);
-			callback(errors.VIRGIL_CARDS_ERROR());
-		});
-}
+module.exports = {
+	register
+};
 
 function register(req, res, next) {
 	const csr = req.body.csr;
@@ -56,13 +34,57 @@ function register(req, res, next) {
 		return next(errors.MISSING_DEVICE_ID());
 	}
 
-	publishQueue.push({ cardRequest }, (err, result) => {
-		if (err) {
-			return next(err);
+	publish(cardRequest)
+		.then(result => res.status(200).send(result))
+		.catch(err => next(err));
+}
+
+function publish(cardRequest) {
+	return withLock(cardRequest.identity, lockTaken => {
+		if (!lockTaken) {
+			return Promise.reject(errors.INVALID_IDENTITY());
 		}
 
-		res.status(200).send(result);
+		return checkIdentityUnique(cardRequest.identity)
+			.then(isUnique => {
+				if (!isUnique) {
+					return Promise.reject(errors.INVALID_IDENTITY());
+				}
+
+				return virgilClient.publishCard(signCardRequest(cardRequest))
+					.then(serializeCard);
+			})
+			.catch(e => {
+				if (e instanceof errors.ApiError) {
+					return Promise.reject(e);
+				}
+
+				logger.error('Unexpected error Virgil Cards error', e);
+				return Promise.reject(errors.VIRGIL_CARDS_ERROR());
+			});
 	});
+}
+
+function withLock(identity, fn) {
+	function cleanup() {
+		unlockIdentity(identity)
+			.catch(e => {
+				logger.error('Failed to release identity lock', e);
+			});
+	}
+
+	return lockIdentity(identity)
+		.then(lockTaken => {
+			return Promise.resolve(fn(lockTaken));
+		})
+		.then(res => {
+			cleanup();
+			return res;
+		})
+		.catch(err => {
+			cleanup();
+			return Promise.reject(err);
+		});
 }
 
 function serializeCard(card) {
@@ -95,6 +117,28 @@ function signCardRequest(cardRequest) {
 	return cardRequest;
 }
 
-module.exports = {
-	register
-};
+function lockIdentity(identity) {
+	return new Promise((resolve, reject) => {
+		cache.add(identity, 1, 10, (err, res) => {
+			if (err) {
+				if (err.notStored) {
+					return resolve(false);
+				}
+				reject(err);
+			}
+			resolve(true);
+		});
+	});
+}
+
+function unlockIdentity(identity) {
+	return new Promise((resolve, reject) => {
+		cache.del(identity, (err, res) => {
+			if (err) {
+				return reject(new Error(err));
+			}
+
+			resolve(res);
+		})
+	})
+}

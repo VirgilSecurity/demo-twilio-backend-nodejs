@@ -18,6 +18,29 @@ test('setup', t => {
 	t.end();
 });
 
+test('two POST /users with same identity simultaneously', t => {
+	const identity = Math.random().toString(36).substr(2, 8);
+	const user1 = createUser(identity);
+	const user2 = createUser(identity);
+
+	Promise.all([
+		api.post('/v1/users')
+			.send({ csr: user1.csr }),
+		api.post('/v1/users')
+			.send({ csr: user2.csr })
+	]).then((responses) => {
+		const successResponse = responses.find(r => r.status === 200);
+		const errorResponse = responses.find(r => r.status === 400);
+
+		t.ok(successResponse, 'one of requests succeeded');
+		t.ok(errorResponse, 'one of requests failed');
+
+		t.ok(successResponse.body.virgil_card, 'virgil card published');
+		t.equal(errorResponse.body.errorCode, 40003, 'failed with expected error');
+		t.end();
+	});
+});
+
 test('POST /users', t => {
 	api.post('/v1/users')
 		.send({ csr: user.csr })
