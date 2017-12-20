@@ -75,15 +75,21 @@ function withLock(identity, fn) {
 
 	return lockIdentity(identity)
 		.then(lockTaken => {
-			return Promise.resolve(fn(lockTaken));
-		})
-		.then(res => {
-			cleanup();
-			return res;
-		})
-		.catch(err => {
-			cleanup();
-			return Promise.reject(err);
+			return Promise.resolve(fn(lockTaken))
+				.then(res => {
+					if (lockTaken) {
+						cleanup();
+					}
+					
+					return res;
+				})
+				.catch(err => {
+					if (lockTaken) {
+						cleanup();
+					}
+
+					return Promise.reject(err);
+				});
 		});
 }
 
