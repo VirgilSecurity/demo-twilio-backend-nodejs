@@ -1,7 +1,7 @@
 const Memcached = require('memcached');
 const logger = require('./logger');
 
-const servers = process.env.MEMCACHED_SERVERS ? process.env.MEMCACHED_SERVERS.split(/\s,\s/) : [];
+const servers = process.env.MEMCACHED_SERVERS ? process.env.MEMCACHED_SERVERS.split(/\s*,\s*/) : [];
 const client = new Memcached(
 	servers,
 	{
