@@ -1,5 +1,5 @@
 const bunyan = require('bunyan');
 
 module.exports = bunyan.createLogger({
-	name: 'virgil-twilio-demo'
+	name: 'demo-twilio-chat-server'
 });
