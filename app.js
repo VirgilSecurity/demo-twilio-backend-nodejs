@@ -1,6 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
 const helmet = require('helmet');
 const router = require('./services/router');
 const errors = require('./services/errors');
@@ -13,7 +12,6 @@ app.use(helmet());
 
 app.get('/health/status', healthController.status);
 
-app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(enableCORS);
 app.use('/v1', router);
