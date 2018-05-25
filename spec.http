@@ -1,0 +1,15 @@
+POST http://localhost:3000/get-virgil-jwt/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "identity": "test"
+}
+
+###
+
+POST http://localhost:3000/get-twilio-jwt/ HTTP/1.1
+Content-Type: application/json
+
+{
+    "identity": "test"
+}
