@@ -1,5 +1,5 @@
 import * as express from "express";
-import { JwtGenerator, CardManager } from "virgil-sdk";
+import { JwtGenerator, CardManager, VirgilCardVerifier, GeneratorJwtProvider, RawSignedModel } from "virgil-sdk";
 import { VirgilCrypto, VirgilAccessTokenSigner, VirgilCardCrypto } from "virgil-crypto";
 import { jwt } from "twilio";
 
@@ -22,23 +22,37 @@ const validateAuth: express.RequestHandler = (req, res, next) => {
     next();
 };
 
-const validateIdentity: express.RequestHandler = (req, res, next) => {
-    if (!req.body || !req.body.identity) {
+const validateParam = (param: string) : express.RequestHandler => (req, res, next) => {
+    if (!req.body || !req.body[param]) {
         return res.status(400).send("identity param is required");
     }
     next();
 };
 
-const crypto = new VirgilCrypto();
+const virgilCrypto = new VirgilCrypto();
+const cardCrypto = new VirgilCardCrypto();
+const cardVerifier = new VirgilCardVerifier(cardCrypto);
 
 const generator = new JwtGenerator({
     appId: APP_ID,
     apiKeyId: API_KEY_ID,
-    apiKey: crypto.importPrivateKey(API_KEY),
-    accessTokenSigner: new VirgilAccessTokenSigner(crypto)
+    apiKey: virgilCrypto.importPrivateKey(API_KEY),
+    accessTokenSigner: new VirgilAccessTokenSigner(virgilCrypto)
 });
 
-app.post("/get-virgil-jwt", validateIdentity, (req, res) => {
+const cardManager = new CardManager({
+    cardCrypto: cardCrypto,
+    cardVerifier: cardVerifier,
+    accessTokenProvider: new GeneratorJwtProvider(generator),
+    retryOnUnauthorized: true
+});
+
+app.post("/signup", validateParam('rawCard'), (req, res) => {
+    const rawCard = RawSignedModel.fromJson(req.body.rawCard);
+    cardManager.publishRawCard(rawCard).then((card) => res.json(card));
+});
+
+app.post("/get-virgil-jwt", validateParam('identity'), (req, res) => {
     res.json({ token: generator.generateToken(req.body.identity).toString() });
 });
 
@@ -49,7 +63,7 @@ const chatGrant = new ChatGrant({
     serviceSid: SERVICE_SID
 });
 
-app.post("/get-twilio-jwt", validateIdentity, (req, res) => {
+app.post("/get-twilio-jwt", validateParam('identity'), (req, res) => {
     const token = new AccessToken(TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET);
 
     token.identity = req.body.identity;
