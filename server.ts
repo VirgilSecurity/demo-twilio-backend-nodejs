@@ -1,7 +1,14 @@
 import * as express from "express";
-import { JwtGenerator, CardManager, VirgilCardVerifier, GeneratorJwtProvider, RawSignedModel } from "virgil-sdk";
+import {
+    JwtGenerator,
+    CardManager,
+    VirgilCardVerifier,
+    GeneratorJwtProvider,
+    RawSignedModel
+} from "virgil-sdk";
 import { VirgilCrypto, VirgilAccessTokenSigner, VirgilCardCrypto } from "virgil-crypto";
 import { jwt } from "twilio";
+import { VirgilPublicKey } from "virgil-crypto/dist/types/VirgilCrypto";
 
 const {
     APP_ID,
@@ -17,18 +24,15 @@ const app = express();
 
 app.use(express.json());
 
-const validateAuth: express.RequestHandler = (req, res, next) => {
-    console.log("HERE YOU CAN CHECK YOUR AUTHORIZATION WHICH IS OUT FROM DEMO SCOPE");
-    next();
-};
-
-const validateParam = (param: string) : express.RequestHandler => (req, res, next) => {
+const validateParam = (param: string): express.RequestHandler => (req, res, next) => {
     if (!req.body || !req.body[param]) {
         return res.status(400).send("identity param is required");
     }
     next();
 };
 
+
+// Virgil SDK configure
 const virgilCrypto = new VirgilCrypto();
 const cardCrypto = new VirgilCardCrypto();
 const cardVerifier = new VirgilCardVerifier(cardCrypto);
@@ -47,12 +51,45 @@ const cardManager = new CardManager({
     retryOnUnauthorized: true
 });
 
-app.post("/signup", validateParam('rawCard'), (req, res) => {
+// We are expect Authentication Header which represent cardId of user, timestamp and signature
+// of this data which truly identify user as the owner of this card
+const validateAuth: express.RequestHandler = (req, res, next) => {
+    if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
+        console.error(
+            "Token wasn't passed as a Bearer token in the Authorization header.",
+            "Make sure you authorize your request by providing the following HTTP header:",
+            "Authorization: Bearer cardId.unixTimestamp.signature(cardId.unixTimestamp)>"
+        );
+        res.status(401).send("Unauthorized");
+        return;
+    }
+
+    const [cardId, timestamp, signature] = req.headers.authorization.split("Bearer ")[1].split(".");
+    cardManager
+        .getCard(cardId)
+        .then(card => {
+            const message = cardId + "." + timestamp;
+            const isAuthenticated = virgilCrypto.verifySignature(
+                cardId,
+                signature,
+                card.publicKey as VirgilPublicKey
+            );
+            if (isAuthenticated) return next();
+            res.status(401).send("Unauthorized");
+        })
+        .catch(error => {
+            console.error("Error while verifying token:", error);
+            res.status(401).send("Unauthorized");
+        });
+    next();
+};
+
+app.post("/signup", validateParam("rawCard"), (req, res) => {
     const rawCard = RawSignedModel.fromJson(req.body.rawCard);
-    cardManager.publishRawCard(rawCard).then((card) => res.json(card));
+    cardManager.publishRawCard(rawCard).then(card => res.json(card));
 });
 
-app.post("/get-virgil-jwt", validateParam('identity'), (req, res) => {
+app.post("/get-virgil-jwt", validateAuth, validateParam("identity"), (req, res) => {
     res.json({ token: generator.generateToken(req.body.identity).toString() });
 });
 
@@ -63,7 +100,7 @@ const chatGrant = new ChatGrant({
     serviceSid: SERVICE_SID
 });
 
-app.post("/get-twilio-jwt", validateParam('identity'), (req, res) => {
+app.post("/get-twilio-jwt", validateAuth, validateParam("identity"), (req, res) => {
     const token = new AccessToken(TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET);
 
     token.identity = req.body.identity;

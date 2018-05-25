@@ -1,4 +1,5 @@
 POST http://localhost:3000/get-virgil-jwt/ HTTP/1.1
+Authorization: Bearer cardId.unixTimestamp.signature(cardId.unixTimestamp)
 Content-Type: application/json
 
 {
@@ -7,6 +8,7 @@ Content-Type: application/json
 
 ###
 POST http://localhost:3000/get-twilio-jwt/ HTTP/1.1
+Authorization: Bearer cardId.unixTimestamp.signature(cardId.unixTimestamp)
 Content-Type: application/json
 
 {
