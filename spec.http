@@ -6,6 +6,8 @@ Content-Type: application/json
     "identity": "test"
 }
 
+Response: ICard
+
 ###
 POST http://localhost:3000/get-twilio-jwt/ HTTP/1.1
 Authorization: Bearer cardId.unixTimestamp.signature(cardId.unixTimestamp)
@@ -15,10 +17,21 @@ Content-Type: application/json
     "identity": "test"
 }
 
+Response:
+{
+    "token": "string"
+}
+
+
 ###
 POST http://localhost:3000/signup HTTP/1.1
 Content-Type: application/json
 
 {
     "card": RawSignedModel.exportAsJson()
+}
+
+Response:
+{
+    "token": "string"
 }

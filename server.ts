@@ -21,7 +21,12 @@ const {
 } = require("./config.json");
 
 const app = express();
+const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
+    res.status(500);
+    res.render("error", { error: err });
+};
 
+app.use(errorHandler);
 app.use(express.json());
 
 const validateParam = (param: string): express.RequestHandler => (req, res, next) => {
@@ -30,7 +35,6 @@ const validateParam = (param: string): express.RequestHandler => (req, res, next
     }
     next();
 };
-
 
 // Virgil SDK configure
 const virgilCrypto = new VirgilCrypto();
@@ -68,25 +72,35 @@ const validateAuth: express.RequestHandler = (req, res, next) => {
     cardManager
         .getCard(cardId)
         .then(card => {
-            const message = cardId + "." + timestamp;
+            const message = cardId + '.' + timestamp;
+
             const isAuthenticated = virgilCrypto.verifySignature(
-                cardId,
+                message,
                 signature,
                 card.publicKey as VirgilPublicKey
             );
+            const currentTimestamp =  Math.floor(Date.now() / 1000);
+            const expireDate = currentTimestamp - (30 * 60);
+            if (+timestamp < expireDate) {
+                return res.status(401).send("Token max TTL 30 minutes")
+            }
             if (isAuthenticated) return next();
-            res.status(401).send("Unauthorized");
+            return res.status(401).send("Unauthorized");
         })
         .catch(error => {
             console.error("Error while verifying token:", error);
-            res.status(401).send("Unauthorized");
+            return res.status(401).send("Unauthorized");
         });
-    next();
 };
 
 app.post("/signup", validateParam("rawCard"), (req, res) => {
     const rawCard = RawSignedModel.fromJson(req.body.rawCard);
-    cardManager.publishRawCard(rawCard).then(card => res.json(card));
+    cardManager
+        .publishRawCard(rawCard)
+        .then(card => res.json(card))
+        .catch(() => {
+            res.status(500);
+        });
 });
 
 app.post("/get-virgil-jwt", validateAuth, validateParam("identity"), (req, res) => {
@@ -110,3 +124,5 @@ app.post("/get-twilio-jwt", validateAuth, validateParam("identity"), (req, res) 
 });
 
 app.listen(3000, () => console.log("server listening on http://localhost:3000/"));
+
+export default app;
