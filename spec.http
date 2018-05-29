@@ -6,7 +6,10 @@ Content-Type: application/json
     "identity": "test"
 }
 
-Response: ICard
+Response:
+{
+    "token": "string"
+}
 
 ###
 POST http://localhost:3000/get-twilio-jwt/ HTTP/1.1
@@ -33,5 +36,5 @@ Content-Type: application/json
 
 Response:
 {
-    "token": "string"
+    "virgil-card": cardManager.exportCardAsJson(card);
 }

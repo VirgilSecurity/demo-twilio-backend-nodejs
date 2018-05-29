@@ -97,7 +97,9 @@ app.post("/signup", validateParam("rawCard"), (req, res) => {
     const rawCard = RawSignedModel.fromJson(req.body.rawCard);
     cardManager
         .publishRawCard(rawCard)
-        .then(card => res.json(card))
+        .then(card => res.json({
+            virgil_card: cardManager.exportCardAsJson(card);
+        }))
         .catch(() => {
             res.status(500);
         });
