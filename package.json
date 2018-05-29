@@ -5,9 +5,9 @@
   "main": "server.js",
   "scripts": {
     "compile": "npx tsc -p ./",
-    "start": "npm run compile && node server.js",
-    "serve": "nodemon --exec ts-node -- ./server.ts",
-    "test": "mocha -r ts-node/register tests/*.test.ts"
+    "start": "npm run compile && node ./server/server.js",
+    "serve": "nodemon --exec ts-node -- ./server/server.ts",
+    "test": "mocha -r ts-node/register ./server/tests/*.test.ts"
   },
   "author": "",
   "license": "ISC",

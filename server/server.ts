@@ -10,31 +10,47 @@ import { VirgilCrypto, VirgilAccessTokenSigner, VirgilCardCrypto } from "virgil-
 import { jwt } from "twilio";
 import { VirgilPublicKey } from "virgil-crypto/dist/types/VirgilCrypto";
 
-const {
-    APP_ID,
-    API_KEY_ID,
-    API_KEY,
-    TWILIO_ACCOUNT_SID,
-    TWILIO_API_KEY,
-    TWILIO_API_SECRET,
-    SERVICE_SID
-} = require("./config.json");
+let config;
 
-const app = express();
+try {
+    config = require("../config.json");
+} catch (e) {
+    if (!config) {
+        throw Error("You need to put config.json from Virgil Dashboard file in project directory");
+    }
+}
+
+// Check config json params
+const params = [
+    "APP_ID",
+    "API_KEY_ID",
+    "API_KEY",
+    "TWILIO_ACCOUNT_SID",
+    "TWILIO_API_KEY",
+    "TWILIO_API_SECRET",
+    "TWILIO_SERVICE_SID"
+];
+
+params.forEach(param => {
+    if (!config[param]) throw Error(param + " is missing in config.json");
+});
+
 const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
     res.status(500);
     res.render("error", { error: err });
 };
 
-app.use(errorHandler);
-app.use(express.json());
-
 const validateParam = (param: string): express.RequestHandler => (req, res, next) => {
     if (!req.body || !req.body[param]) {
-        return res.status(400).send("identity param is required");
+        return res.status(400).send(param + " param is required");
     }
     next();
 };
+
+const app = express();
+
+app.use(errorHandler);
+app.use(express.json());
 
 // Virgil SDK configure
 const virgilCrypto = new VirgilCrypto();
@@ -42,9 +58,9 @@ const cardCrypto = new VirgilCardCrypto();
 const cardVerifier = new VirgilCardVerifier(cardCrypto);
 
 const generator = new JwtGenerator({
-    appId: APP_ID,
-    apiKeyId: API_KEY_ID,
-    apiKey: virgilCrypto.importPrivateKey(API_KEY),
+    appId: config.APP_ID,
+    apiKeyId: config.API_KEY_ID,
+    apiKey: virgilCrypto.importPrivateKey(config.API_KEY),
     accessTokenSigner: new VirgilAccessTokenSigner(virgilCrypto)
 });
 
@@ -72,18 +88,18 @@ const validateAuth: express.RequestHandler = (req, res, next) => {
     cardManager
         .getCard(cardId)
         .then(card => {
-            const message = cardId + '.' + timestamp;
+            const message = cardId + "." + timestamp;
 
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            const expireDate = currentTimestamp - 30 * 60;
+            if (+timestamp < expireDate) {
+                return res.status(401).send("Token max TTL 30 minutes");
+            }
             const isAuthenticated = virgilCrypto.verifySignature(
                 message,
                 signature,
                 card.publicKey as VirgilPublicKey
             );
-            const currentTimestamp =  Math.floor(Date.now() / 1000);
-            const expireDate = currentTimestamp - (30 * 60);
-            if (+timestamp < expireDate) {
-                return res.status(401).send("Token max TTL 30 minutes")
-            }
             if (isAuthenticated) return next();
             return res.status(401).send("Unauthorized");
         })
@@ -97,9 +113,11 @@ app.post("/signup", validateParam("rawCard"), (req, res) => {
     const rawCard = RawSignedModel.fromJson(req.body.rawCard);
     cardManager
         .publishRawCard(rawCard)
-        .then(card => res.json({
-            virgil_card: cardManager.exportCardAsJson(card)
-        }))
+        .then(card =>
+            res.json({
+                virgil_card: cardManager.exportCardAsJson(card)
+            })
+        )
         .catch(() => {
             res.status(500);
         });
@@ -113,11 +131,15 @@ app.post("/get-virgil-jwt", validateAuth, validateParam("identity"), (req, res) 
 const AccessToken = jwt.AccessToken;
 const ChatGrant = AccessToken.ChatGrant;
 const chatGrant = new ChatGrant({
-    serviceSid: SERVICE_SID
+    serviceSid: config.TWILIO_SERVICE_SID
 });
 
 app.post("/get-twilio-jwt", validateAuth, validateParam("identity"), (req, res) => {
-    const token = new AccessToken(TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET);
+    const token = new AccessToken(
+        config.TWILIO_ACCOUNT_SID,
+        config.TWILIO_API_KEY,
+        config.TWILIO_API_SECRET
+    );
 
     token.identity = req.body.identity;
     token.addGrant(chatGrant);

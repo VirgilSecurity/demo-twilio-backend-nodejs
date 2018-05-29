@@ -10,5 +10,5 @@
         "lib": ["es6", "es2016.array.include"],
         "types" : [ "node", "express" ]
     },
-    "files": ["server.ts"]
+    "files": ["./server/server.ts"]
 }

@@ -46,10 +46,11 @@ describe("POST /signup", function() {
             })
             .then(res => {
                 assert.equal(res.status, 200);
-                assert.typeOf(res.data.id, "string");
+                assert.typeOf(res.data.virgil_card, "object");
+                const card = cardManager.importCardFromJson(res.data.virgil_card);
                 privateKey = keyPair.privateKey;
 
-                cardId = res.data.id;
+                cardId = card.id;
 
                 done();
             })

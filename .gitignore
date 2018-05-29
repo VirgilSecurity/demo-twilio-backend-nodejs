@@ -61,5 +61,6 @@ server.js
 server.js.map
 client/**/*.js
 client/**/*.js.map
+config.json
 
 *.DS_Store

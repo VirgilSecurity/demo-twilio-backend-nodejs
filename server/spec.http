@@ -31,10 +31,10 @@ POST http://localhost:3000/signup HTTP/1.1
 Content-Type: application/json
 
 {
-    "card": RawSignedModel.exportAsJson()
+    "rawCard": RawSignedModel.exportAsJson()
 }
 
 Response:
 {
-    "virgil-card": cardManager.exportCardAsJson(card);
+    "virgil_card": cardManager.exportCardAsJson(card);
 }
