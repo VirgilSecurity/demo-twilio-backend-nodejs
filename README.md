@@ -2,9 +2,6 @@
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
 
-
-- [Quickstart Guide](/docs)
-
 ## Clone & Configurate
 
 Clone the repository from our GitHub.
@@ -32,7 +29,7 @@ Set Twilio & Virgil environment variables declared in `config.json` file.
 | TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/console)        |
 | TWILIO_API_KEY                    | Used to authenticate to Twilio - [generate one here](https://www.twilio.com/console/chat/runtime/api-keys). |
 | TWILIO_API_SECRET                 | Used to authenticate to Twilio - just like the above, [you'll get one here.](https://www.twilio.com/console/chat/runtime/api-keys) |
-| SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
+| TWILIO_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
 
 ## Install & Start
 
