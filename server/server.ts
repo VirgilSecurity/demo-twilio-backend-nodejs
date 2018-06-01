@@ -89,7 +89,9 @@ const validateAuth: express.RequestHandler = (req, res, next) => {
         .getCard(cardId)
         .then(card => {
             const message = cardId + "." + timestamp;
-
+            // client send us his cardId and timestamp which signed with his private key
+            // so we can check that he is the owner of that token
+            // and if token was compromised it will be valid for 30 minutes
             const currentTimestamp = Math.floor(Date.now() / 1000);
             const expireDate = currentTimestamp - 30 * 60;
             if (+timestamp < expireDate) {
@@ -111,20 +113,30 @@ const validateAuth: express.RequestHandler = (req, res, next) => {
 
 app.post("/signup", validateParam("rawCard"), (req, res) => {
     let resCard = req.body.rawCard;
-    if (typeof req.body.rawCard === 'string') {
+    if (typeof req.body.rawCard === "string") {
+        // if card sent in JSON string representation
         resCard = JSON.parse(resCard);
     }
+    // we can publish rawCard created on client and than client can use his
+    // private key to sign and encrypt information
     const rawCard = RawSignedModel.fromJson(resCard);
-    cardManager
-        .publishRawCard(rawCard)
-        .then(card =>
-            res.json({
-                virgil_card: cardManager.exportCardAsJson(card)
-            })
-        )
-        .catch(() => {
-            res.status(500);
-        });
+    const identity = JSON.parse(rawCard.contentSnapshot.toString()).identity;
+
+    // at first we search cards with this identity to ensure it is not taken
+    return cardManager
+        .searchCards(identity)
+        .then(cards => {
+            if (cards.length > 0) {
+                return res.status(400).send("Card with this identity already exists");
+            }
+            // then we publish it and return to client as JSON
+            return cardManager.publishRawCard(rawCard).then(card =>
+                res.json({
+                    virgil_card: cardManager.exportCardAsJson(card)
+                })
+            );
+        })
+        .catch(() => res.status(500));
 });
 
 app.post("/get-virgil-jwt", validateAuth, validateParam("identity"), (req, res) => {
