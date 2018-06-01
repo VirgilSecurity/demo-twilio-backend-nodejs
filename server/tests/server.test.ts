@@ -30,6 +30,7 @@ const getAuthorizationHeader = () => {
 
     return `Bearer ${message}.${signature.toString("base64")}`;
 };
+
 describe("POST /signup", function() {
     it("should return created virgil card", function(done) {
         const keyPair = new VirgilCrypto().generateKeys();
@@ -56,9 +57,7 @@ describe("POST /signup", function() {
             })
             .catch(done);
     });
-});
 
-describe("POST /signup", function() {
     it("should return created virgil card (JSON string rawCard)", function(done) {
         const keyPair = new VirgilCrypto().generateKeys();
 
@@ -79,6 +78,42 @@ describe("POST /signup", function() {
                 done();
             })
             .catch(done);
+    });
+});
+
+describe("POST /signin", function() {
+    it("should return created virgil card", function(done) {
+        request
+            .post("signin/", {
+                identity: "test_uniq"
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
+                assert.typeOf(res.data.virgil_card, "object");
+                const card = cardManager.importCardFromJson(res.data.virgil_card);
+                done();
+            })
+            .catch(done);
+    });
+    it("should return 400 when card doesn't exist", function(done) {
+        request
+            .post("signin/", {
+                identity: "test_not_defined"
+            })
+            .catch(error => {
+                assert.equal(error.response.status, 400);
+                done();
+            });
+    });
+    it("should return 400 when more then one card", function(done) {
+        request
+            .post("signin/", {
+                identity: "test"
+            })
+            .catch((err) =>  {
+                assert.equal(err.response.status, 400);
+                done();
+            });
     });
 });
 

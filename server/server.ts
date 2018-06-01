@@ -139,6 +139,23 @@ app.post("/signup", validateParam("rawCard"), (req, res) => {
         .catch(() => res.status(500));
 });
 
+app.post("/signin", validateParam("identity"), (req, res) => {
+    return cardManager
+        .searchCards(req.body.identity)
+        .then(cards => {
+            if (!cards.length) {
+                return res.status(400).send("Card with this identity don't exists");
+            }
+            if (cards.length > 1) {
+                return res.status(400).send("There are more then one card with this identity");
+            }
+            res.json({
+                virgil_card: cardManager.exportCardAsJson(cards[0])
+            })
+        })
+});
+
+
 app.post("/get-virgil-jwt", validateAuth, validateParam("identity"), (req, res) => {
     res.json({ token: generator.generateToken(req.body.identity).toString() });
 });
