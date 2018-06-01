@@ -110,7 +110,11 @@ const validateAuth: express.RequestHandler = (req, res, next) => {
 };
 
 app.post("/signup", validateParam("rawCard"), (req, res) => {
-    const rawCard = RawSignedModel.fromJson(req.body.rawCard);
+    let resCard = req.body.rawCard;
+    if (typeof req.body.rawCard === 'string') {
+        resCard = JSON.parse(resCard);
+    }
+    const rawCard = RawSignedModel.fromJson(resCard);
     cardManager
         .publishRawCard(rawCard)
         .then(card =>

@@ -58,6 +58,30 @@ describe("POST /signup", function() {
     });
 });
 
+describe("POST /signup", function() {
+    it("should return created virgil card (JSON string rawCard)", function(done) {
+        const keyPair = new VirgilCrypto().generateKeys();
+
+        const card = cardManager.generateRawCard({
+            privateKey: keyPair.privateKey,
+            publicKey: keyPair.publicKey,
+            identity: "test"
+        });
+
+        request
+            .post("signup/", {
+                rawCard: JSON.stringify(card.exportAsJson())
+            })
+            .then(res => {
+                assert.equal(res.status, 200);
+                assert.typeOf(res.data.virgil_card, "object");
+                const card = cardManager.importCardFromJson(res.data.virgil_card);
+                done();
+            })
+            .catch(done);
+    });
+});
+
 describe("CHECK AUTH get-virgil-jwt/ and get-twilio-jwt/", function() {
     it("should allow request, if token is fresh", function(done) {
         request
