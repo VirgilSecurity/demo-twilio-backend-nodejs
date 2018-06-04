@@ -13,7 +13,7 @@ $ git clone git@github.com:VirgilSecurity/demo-twilio-chat-js.git
 Then, rename configuration file ```config.json``` file using next command:
 
 ```
-$ cd ./virgil-demo-twilio
+$ cd ./demo-twilio-chat-js
 $ cp ./config.example.json ./config.json
 ```
 
