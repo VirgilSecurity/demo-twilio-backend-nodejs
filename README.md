@@ -7,7 +7,7 @@ With these instructions, you'll learn how to install and integrate the Virgil Se
 Clone the repository from our GitHub.
 
 ```
-$ git clone git@github.com:VirgilSecurity/demo-twilio-chat-js.git
+$ git clone https://github.com/VirgilSecurity/demo-twilio-chat-js.git
 ```
 
 Then, rename configuration file ```config.json``` file using next command:
