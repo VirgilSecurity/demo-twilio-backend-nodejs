@@ -9,8 +9,12 @@
     "serve": "nodemon --exec ts-node -- ./server/server.ts",
     "test": "mocha -r ts-node/register ./server/tests/*.test.ts"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Virgil Security Inc. <support@virgilsecurity.com>",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VirgilSecurity/demo-twilio-chat-js"
+  },
   "dependencies": {
     "core-js": "^2.5.1",
     "express": "^4.16.3",
