@@ -15,7 +15,7 @@
     "core-js": "^2.5.1",
     "express": "^4.16.3",
     "twilio": "^3.17.0",
-    "virgil-crypto": "^3.0.0-alpha.11",
+    "virgil-crypto": "^3.0.0-alpha.12",
     "virgil-sdk": "^5.0.0-alpha.2"
   },
   "devDependencies": {
