@@ -11,7 +11,7 @@ Response:
 }
 
 ###
-POST http://localhost:3000/signup HTTP/1.1
+POST http://localhost:3000/signin HTTP/1.1
 Content-Type: application/json
 
 {
