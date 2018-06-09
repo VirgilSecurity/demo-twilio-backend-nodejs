@@ -1,6 +1,9 @@
-# Virgil & Twilio Programmable Chat
+# Virgil & Twilio Programmable Chat Backend
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
+
+> This demo contains only node.js server. For the client-side you can check our [ios](https://github.com/VirgilSecurity/chat-twilio-ios/tree/sample-v5) and [android](https://github.com/VirgilSecurity/demo-twilio-chat-android) repos.
+
 
 ## Clone & Configurate
 
