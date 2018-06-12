@@ -180,6 +180,8 @@ app.post("/get-twilio-jwt", validateAuth, validateParam("identity"), (req, res) 
     res.json({ token: token.toJwt() });
 });
 
+app.get("/_service/status", (req, res) => res.send("ok"))
+
 app.listen(3000, () => console.log("server listening on http://localhost:3000/"));
 
 export default app;

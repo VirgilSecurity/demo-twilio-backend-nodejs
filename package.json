@@ -4,7 +4,8 @@
   "description": "Virgil Security Twilio Integration",
   "main": "server.js",
   "scripts": {
-    "start": "node ./server/server.js",
+    "compile": "tsc -p ./",
+    "start": "npm run compile && node ./server/server.js",
     "serve": "nodemon --exec ts-node -- ./server/server.ts",
     "test": "mocha -r ts-node/register ./server/tests/*.test.ts"
   },
