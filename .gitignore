@@ -64,3 +64,4 @@ client/**/*.js.map
 config.json
 
 *.DS_Store
+dist/*

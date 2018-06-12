@@ -5,10 +5,18 @@
         "moduleResolution": "node",
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
+        "esModuleInterop": true,
         "removeComments": false,
         "noImplicitAny": false,
         "lib": ["es6", "es2016.array.include"],
-        "types" : [ "node", "express" ]
+        "types" : [ "node", "express" ],
+        "resolveJsonModule": true,
+        "rootDir": ".",
+        "outDir": "dist/",
+        "baseUrl": "./"
     },
-    "files": ["./server/server.ts"]
+    "files": ["./api/index.ts", "./bin/server.ts"],
+    "include": [
+		"./**/*"
+	]
 }
