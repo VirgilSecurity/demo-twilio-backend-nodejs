@@ -1,0 +1,28 @@
+---
+sudo: required
+
+services:
+  - docker
+env:
+  global:
+    - GIT_COMMIT=$TRAVIS_COMMIT
+    - GIT_BRANCH=$TRAVIS_BRANCH
+
+before_install:
+  - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD virgilsecurity-docker-core.bintray.io
+
+install:
+  - echo $GIT_COMMIT $GIT_BRANCH
+
+script:
+  - make docker
+  - make docker_registry_tag
+
+after_success:
+  - make docker_inspect
+  - make docker_registry_push
+
+branches:
+  only:
+  - master
+  - /^v\d+/
