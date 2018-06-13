@@ -5,9 +5,9 @@
   "main": "server.js",
   "scripts": {
     "compile": "npx tsc -p ./",
-    "start": "npm run compile && node ./dist/bin/server.js",
-    "serve": "nodemon  -- ./bin/server.ts",
-    "tutorial": "npm run compile && node ./bin/interactive.js",
+    "start": "npm run compile && node ./bin/server.js",
+    "serve": "nodemon  -- ./bin/server.js",
+    "tutorial": "node ./bin/interactive.js",
     "test": "mocha --timeout 5000 -r ts-node/register ./tests/*.test.ts"
   },
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",

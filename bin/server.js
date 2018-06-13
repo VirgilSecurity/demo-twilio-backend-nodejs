@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-const app = require('../api');
+const app = require('../dist/api').default;
 const http = require('http');
 
 /**
@@ -86,5 +86,5 @@ function onListening() {
         'pipe ' + addr :
         'port ' + addr.port;
 
-    console.log('server listening on ', bind)
+    console.log('server listening on http://localhost:' + port)
 }

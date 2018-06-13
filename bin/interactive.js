@@ -15,6 +15,24 @@ const tokenValidator = (prefix, variable) => (value) => {
 const questions = [
     {
         type: "input",
+        name: "APP_ID",
+        message: `Paste here a virgil ${chalk.magenta("APPLICATION ID")}
+you can create app: https://dashboard.virgilsecurity.com/ \n>`,
+    },
+    {
+        type: "input",
+        name: "API_KEY",
+        message: `Paste here a virgil ${chalk.magenta("API KEY")}
+you can create api key here: https://dashboard.virgilsecurity.com/api-keys/ \n>`,
+    },
+    {
+        type: "input",
+        name: "API_KEY_ID",
+        message: `Paste here a virgil ${chalk.magenta("KEY ID")}
+you can copy api key here: https://dashboard.virgilsecurity.com/api-keys/ \n>`,
+    },
+    {
+        type: "input",
         name: "TWILIO_ACCOUNT_SID",
         message: `Paste here a twilio ${chalk.magenta("ACCOUNT SID")} (string that starts with "AC")
 you can find it on: https://www.twilio.com/console \n>`,
@@ -56,8 +74,7 @@ if (!fs.existsSync(configPath)) {
     fs.copyFileSync(configExamplePath, configPath);
 }
 
-let config = fs.readFileSync(configPath, "utf8");
-config = JSON.parse(config);
+let config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
 const missingParams = validateConfig(config);
 
@@ -71,5 +88,5 @@ console.log(`Hello, there ${missingParamsQuestions.length} steps left to complet
 inquirer.prompt(missingParamsQuestions).then(answers => {
     const newConfig = JSON.stringify(Object.assign(config, answers), null, 4);
     fs.writeFileSync(configPath, newConfig);
-    exec('npm run compile', () => require("../dist/bin/server"));
+    exec('npm run compile', () => require("./server"));
 });
