@@ -1,24 +1,10 @@
 import express from "express";
-import config from '../config.json';
 import router from "./routes";
+import { validateConfig } from "../utils/validateConfig";
+import config from '../config.json';
 
-if (!config) {
-    throw Error("You need to put config.json from Virgil Dashboard file in project directory");
-}
-
-// Check config json params
-const params = [
-    "APP_ID",
-    "API_KEY_ID",
-    "API_KEY",
-    "TWILIO_ACCOUNT_SID",
-    "TWILIO_API_KEY",
-    "TWILIO_API_SECRET",
-    "TWILIO_SERVICE_SID"
-];
-
-params.forEach(param => {
-    if (!config[param]) throw Error(param + " is missing in config.json");
+validateConfig(config).forEach(param => {
+    if (!param) throw Error(param + " is missing in config.json");
 });
 
 const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {

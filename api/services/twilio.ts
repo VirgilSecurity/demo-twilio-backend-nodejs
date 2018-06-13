@@ -1,5 +1,5 @@
 import { jwt } from "twilio";
-import config from '../../config.json'
+import config from '../../config.json';
 
 const AccessToken = jwt.AccessToken;
 const ChatGrant = AccessToken.ChatGrant;

@@ -3,7 +3,6 @@ import { cardManager, virgilCrypto } from '../services/virgil';
 import { VirgilPublicKey } from 'virgil-crypto/dist/types/VirgilCrypto';
 
 export const validateAuth: express.RequestHandler = (req, res, next) => {
-    console.log('req.', req.headers)
     if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
         console.error(
             "Token wasn't passed as a Bearer token in the Authorization header.",

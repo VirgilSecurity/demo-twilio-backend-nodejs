@@ -2,8 +2,7 @@ import express from 'express';
 import { cardManager } from '../services/virgil';
 import { RawSignedModel } from 'virgil-sdk';
 
-export const signUp: express.RequestHandler = function signUp(req, res) {
-    console.log('req.body', req.body)
+export const signUp: express.RequestHandler = (req, res) => {
     let reqCard = req.body.rawCard;
     if (typeof reqCard === "string") {
         // if card sent in JSON string representation
