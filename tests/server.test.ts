@@ -38,7 +38,7 @@ describe("POST /signup", function() {
         const card = cardManager.generateRawCard({
             privateKey: keyPair.privateKey,
             publicKey: keyPair.publicKey,
-            identity: "test" + Math.random()
+            identity: "test" + Date.now()
         });
 
         request
@@ -64,7 +64,7 @@ describe("POST /signup", function() {
         const card = cardManager.generateRawCard({
             privateKey: keyPair.privateKey,
             publicKey: keyPair.publicKey,
-            identity: "test" + Math.random()
+            identity: "test" + Date.now()
         });
 
         request

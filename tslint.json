@@ -38,7 +38,6 @@
         "triple-equals": [ true, "allow-null-check" ],
         "typedef": [
             true,
-            "parameter",
             "property-declaration"
         ],
         "variable-name": [true, "ban-keywords", "check-format", "allow-leading-underscore", "allow-pascal-case"]

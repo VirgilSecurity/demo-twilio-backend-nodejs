@@ -1,7 +1,7 @@
 import express from 'express';
 import { cardManager } from '../services/virgil';
 
-export const signIn: express.RequestHandler = function signIn(req, res) {
+export const signIn: express.RequestHandler = (req, res) => {
     return cardManager
         .searchCards(req.body.identity)
         .then(cards => {
