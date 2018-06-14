@@ -13,13 +13,11 @@ Clone the repository from our GitHub.
 $ git clone https://github.com/VirgilSecurity/demo-twilio-chat-js.git
 ```
 
-Put configuration file ```config.json``` from dashboard if you download one or skip this step if you haven't
-
 ## Install & Start
 
-Install all the package dependencies and start the application using next commands:
+Put configuration file ```config.json``` from dashboard if you downloaded one or skip this step if you haven't.
 
-> **IMPORTANT** Make sure you set the variables in `config.json` before you try to start the server. It won't work without these.
+Install all the package dependencies and start the application using next commands:
 
 ```
 $ npm install
