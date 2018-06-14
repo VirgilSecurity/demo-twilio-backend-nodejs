@@ -1,11 +1,5 @@
 import express from "express";
 import router from "./routes";
-import { validateConfig } from "../utils/validateConfig";
-import config from '../config.json';
-
-validateConfig(config).forEach(param => {
-    if (!param) throw Error(param + " is missing in config.json");
-});
 
 const errorHandler: express.ErrorRequestHandler = (err, req, res, next) => {
     res.status(500);
