@@ -1,4 +1,4 @@
-# Virgil & Twilio Programmable Chat Backend
+# Virgil & Twilio Programmable Chat Backend (Interactive Version)
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
 
@@ -13,14 +13,21 @@ Clone the repository from our GitHub.
 $ git clone https://github.com/VirgilSecurity/demo-twilio-chat-js.git
 ```
 
-Then, rename configuration file ```config.json``` file using next command:
+Put configuration file ```config.json``` from dashboard if you download one or skip this step if you haven't
+
+## Install & Start
+
+Install all the package dependencies and start the application using next commands:
+
+> **IMPORTANT** Make sure you set the variables in `config.json` before you try to start the server. It won't work without these.
 
 ```
-$ cd ./demo-twilio-chat-js
-$ cp ./config.example.json ./config.json
+$ npm install
+$ npm run interactive
 ```
 
-Set Twilio & Virgil environment variables declared in `config.json` file.
+## config.json content
+
 
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
@@ -31,14 +38,3 @@ Set Twilio & Virgil environment variables declared in `config.json` file.
 | TWILIO_API_KEY                    | SID of Twilio Api Key. Used for authentication on twilio services. Generated with TWILIO_API_SECRET|
 | TWILIO_API_SECRET                 | Private part of Api Key. **Available only after creation** - [you can generate one here](https://www.twilio.com/console/chat/runtime/api-keys). |
 | TWILIO_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
-
-## Install & Start
-
-Install all the package dependencies and start the application using next commands:
-
-> **IMPORTANT** Make sure you set the variables in `config.json` before you try to start the server. It won't work without these.
-
-```
-$ npm install
-$ npm start
-```

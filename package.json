@@ -7,7 +7,7 @@
     "compile": "npx tsc -p ./",
     "start": "npm run compile && node ./bin/server.js",
     "serve": "nodemon  -- ./bin/server.js",
-    "tutorial": "node ./bin/interactive.js",
+    "interactive": "node ./bin/interactive.js",
     "test": "mocha --timeout 5000 -r ts-node/register ./tests/*.test.ts"
   },
   "author": "Virgil Security Inc. <support@virgilsecurity.com>",
