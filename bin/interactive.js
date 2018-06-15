@@ -6,11 +6,13 @@ const exec = require("child_process").exec;
 const validateConfig = require("../utils/validateConfig").validateConfig;
 
 const tokenValidator = (prefix, variable) => (value) => {
-    const pass = value.match(new RegExp(`^${prefix}[\\d\\w]{32}$`));
+    const pass = value.trim().match(new RegExp(`^${prefix}[\\d\\w]{32}$`));
     if (pass) return true;
 
     return `Wrong ${variable}, key scheme: ${prefix}XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`;
 };
+
+const validateNotEmpty = (value) => value.trim() !== '' ? true : 'Please paste non-empty string with parameter value';
 
 const questions = [
     {
@@ -18,25 +20,28 @@ const questions = [
         name: "APP_ID",
         message: `Paste here a virgil ${chalk.magenta("APPLICATION ID")}
 you can create app: https://dashboard.virgilsecurity.com/ \n>`,
+        validate: validateNotEmpty
     },
     {
         type: "input",
         name: "API_KEY",
         message: `Paste here a virgil ${chalk.magenta("API KEY")}
 you can create api key here: https://dashboard.virgilsecurity.com/api-keys/ \n>`,
+        validate: validateNotEmpty
     },
     {
         type: "input",
         name: "API_KEY_ID",
         message: `Paste here a virgil ${chalk.magenta("KEY ID")}
 you can copy api key here: https://dashboard.virgilsecurity.com/api-keys/ \n>`,
+        validate: validateNotEmpty
     },
     {
         type: "input",
         name: "TWILIO_ACCOUNT_SID",
         message: `Paste here a twilio ${chalk.magenta("ACCOUNT SID")} (string that starts with "AC")
 you can find it on: https://www.twilio.com/console \n>`,
-        validate: tokenValidator("AC", "account SID")
+        validate: tokenValidator("AC", "account SID"),
     },
     {
         type: "input",
@@ -45,7 +50,7 @@ you can find it on: https://www.twilio.com/console \n>`,
 1. Open https://www.twilio.com/console/chat/runtime/api-keys/create
 2. Input friendly name and select 'Standard' key
 3. Paste SECRET \n>`,
-        validate: value => (value.length === 32 ? true : "API SECRET have 32 symbols length")
+        validate: value => (value.trim().length === 32 ? true : "API SECRET have 32 symbols length")
     },
     {
         type: "input",
