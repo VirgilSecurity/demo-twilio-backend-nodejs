@@ -1,4 +1,4 @@
-# Virgil & Twilio Programmable Chat Backend (Interactive Version)
+# Demo Virgil & Twilio E2EE Chat - Backend
 
 With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
 
