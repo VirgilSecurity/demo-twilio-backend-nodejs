@@ -1,38 +1,39 @@
 # Demo Virgil & Twilio E2EE Chat - Backend
 
-With these instructions, you'll learn how to install and integrate the Virgil Security to Twilio Programmable Chat API.
+Follow these instructions to install a sample Node backend for Virgil Security's end-to-end encrypted messaging SDK for Twilio's Programmable Chat API. This sample backend is necessary for the client/mobile apps to work: it generates user tokens for Twilio's and Virgil's APIs.
 
-> This demo contains only node.js server. For the client-side you can check our [ios](https://github.com/VirgilSecurity/chat-twilio-ios/tree/sample-v5) and [android](https://github.com/VirgilSecurity/demo-twilio-chat-android) repos.
+> Client/mobile apps: [ios](https://github.com/VirgilSecurity/chat-twilio-ios/tree/sample-v5) and [android](https://github.com/VirgilSecurity/demo-twilio-chat-android).
 
 
-## Clone & Configurate
+## Clone & Configure
 
-Clone the repository from our GitHub.
+Clone the repository from GitHub.
 
 ```
 $ git clone https://github.com/VirgilSecurity/demo-twilio-chat-js.git
 ```
 
-## Install & Start
+## Download your Virgil app config
 
-Put configuration file ```config.json``` from dashboard if you downloaded one or skip this step if you haven't.
+If you don't yet have a Virgil account, [sign up for one](https://VirgilSecurity.com/getstarted).
 
-Install all the package dependencies and start the application using next commands:
+Create a new app, download the app's ```config.json``` file from the app's page and copy it into the root of this node sample.
+
+## Add your Twilio account data to config.json
+
+| Variable Name                     | Description                    |
+|-----------------------------------|--------------------------------|
+| APP_ID                   | This is your Virgil app's ID - no need to touch it |
+| API_KEY                  | This is your Virgil API key - no need to touch it |
+| API_KEY_ID               | This is your Virgil API key ID - no need to touch it |
+| TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/console)        |
+| TWILIO_API_KEY                    | SID of Twilio Api Key. Used for authentication on twilio services. Generated with TWILIO_API_SECRET|
+| TWILIO_API_SECRET                 | Twilio API key secret: [generate one here](https://www.twilio.com/console/chat/runtime/api-keys) |
+| TWILIO_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
+
+## Install dependencies and run the app
 
 ```
 $ npm install
 $ npm run interactive
 ```
-
-## config.json content
-
-
-| Variable Name                     | Description                    |
-|-----------------------------------|--------------------------------|
-| APP_ID                   | Used to specify uniqueness and identifies your application in Virgil Security services. |
-| API_KEY                  | Generated string that allows you to create JWT needed for access to Virgil Security Services. You can [create one here](https://dashboard.virgilsecurity.com/api-keys). **Remember, you will be able to save it only after creation of Api Key.** |
-| API_KEY_ID               | Api Key Id from Virgil Security Dashboard |
-| TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/console)        |
-| TWILIO_API_KEY                    | SID of Twilio Api Key. Used for authentication on twilio services. Generated with TWILIO_API_SECRET|
-| TWILIO_API_SECRET                 | Private part of Api Key. **Available only after creation** - [you can generate one here](https://www.twilio.com/console/chat/runtime/api-keys). |
-| TWILIO_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
