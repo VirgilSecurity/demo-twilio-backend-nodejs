@@ -5,7 +5,7 @@ Follow these instructions to install a sample Node backend for Virgil Security's
 > Client/mobile apps: [ios](https://github.com/VirgilSecurity/chat-twilio-ios/tree/sample-v5) and [android](https://github.com/VirgilSecurity/demo-twilio-chat-android).
 
 
-## Clone & Configurate
+## Clone & Configure
 
 Clone the repository from GitHub.
 
