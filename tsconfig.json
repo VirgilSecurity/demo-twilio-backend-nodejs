@@ -11,8 +11,16 @@
         "lib": ["es6", "es2016.array.include"],
         "types" : [ "node", "express" ],
         "outDir": "dist/",
-        "rootDir": "./",
-        "resolveJsonModule": true
+        "rootDir": ".",
+        "resolveJsonModule": true,
+        "baseUrl": "./api",
+        "paths": {
+            "controllers*": ["controllers*"],
+            "models*": ["models*"],
+            "routes*": ["routes*"],
+            "services*": ["services*"],
+            "tests*": ["tests*"],
+        }
     },
-    "files": ["./api/index.ts"],
+    "include": ["./api/**/*"],
 }
