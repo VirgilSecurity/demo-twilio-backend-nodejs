@@ -8,7 +8,7 @@
         "esModuleInterop": true,
         "removeComments": false,
         "noImplicitAny": false,
-        "lib": ["es6", "es2016.array.include"],
+        "lib": ["es6", "dom", "es2016.array.include"],
         "types" : [ "node", "express" ],
         "outDir": "dist/",
         "rootDir": ".",
