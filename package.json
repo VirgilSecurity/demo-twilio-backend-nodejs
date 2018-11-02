@@ -21,7 +21,7 @@
     "express": "^4.16.3",
     "joi": "^13.6.0",
     "mongodb": "^3.1.4",
-    "twilio": "^3.17.0",
+    "twilio": "^3.23.2",
     "virgil-crypto": "^3.1.0",
     "virgil-sdk": "^5.1.1"
   },
