@@ -1,6 +1,6 @@
 import express from 'express';
 import { cardManager, virgilCrypto } from '../services/virgil';
-import { VirgilPublicKey } from 'virgil-crypto/dist/types/VirgilCrypto';
+import { VirgilPublicKey } from 'virgil-crypto';
 
 export const validateAuth: express.RequestHandler = (req, res, next) => {
     if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {

@@ -14,7 +14,8 @@ export const generateTwilioJwt = (identity: string) => {
         config.TWILIO_API_SECRET
     );
 
-    token.identity = identity;
+    // tslint:disable-next-line:no-any
+    (token as any).identity = identity;
     token.addGrant(chatGrant);
 
     return token;

@@ -7,10 +7,12 @@ import {
 import { VirgilCrypto, VirgilAccessTokenSigner, VirgilCardCrypto } from "virgil-crypto";
 import config from '../../config.json';
 
-const cardCrypto = new VirgilCardCrypto();
+const virgilCrypto = new VirgilCrypto();
+
+const cardCrypto = new VirgilCardCrypto(virgilCrypto);
 const cardVerifier = new VirgilCardVerifier(cardCrypto);
 
-export const virgilCrypto = new VirgilCrypto();
+export { virgilCrypto };
 
 export const generator = new JwtGenerator({
     appId: config.APP_ID,
