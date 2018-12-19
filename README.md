@@ -119,7 +119,7 @@ const generator = new JwtGenerator({
 
 Then you need to provide an HTTP endpoint which will return the JWT with the user's identity as a JSON.
 
-For more details take a look at the [server.js](server.js) file.
+For more details take a look at the [virgilToken.js](api/virgilToken.js) file.
 
 ## Demo twilio backend
 
