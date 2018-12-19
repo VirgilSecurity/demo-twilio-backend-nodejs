@@ -1,8 +1,8 @@
-# Sample Backend for Node.js
+# Twilio Sample Backend for Node.js
 
-This repository contains a sample backend code that demonstrates how to generate a Virgil JWT using the [Javascript SDK](https://github.com/VirgilSecurity/virgil-sdk-javascript)
+This repository contains a sample backend code that demonstrates how to combine Virgil and Twilio JWT generation.
 
-> Do not use this authentication in production. Requests to a /virgil-jwt endpoint must be allowed for authenticated users. Use your application authorization strategy.
+> Do not use this authentication in production. Requests to a /virgil-jwt and /twilio-jwt endpoints must be allowed for authenticated users. Use your application authorization strategy.
 
 ## Prerequisites
 - [NodeJS from 6 to 11](https://nodejs.org/uk/)
@@ -130,6 +130,7 @@ If you looking for android and ios demos backend, you can find it here: https://
 This library is released under the [3-clause BSD License](LICENSE.md).
 
 ## Support
+
 Our developer support team is here to help you. Find out more information on our [Help Center](https://help.virgilsecurity.com/).
 
 You can find us on [Twitter](https://twitter.com/VirgilSecurity) or send us email support@VirgilSecurity.com.
