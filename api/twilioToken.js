@@ -1,5 +1,5 @@
-import { jwt } from "twilio";
-import config from "../config";
+const { jwt } = require("twilio");
+const config = require("./config");
 
 const AccessToken = jwt.AccessToken;
 const ChatGrant = AccessToken.ChatGrant;
@@ -14,10 +14,9 @@ const generateTwilioJwt = (req, res) => {
     config.twilio.apiSecret
   );
 
-  token.identity = identity;
+  token.identity = req.user.identity;
   token.addGrant(chatGrant);
-
   res.json({ twilioToken: token.toJwt() })
 }
 
-module.exports = { generateTwilioJwt }
+module.exports = { generateTwilioJwt };

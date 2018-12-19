@@ -10,6 +10,7 @@
     "cors": "^2.8.4",
     "dotenv": "^6.1.0",
     "express": "~4.16.0",
+    "twilio": "^3.25.0",
     "virgil-crypto": "^3.2.0",
     "virgil-sdk": "^5.1.1"
   },

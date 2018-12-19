@@ -19,7 +19,7 @@ async function authenticate(identity) {
 }
 
 // Log in as `alice`
-authenticate('alice').then(authToken => {
+authenticate('alice').then(async authToken => {
     showMessage('User with identity "alice" got authToken and start initializing e3kit');
     // E3kit will call this callback function and wait for the Promise resolve.
     // When it receives Virgil JWT it can do authorized requests to Virgil Cloud.
@@ -27,6 +27,10 @@ authenticate('alice').then(authToken => {
     E3kit.EThree.initialize(getVirgilToken)
         .then(e3kit => showMessage('e3kit ready for identity: ' + e3kit.identity));
 
+    const twilioToken = await getTwilioToken();
+    console.log('twilioToken', twilioToken);
+    Twilio.Chat.Client.create(twilioToken)
+        .then(twilioClient => showMessage('twilio chat client ready'));
     // This function makes authenticated request to GET /virgil-jwt endpoint
     // The token it returns serves to make authenticated requests to Virgil Cloud
     async function getVirgilToken() {
@@ -43,6 +47,22 @@ authenticate('alice').then(authToken => {
 
         // If request was successful we return Promise which will resolve with token string.
         return response.json().then(data => data.virgilToken);
+    }
+
+    async function getTwilioToken() {
+        const response = await fetch('http://localhost:3000/twilio-jwt', {
+            headers: {
+                // We use bearer authorization, but you can use any other mechanism.
+                // The point is only, this endpoint should be protected.
+                Authorization: `Bearer ${authToken}`,
+            }
+        })
+        if (!response.ok) {
+            throw new Error(`Error code: ${response.status} \nMessage: ${response.statusText}`);
+        }
+
+        // If request was successful we return Promise which will resolve with token string.
+        return response.json().then(data => data.twilioToken);
     }
 });
 

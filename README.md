@@ -5,7 +5,7 @@ This repository contains a sample backend code that demonstrates how to generate
 > Do not use this authentication in production. Requests to a /virgil-jwt endpoint must be allowed for authenticated users. Use your application authorization strategy.
 
 ## Prerequisites
-- [NodeJS from 6 to 11](https://nodejs.org/uk/) 
+- [NodeJS from 6 to 11](https://nodejs.org/uk/)
 
 ## Clone
 
@@ -15,11 +15,11 @@ Clone the repository from GitHub.
 $ git clone https://github.com/VirgilSecurity/sample-backend-nodejs.git
 ```
 
-## Get Virgil Credentials
+## Get Virgil and Twilio Credentials
 
 If you don't have an account yet, [sign up for one](https://dashboard.virgilsecurity.com/signup) using your e-mail.
 
-To generate a JWT the following values are required:
+To generate a Virgil JWT the following values are required:
 
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
@@ -27,7 +27,14 @@ To generate a JWT the following values are required:
 | API_KEY_ID               | ID of your API key. A unique string value that identifies your account in the Virgil Cloud. |
 | APP_ID                   | ID of your Virgil Application. |
 
-## Add Virgil Credentials to .env
+To generate a Twilio JWT the following values are required:
+
+| TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/console)        |
+| TWILIO_API_KEY                    | SID of Twilio Api Key. Used for authentication on twilio services. Generated with TWILIO_API_SECRET|
+| TWILIO_API_SECRET                 | Twilio API key secret: [generate one here](https://www.twilio.com/console/chat/runtime/api-keys) |
+| TWILIO_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
+
+## Add Credentials to .env
 
 - open the project folder
 - create a `.env` file
@@ -78,6 +85,21 @@ Response:
 }
 ```
 
+### /twilio-jwt endpoint
+Same as virgil token endpoint twilio endpoint should be protected and responds with `twilioToken`.
+
+```http
+GET https://localhost:3000/twilio-jwt HTTP/1.1
+Content-type: application/json;
+Authorization: Bearer <authToken>
+
+Response:
+
+{
+    "twilioToken": "string"
+}
+```
+
 ## Virgil JWT Generation
 To generate JWT, you need to use the `JwtGenerator` class from the SDK.
 
@@ -92,10 +114,10 @@ const generator = new JwtGenerator({
 });
 
 ```
+
 Then you need to provide an HTTP endpoint which will return the JWT with the user's identity as a JSON.
 
 For more details take a look at the [server.js](server.js) file.
-
 
 
 ## License
