@@ -32,8 +32,9 @@ authenticate('alice').then(async authToken => {
     const twilioToken = await getTwilioToken();
     Twilio.Chat.Client.create(twilioToken)
         .then(twilioClient => showMessage('twilio chat client ready for usage'));
+
     // This function makes authenticated request to GET /virgil-jwt endpoint
-    // The token it returns serves to make authenticated requests to Virgil Cloud
+    // The token serves to make authenticated requests to Virgil Cloud
     async function getVirgilToken() {
         const response = await fetch('http://localhost:3000/virgil-jwt', {
             headers: {
@@ -50,19 +51,17 @@ authenticate('alice').then(async authToken => {
         return response.json().then(data => data.virgilToken);
     }
 
+    // This function makes authenticated request to GET /twilio-jwt endpoint
+    // Returned token is used by twilio library
     async function getTwilioToken() {
         const response = await fetch('http://localhost:3000/twilio-jwt', {
             headers: {
-                // We use bearer authorization, but you can use any other mechanism.
-                // The point is only, this endpoint should be protected.
                 Authorization: `Bearer ${authToken}`,
             }
         })
         if (!response.ok) {
             throw new Error(`Error code: ${response.status} \nMessage: ${response.statusText}`);
         }
-
-        // If request was successful we return Promise which will resolve with token string.
         return response.json().then(data => data.twilioToken);
     }
 });

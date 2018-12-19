@@ -29,6 +29,8 @@ To generate a Virgil JWT the following values are required:
 
 To generate a Twilio JWT the following values are required:
 
+| Variable Name                     | Description                    |
+|-----------------------------------|--------------------------------|
 | TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/console)        |
 | TWILIO_API_KEY                    | SID of Twilio Api Key. Used for authentication on twilio services. Generated with TWILIO_API_SECRET|
 | TWILIO_API_SECRET                 | Twilio API key secret: [generate one here](https://www.twilio.com/console/chat/runtime/api-keys) |
@@ -119,6 +121,9 @@ Then you need to provide an HTTP endpoint which will return the JWT with the use
 
 For more details take a look at the [server.js](server.js) file.
 
+## Demo twilio backend
+
+If you looking for android and ios demos backend, you can find it here: https://github.com/VirgilSecurity/twilio-sample-backend-nodejs/tree/v5-demo-backend
 
 ## License
 
