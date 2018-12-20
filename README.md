@@ -23,9 +23,9 @@ To generate a Virgil JWT the following values are required:
 
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
-| VIRGIL_API_PRIVATE_KEY          | Private key of your Virgil API key that is used to sign the JWTs. |
-| VIRGIL_API_KEY_ID               | ID of your Virgil API key. A unique string value that identifies your account in the Virgil Cloud. |
-| VIRGIL_APP_ID                   | ID of your Virgil Application. |
+| API_PRIVATE_KEY          | Private key of your Virgil API key that is used to sign the JWTs. |
+| API_KEY_ID               | ID of your Virgil API key. A unique string value that identifies your account in the Virgil Cloud. |
+| APP_ID                   | ID of your Virgil Application. |
 
 To generate a Twilio JWT the following values are required:
 
