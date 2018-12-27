@@ -50,7 +50,7 @@ function subscribeOnMessage({ channel, identity, e3kit, twilioChat }) {
         displayMessage('encrypted message received', message.body);
         try {
             let decryptedMessage = await decryptMessage(e3kit, message);
-            displayMessage('message decrypted', decryptedMessage)
+            displayMessage(`${identity} decrypts message`, decryptedMessage)
         } catch (error) {
             console.log(error);
             displayMessage('decryption error', error)
