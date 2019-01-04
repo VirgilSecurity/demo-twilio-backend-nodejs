@@ -50,18 +50,6 @@ async function getTwilioToken(authToken) {
     return response.json().then(data => data.twilioToken);
 }
 
-async function initialize(identity) {
-    // E3kit will call this callback function and wait for the Promise resolve.
-    // When it receives Virgil JWT it can do authorized requests to Virgil Cloud.
-    // E3kit uses the identity encoded in the JWT as the current user's identity.
-    const authToken = await authenticate(identity);
-    const [e3kit, twilioChat] = await Promise.all([
-        E3kit.EThree.initialize(() => getVirgilToken(authToken)),
-        getTwilioToken(authToken).then(twilioToken => Twilio.Chat.Client.create(twilioToken))
-    ]);
-    return { e3kit, twilioChat };
-}
-
 async function createChannel(twilioChat, name) {
     return await twilioChat.createChannel({
         uniqueName: name,

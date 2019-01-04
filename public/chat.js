@@ -11,8 +11,12 @@ function loginOrRegister(prevIdentity) {
     if (prevIdentity === identity) {
         return loginOrRegister('identity shouldn\'t be the same!');
     }
-    return initialize(identity).then(clients => {
-        return clients.e3kit.register()
+    return authenticate(identity).then(authToken => Promise.all([
+        E3kit.EThree.initialize(() => getVirgilToken(authToken)),
+        getTwilioToken(authToken).then(twilioToken => Twilio.Chat.Client.create(twilioToken))
+    ]))
+    .then(([e3kit, twilioChat]) => {
+        return e3kit.register()
             .then(() => {
                 displayMessage('register', identity);
             })
@@ -22,9 +26,9 @@ function loginOrRegister(prevIdentity) {
                 } else {
                     console.log('oops, unexpected error:');
                     console.error(e);
-                    return clients.e3kit.rotatePrivateKey();
+                    return e3kit.rotatePrivateKey();
                 }
-            }).then(() => ({ identity, ...clients }))
+            }).then(() => ({ identity, e3kit, twilioChat }))
     });
 }
 
