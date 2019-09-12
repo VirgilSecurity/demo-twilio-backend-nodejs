@@ -2,8 +2,8 @@ require('dotenv').config();
 
 const requiredParams = [
     "APP_ID",
-    "API_PRIVATE_KEY",
-    "API_KEY_ID",
+    "APP_KEY",
+    "APP_KEY_ID",
     "TWILIO_ACCOUNT_SID",
     "TWILIO_API_SECRET",
     "TWILIO_API_KEY",
@@ -17,8 +17,8 @@ if (requiredParams.length > 0) {
 module.exports = {
     virgil: {
         appId: process.env.APP_ID,
-        apiPrivateKey: process.env.API_PRIVATE_KEY,
-        apiKeyId: process.env.API_KEY_ID
+        apiPrivateKey: process.env.APP_KEY,
+        apiKeyId: process.env.APP_KEY_ID
     },
     twilio: {
         accountSid: process.env.TWILIO_ACCOUNT_SID,
