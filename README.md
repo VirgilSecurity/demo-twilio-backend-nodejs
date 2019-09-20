@@ -15,34 +15,43 @@ Clone the repository from GitHub.
 $ git clone https://github.com/VirgilSecurity/twilio-sample-backend-nodejs.git
 ```
 
-## Get Virgil and Twilio Credentials
+## Get Virgil Credentials
 
-If you don't have an account yet, [sign up for one](https://dashboard.virgilsecurity.com/signup) using your email.
+If you don't have an account yet, [sign up for one](https://dashboard.virgilsecurity.com/signup) using your e-mail.
+
+### You can download a ready-to-use .env file
+
+1. Navigate to the Virgil Dashboard -> Your Application -> E3Kit Section.
+2. Generate `.env` in the **.env file** section.
+3. Download the generated file, paste it into the project root folder and rename it to `.env`.
+
+### Or you can add the parameters manually:
 
 To generate a Virgil JWT the following values are required:
 
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
-| APP_KEY                  | Private key of your Virgil APP key that is used to sign the JWTs. |
-| APP_KEY_ID               | ID of your Virgil APP key. A unique string value that identifies your account in the Virgil Cloud. |
 | APP_ID                   | ID of your Virgil Application. |
+| APP_KEY                  | Private key of your App that is used to sign the JWTs. |
+| APP_KEY_ID               | ID of your App Key. A unique string value that identifies your account in the Virgil Cloud. |
+
+1. Copy and rename `.env.example` to `.env`.
+2. Create Application in the Virgil Dashboard, copy its `APP_ID` to the `.env` file;
+3. Create App Key and save it to `APP_KEY` line in the `.env` file;
+4. Copy ID of the created key to `APP_KEY_ID` line in the `.env` file;
+
+## Get Twilio Credentials
 
 To generate a Twilio JWT the following values are required:
 
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
 | TWILIO_ACCOUNT_SID                | Your primary Twilio account identifier - [find this in the console here.](https://www.twilio.com/console)        |
-| TWILIO_API_KEY                    | SID of Twilio Api Key. Used for authentication on Twilio services. Generated with TWILIO_API_SECRET|
+| TWILIO_API_KEY_SID                    | SID of Twilio Api Key. Used for authentication on Twilio services. Generated with TWILIO_API_SECRET|
 | TWILIO_API_SECRET                 | Twilio API key secret: [generate one here](https://www.twilio.com/console/chat/runtime/api-keys) |
 | TWILIO_SERVICE_SID            | A service instance where all the data for our application is stored and scoped. [Generate one in the console here.](https://www.twilio.com/console/chat/dashboard) |
 
-## Add Credentials to .env
-
-- open the project folder
-- create a `.env` file
-- fill it with your account credentials (take a look at the `.env.example` file to find out how to setup your own `.env` file)
-- save the `.env` file
-
+Add this parameters to your `.env` file.
 
 ## Install Dependencies and Run the Server
 

@@ -6,7 +6,7 @@ const requiredParams = [
     "APP_KEY_ID",
     "TWILIO_ACCOUNT_SID",
     "TWILIO_API_SECRET",
-    "TWILIO_API_KEY",
+    "TWILIO_API_KEY_SID",
     "TWILIO_SERVICE_SID",
 ].filter(name => !process.env[name]);
 
@@ -17,13 +17,13 @@ if (requiredParams.length > 0) {
 module.exports = {
     virgil: {
         appId: process.env.APP_ID,
-        apiPrivateKey: process.env.APP_KEY,
-        apiKeyId: process.env.APP_KEY_ID
+        appKey: process.env.APP_KEY,
+        appKeyId: process.env.APP_KEY_ID
     },
     twilio: {
         accountSid: process.env.TWILIO_ACCOUNT_SID,
         apiSecret: process.env.TWILIO_API_SECRET,
-        apiKey: process.env.TWILIO_API_KEY,
+        apiKeySid: process.env.TWILIO_API_KEY_SID,
         serviceSid: process.env.TWILIO_SERVICE_SID,
     }
 };

@@ -6,8 +6,8 @@ const virgilCrypto = new VirgilCrypto();
 
 const generator = new JwtGenerator({
   appId: config.virgil.appId,
-  apiKeyId: config.virgil.apiKeyId,
-  apiKey: virgilCrypto.importPrivateKey(config.virgil.apiPrivateKey),
+  apiKeyId: config.virgil.appKeyId,
+  apiKey: virgilCrypto.importPrivateKey(config.virgil.appKey),
   accessTokenSigner: new VirgilAccessTokenSigner(virgilCrypto)
 });
 

@@ -10,7 +10,7 @@ const chatGrant = new ChatGrant({
 const generateTwilioJwt = (req, res) => {
   const token = new AccessToken(
     config.twilio.accountSid,
-    config.twilio.apiKey,
+    config.twilio.apiKeySid,
     config.twilio.apiSecret
   );
 
