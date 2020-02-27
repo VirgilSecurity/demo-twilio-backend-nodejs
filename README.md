@@ -130,10 +130,6 @@ Then you need to provide an HTTP endpoint which will return the JWT with the use
 
 For more details take a look at the [virgilToken.js](api/virgilToken.js) file.
 
-## Demo Twilio backend
-
-If you use Demo Twilio Chat [Android](https://github.com/VirgilSecurity/demo-twilio-chat-android) or [iOS](https://github.com/VirgilSecurity/chat-twilio-ios/tree/sample-v5) and you looking for its backend, you can find it here: https://github.com/VirgilSecurity/twilio-sample-backend-nodejs/tree/v5-demo-backend
-
 ## License
 
 This library is released under the [3-clause BSD License](LICENSE.md).
