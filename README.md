@@ -5,7 +5,7 @@ This repository contains a sample backend code that demonstrates how to combine 
 > Do not use this authentication in production. Requests to a /virgil-jwt and /twilio-jwt endpoints must be allowed for authenticated users. Use your application authorization strategy.
 
 ## Prerequisites
-- [NodeJS from 6 to 11](https://nodejs.org)
+- [NodeJS](https://nodejs.org) from 10 to 13
 
 ## Clone
 

@@ -3,7 +3,7 @@
 // This is a simplified solution without any real protection, so here you need use your
 // application authentication mechanism.
 async function authenticate(identity) {
-    const response = await fetch('http://localhost:3000/authenticate', {
+    const response = await fetch('/authenticate', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ async function authenticate(identity) {
 // This function makes authenticated request to GET /virgil-jwt endpoint
 // The token serves to make authenticated requests to Virgil Cloud
 async function getVirgilToken(authToken) {
-    const response = await fetch('http://localhost:3000/virgil-jwt', {
+    const response = await fetch('/virgil-jwt', {
         headers: {
             // We use bearer authorization, but you can use any other mechanism.
             // The point is only, this endpoint should be protected.
@@ -39,7 +39,7 @@ async function getVirgilToken(authToken) {
 // This function makes authenticated request to GET /twilio-jwt endpoint
 // Returned token is used by twilio library
 async function getTwilioToken(authToken) {
-    const response = await fetch('http://localhost:3000/twilio-jwt', {
+    const response = await fetch('/twilio-jwt', {
         headers: {
             Authorization: `Bearer ${authToken}`,
         }

@@ -1,17 +1,24 @@
 const { JwtGenerator } = require('virgil-sdk');
-const { VirgilCrypto, VirgilAccessTokenSigner } = require('virgil-crypto');
+const { initCrypto, VirgilCrypto, VirgilAccessTokenSigner } = require('virgil-crypto');
 const config = require('./config');
 
-const virgilCrypto = new VirgilCrypto();
+async function getJwtGenerator() {
+	await initCrypto();
 
-const generator = new JwtGenerator({
-  appId: config.virgil.appId,
-  apiKeyId: config.virgil.appKeyId,
-  apiKey: virgilCrypto.importPrivateKey(config.virgil.appKey),
-  accessTokenSigner: new VirgilAccessTokenSigner(virgilCrypto)
-});
+	const virgilCrypto = new VirgilCrypto();
 
-const generateVirgilJwt = (req, res) => {
+	return new JwtGenerator({
+		appId: config.virgil.appId,
+		apiKeyId: config.virgil.appKeyId,
+		apiKey: virgilCrypto.importPrivateKey(config.virgil.appKey),
+		accessTokenSigner: new VirgilAccessTokenSigner(virgilCrypto)
+	});
+}
+
+const generatorPromise = getJwtGenerator();
+
+const generateVirgilJwt = async (req, res) => {
+	const generator = await generatorPromise;
   const virgilJwtToken = generator.generateToken(req.user.identity);
 
   res.json({ virgilToken: virgilJwtToken.toString() });
