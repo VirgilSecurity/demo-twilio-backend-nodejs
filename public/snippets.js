@@ -75,13 +75,13 @@ async function getChannel(twilioChat, name) {
 }
 
 async function decryptMessage(e3kit, message) {
-    const authorPublicKey = await e3kit.lookupPublicKeys(message.author);
-    return await e3kit.decrypt(message.body, authorPublicKey);
+    const cards = await e3kit.findUsers(message.author);
+    return await e3kit.authDecrypt(message.body, cards);
 }
 
 async function sendMessage(e3kit, channel, message) {
     const membersIdentities = await channel.getMembers().then(members => members.map(member => member.identity));
-    const publicKeys = await e3kit.lookupPublicKeys(membersIdentities);
-    const encryptedMessage = await e3kit.encrypt(message, publicKeys);
+    const cards = await e3kit.findUsers(membersIdentities);
+    const encryptedMessage = await e3kit.authEncrypt(message, cards);
     return channel.sendMessage(encryptedMessage);
 }
