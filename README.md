@@ -64,6 +64,8 @@ $ npm run start
 ```
 Now, use your client code to make a request to get a JWT from the sample backend that is working on http://localhost:3000.
 
+Along with the backend we provide a demonstration of a simple client chat interacting with Virgil API, which you can see if you navigate to http://localhost:3000 at your browser. The sample chat code is located in the the [`public`](https://github.com/VirgilSecurity/demo-twilio-backend-nodejs/tree/master/public) directory.
+
 ## Specification
 
 ### /authenticate endpoint
@@ -132,10 +134,6 @@ const generator = new JwtGenerator({
 Then you need to provide an HTTP endpoint which will return the JWT with the user's identity as a JSON.
 
 For more details take a look at the [virgilToken.js](api/virgilToken.js) file.
-
-## Demo Chat
-
-To see how a client application can interact with Virgil API, take a look at the [`public`](https://github.com/VirgilSecurity/demo-twilio-backend-nodejs/tree/master/public) directory, which contains a simple E3Kit-based chat that uses this demo backend. 
 
 ## License
 
