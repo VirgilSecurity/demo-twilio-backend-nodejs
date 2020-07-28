@@ -5,9 +5,12 @@ This repository contains a sample backend code that demonstrates how to combine 
 > Do not use this authentication in production. Requests to a /virgil-jwt and /twilio-jwt endpoints must be allowed for authenticated users. Use your application authorization strategy.
 
 ## Prerequisites
+
 - [NodeJS](https://nodejs.org) from 10 to 13
 
-## Clone
+## Set up and run demo
+
+### Clone
 
 Clone the repository from GitHub.
 
@@ -15,17 +18,17 @@ Clone the repository from GitHub.
 $ git clone https://github.com/VirgilSecurity/twilio-sample-backend-nodejs.git
 ```
 
-## Get Virgil Credentials
+### Get Virgil Credentials
 
-If you don't have an account yet, [sign up for one](https://dashboard.virgilsecurity.com/signup) using your e-mail.
+If you don't have an account yet, [sign up for one](https://dashboard.virgilsecurity.com/signup) using your e-mail. 
 
-### You can download a ready-to-use .env file
+#### You can download a ready-to-use .env file
 
 1. Navigate to the Virgil Dashboard -> Your Application -> E3Kit Section.
 2. Generate `.env` in the **.env file** section.
 3. Download the generated file, paste it into the project root folder and rename it to `.env`.
 
-### Or you can add the parameters manually:
+#### Or you can add the parameters manually:
 
 To generate a Virgil JWT the following values are required:
 
@@ -37,10 +40,10 @@ To generate a Virgil JWT the following values are required:
 
 1. Copy and rename `.env.example` to `.env`.
 2. Create Application in the Virgil Dashboard, copy its `APP_ID` to the `.env` file;
-3. Create App Key and save it to `APP_KEY` line in the `.env` file;
+3. Create App Key and save its private key value to `APP_KEY` line in the `.env` file;
 4. Copy ID of the created key to `APP_KEY_ID` line in the `.env` file;
 
-## Get Twilio Credentials
+### Get Twilio Credentials
 
 To generate a Twilio JWT the following values are required:
 
@@ -53,7 +56,7 @@ To generate a Twilio JWT the following values are required:
 
 Add this parameters to your `.env` file.
 
-## Install Dependencies and Run the Server
+### Install Dependencies and Run the Server
 
 ```
 $ npm install
@@ -129,6 +132,10 @@ const generator = new JwtGenerator({
 Then you need to provide an HTTP endpoint which will return the JWT with the user's identity as a JSON.
 
 For more details take a look at the [virgilToken.js](api/virgilToken.js) file.
+
+## Demo Chat
+
+To see how a client application can interact with Virgil API, take a look at the [`public`](https://github.com/VirgilSecurity/demo-twilio-backend-nodejs/tree/master/public) directory, which contains a simple E3Kit-based chat that uses this demo backend. 
 
 ## License
 
