@@ -66,6 +66,8 @@ Now, use your client code to make a request to get a JWT from the sample backend
 
 Along with the backend we provide a demonstration of a simple client chat interacting with Virgil API, which you can see if you navigate to http://localhost:3000 at your browser. The sample chat code is located in the the [`public`](https://github.com/VirgilSecurity/demo-twilio-backend-nodejs/tree/master/public) directory.
 
+<img  src="img/demo.png" alt="Demo screenshot">
+
 ## Specification
 
 ### /authenticate endpoint
